@@ -140,7 +140,6 @@ body::after {
 }
 
 .content {
-
   position: relative;
   z-index: 1;
   padding: 20px;
@@ -215,4 +214,103 @@ body::after {
   75% {
     transform: translateY(-8px) rotate(-1deg);
   }
+}
+
+
+.interactive-element {
+  position: relative;
+  z-index: 10;
+}
+
+button {
+  position: relative;
+  z-index: 10;
+  cursor: pointer;
+}
+
+a, button, input, select, textarea {
+  position: relative;
+  z-index: 10;
+}
+
+.boxes {
+  position: relative;
+  z-index: 10;
+  cursor: pointer
+}
+
+/* Add this to your global CSS file (e.g., globals.css) */
+
+@keyframes rocket-launch {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+  25% {
+    transform: translateY(-10px) rotate(2deg);
+  }
+  50% {
+    transform: translateY(-20px) rotate(-2deg);
+  }
+  75% {
+    transform: translateY(-10px) rotate(2deg);
+  }
+  100% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+@keyframes exhaust-glow {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+}
+
+@keyframes pulse-light {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(1.5);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.6);
+  }
+}
+
+.animate-rocket-launch {
+  animation: rocket-launch 4s ease-in-out infinite;
+}
+
+.animate-exhaust-glow {
+  animation: exhaust-glow 2s ease-out infinite;
+}
+
+.animate-pulse-light {
+  animation: pulse-light 3s ease-in-out infinite;
+}
+
+/* Ensure Inter font is applied globally if not already */
+body {
+  font-family: 'Inter', sans-serif;
+}
+
+/* Add this to hide white backgrounds in Lottie animations */
+.lottie-animation svg rect[fill="#ffffff"],
+.lottie-animation svg rect[fill="white"],
+.lottie-animation svg rect[fill="#fff"] {
+  fill: transparent !important;
+}
+
+.lottie-animation canvas {
+  background: transparent !important;
 }

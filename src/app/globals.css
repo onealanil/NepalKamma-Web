@@ -1,51 +1,51 @@
 @import "tailwindcss";
 
 :root {
-  /* Light theme colors */
+  /* Light theme colors - Updated with your green palette */
   --background: #ffffff;
   --foreground: #0a0a0a;
   --card: #ffffff;
   --card-foreground: #0a0a0a;
   --popover: #ffffff;
   --popover-foreground: #0a0a0a;
-  --primary: #18181b;
-  --primary-foreground: #fafafa;
-  --secondary: #f4f4f5;
-  --secondary-foreground: #18181b;
-  --muted: #f4f4f5;
-  --muted-foreground: #71717a;
-  --accent: #f4f4f5;
-  --accent-foreground: #18181b;
+  --primary: #618264;
+  --primary-foreground: #ffffff;
+  --secondary: #D0E7D2;
+  --secondary-foreground: #618264;
+  --muted: #B0D9B1;
+  --muted-foreground: #618264;
+  --accent: #79AC78;
+  --accent-foreground: #ffffff;
   --destructive: #ef4444;
   --destructive-foreground: #fafafa;
-  --border: #e4e4e7;
-  --input: #e4e4e7;
-  --ring: #18181b;
+  --border: #B0D9B1;
+  --input: #D0E7D2;
+  --ring: #618264;
   --radius: 0.5rem;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    /* Dark theme colors */
+    /* Dark theme colors - Adapted for your green palette */
     --background: #0a0a0a;
-    --foreground: #fafafa;
-    --card: #0a0a0a;
-    --card-foreground: #fafafa;
-    --popover: #0a0a0a;
-    --popover-foreground: #fafafa;
-    --primary: #fafafa;
-    --primary-foreground: #18181b;
-    --secondary: #27272a;
-    --secondary-foreground: #fafafa;
-    --muted: #27272a;
-    --muted-foreground: #a1a1aa;
-    --accent: #27272a;
-    --accent-foreground: #fafafa;
+    --foreground: #D0E7D2;
+    --card: #1a1a1a;
+    --card-foreground: #D0E7D2;
+    --popover: #1a1a1a;
+    --popover-foreground: #D0E7D2;
+    --primary: #32b327;
+    --primary-foreground: #68b560;
+    --secondary: #2a2a2a;
+    --secondary-foreground: #B0D9B1;
+    --muted: #2a2a2a;
+    --muted-foreground: #79AC78;
+    --accent: #618264;
+    --accent-foreground: #D0E7D2;
     --destructive: #7f1d1d;
     --destructive-foreground: #fafafa;
-    --border: #27272a;
-    --input: #27272a;
-    --ring: #d4d4d8;
+    --border: #618264;
+    --input: #2a2a2a;
+    --ring: #79AC78;
   }
 }
 
@@ -95,7 +95,7 @@ body {
 body {
   position: relative;
   font-family: Arial, sans-serif;
-  background-color: #f8f7f4;
+  background-color: #ffffff;
   color: #333;
   min-height: 100vh;
 }
@@ -107,14 +107,40 @@ body::before {
   left: 0;
   width: 100%;
   height: 100%;
-  background-image: url('../../public/background/grain.jpg');
-  opacity: 0.2;
+  background-image: url('/background/grain.svg');
+  background-size: 100px 100px;
+  opacity: 0.6;
   pointer-events: none;
-  z-index: -1;
-  animation: grain 3s steps(1) infinite;
+  z-index: 1;
+  animation: grain 2s infinite;
+}
+
+body::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 150vmax;
+  height: 150vmax;
+  background: radial-gradient(circle, rgba(0, 255, 0, 0.20) 0%, rgba(0, 255, 0, 0) 60%);
+  transform-origin: center center;
+  animation: rotate 40s linear infinite;
+  z-index: 0;
+  transform: translate(-50%, -50%);
+}
+
+@keyframes rotate {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
 }
 
 .content {
+
   position: relative;
   z-index: 1;
   padding: 20px;
@@ -131,38 +157,62 @@ body::before {
   }
 
   10% {
-    transform: translate(-0.5%, -0.5%);
+    transform: translate(-1px, -1px);
   }
 
   20% {
-    transform: translate(0.5%, 0.5%);
+    transform: translate(1px, 1px);
   }
 
   30% {
-    transform: translate(-1.5%, 1.5%);
+    transform: translate(-2px, 1px);
   }
 
   40% {
-    transform: translate(1.5%, -1.5%);
+    transform: translate(2px, -1px);
   }
 
   50% {
-    transform: translate(-0.5%, 0.5%);
+    transform: translate(-1px, 2px);
   }
 
   60% {
-    transform: translate(0.5%, -0.5%);
+    transform: translate(1px, -2px);
   }
 
   70% {
-    transform: translate(-0.5%, -0.5%);
+    transform: translate(-2px, -1px);
   }
 
   80% {
-    transform: translate(1.5%, 1.5%);
+    transform: translate(2px, 1px);
   }
 
   90% {
-    transform: translate(-0.5%, 1.5%);
+    transform: translate(-1px, -2px);
+  }
+}
+
+.floating-animation {
+  animation: floating 4s ease-in-out infinite;
+}
+
+@keyframes floating {
+
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+
+  25% {
+    transform: translateY(-8px) rotate(1deg);
+  }
+
+  50% {
+    transform: translateY(-12px) rotate(0deg);
+  }
+
+  75% {
+    transform: translateY(-8px) rotate(-1deg);
   }
 }

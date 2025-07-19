@@ -1,0 +1,13 @@
+<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'>
+  <defs>
+    <filter id='noise' x='0' y='0' width='100%' height='100%'>
+      <feTurbulence type='fractalNoise' baseFrequency='2.5' numOctaves='6' stitchTiles='stitch'/>
+      <feColorMatrix type='matrix' values='0 0 0 0 0.2, 0 0 0 0 0.2, 0 0 0 0 0.2, 0 0 0 0.8 0'/>
+    </filter>
+    <pattern id='dots' x='0' y='0' width='4' height='4' patternUnits='userSpaceOnUse'>
+      <circle cx='2' cy='2' r='0.5' fill='rgba(0,0,0,0.15)'/>
+    </pattern>
+  </defs>
+  <rect width='100%' height='100%' filter='url(#noise)' opacity='1'/>
+  <rect width='100%' height='100%' fill='url(#dots)' opacity='0.6'/>
+</svg>

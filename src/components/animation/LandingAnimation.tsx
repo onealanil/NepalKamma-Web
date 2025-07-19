@@ -1,15 +1,15 @@
 "use client";
 
-import { useLottie } from "lottie-react";
+import { useLottie, LottieOptions } from "lottie-react";
 import { useEffect, useState } from "react";
 
 const LandingAnimation = () => {
-    const [animationData, setAnimationData] = useState(null);
+    const [animationData, setAnimationData] = useState<LottieOptions['animationData']>(null);
 
     useEffect(() => {
         // Dynamically import the animation data
         import("../../../public/animation/rocket.json")
-            .then((data: any) => {
+            .then((data) => {
                 setAnimationData(data.default);
             })
             .catch((error) => {

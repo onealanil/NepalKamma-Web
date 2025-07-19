@@ -1,4 +1,4 @@
-import LandingAnimation from "@/components/animation/LandingAnimation";
+"use client";
 
 const features = [
   {

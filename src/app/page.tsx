@@ -1,9 +1,17 @@
-import Image from "next/image";
+import Hero from '@/components/landing/Hero';
+import ValueProps from '@/components/landing/ValueProps';
+import HowItWorks from '@/components/landing/HowItWorks';
+import FeaturedJobs from '@/components/landing/FeaturedJobs';
+import Testimonials from '@/components/landing/Testimonials';
 
-export default function Home() {
+export default function LandingPage() {
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <span className="text-color1">Nepal Kamma</span>
-    </div>
+    <main>
+      <Hero />
+      <ValueProps />
+      <HowItWorks />
+      <FeaturedJobs />
+      <Testimonials />
+    </main>
   );
 }

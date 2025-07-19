@@ -14,7 +14,7 @@ export default function Hero() {
                 , and in Every Story, We Find <span className='text-primary'>Purpose</span>
               </h1>
               <p className="textmd- md:text-xl text-gray-600 mb-8 max-w-2xl mx-auto lg:mx-0">
-                Nepal's first local gig marketplace. Find quick jobs near you or hire skilled locals for everyday tasks. From fan repairs to home services - earn extra income or get things done with trusted neighbors.
+                Nepal&apos;s first local gig marketplace. Find quick jobs near you or hire skilled locals for everyday tasks. From fan repairs to home services - earn extra income or get things done with trusted neighbors.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                 <button className="bg-primary cursor-pointer hover:bg-accent text-white px-8 py-4 rounded-lg font-semibold text-lg transition-all duration-300 transform hover:scale-105 shadow-lg">

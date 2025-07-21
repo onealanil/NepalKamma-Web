@@ -1,7 +1,6 @@
 @import "tailwindcss";
 
-:root {
-  /* Light theme colors - Updated with your green palette */
+/* :root {
   --background: #ffffff;
   --foreground: #0a0a0a;
   --card: #ffffff;
@@ -22,32 +21,32 @@
   --input: #D0E7D2;
   --ring: #618264;
   --radius: 0.5rem;
+} */
+
+/* @media (prefers-color-scheme: dark) { */
+:root {
+  --background: #0a0a0a;
+  --foreground: #D0E7D2;
+  --card: #1a1a1a;
+  --card-foreground: #D0E7D2;
+  --popover: #1a1a1a;
+  --popover-foreground: #D0E7D2;
+  --primary: #32b327;
+  --primary-foreground: #68b560;
+  --secondary: #2a2a2a;
+  --secondary-foreground: #B0D9B1;
+  --muted: #2a2a2a;
+  --muted-foreground: #79AC78;
+  --accent: #618264;
+  --accent-foreground: #D0E7D2;
+  --destructive: #7f1d1d;
+  --destructive-foreground: #fafafa;
+  --border: #618264;
+  --input: #2a2a2a;
+  --ring: #79AC78;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    /* Dark theme colors - Adapted for your green palette */
-    --background: #0a0a0a;
-    --foreground: #D0E7D2;
-    --card: #1a1a1a;
-    --card-foreground: #D0E7D2;
-    --popover: #1a1a1a;
-    --popover-foreground: #D0E7D2;
-    --primary: #32b327;
-    --primary-foreground: #68b560;
-    --secondary: #2a2a2a;
-    --secondary-foreground: #B0D9B1;
-    --muted: #2a2a2a;
-    --muted-foreground: #79AC78;
-    --accent: #618264;
-    --accent-foreground: #D0E7D2;
-    --destructive: #7f1d1d;
-    --destructive-foreground: #fafafa;
-    --border: #618264;
-    --input: #2a2a2a;
-    --ring: #79AC78;
-  }
-}
+/* } */
 
 @theme inline {
   --color-background: var(--background);
@@ -97,7 +96,7 @@ body {
   font-family: Arial, sans-serif;
   background-color: #ffffff;
   color: #333;
-  min-height: 100vh;
+  height: 100vh;
 }
 
 body::before {
@@ -117,7 +116,7 @@ body::before {
 
 body::after {
   content: "";
-  position: absolute;
+  position: fixed;
   top: 50%;
   left: 50%;
   width: 150vmax;
@@ -127,6 +126,7 @@ body::after {
   animation: rotate 40s linear infinite;
   z-index: 0;
   transform: translate(-50%, -50%);
+  pointer-events: none;
 }
 
 @keyframes rotate {
@@ -228,7 +228,11 @@ button {
   cursor: pointer;
 }
 
-a, button, input, select, textarea {
+a,
+button,
+input,
+select,
+textarea {
   position: relative;
   z-index: 10;
 }
@@ -246,15 +250,19 @@ a, button, input, select, textarea {
     transform: translateY(0) rotate(0deg);
     opacity: 1;
   }
+
   25% {
     transform: translateY(-10px) rotate(2deg);
   }
+
   50% {
     transform: translateY(-20px) rotate(-2deg);
   }
+
   75% {
     transform: translateY(-10px) rotate(2deg);
   }
+
   100% {
     transform: translateY(0) rotate(0deg);
     opacity: 1;
@@ -266,10 +274,12 @@ a, button, input, select, textarea {
     opacity: 0;
     transform: scale(0.5);
   }
+
   50% {
     opacity: 1;
     transform: scale(1);
   }
+
   100% {
     opacity: 0;
     transform: scale(0.5);
@@ -277,10 +287,13 @@ a, button, input, select, textarea {
 }
 
 @keyframes pulse-light {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 0.3;
     transform: scale(1.5);
   }
+
   50% {
     opacity: 0.6;
     transform: scale(1.6);

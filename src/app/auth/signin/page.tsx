@@ -2,13 +2,11 @@
 'use client'
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { LoginFormData } from '@/types/auth';
 
 export default function SignIn() {
-    const router = useRouter();
     const [formData, setFormData] = useState<LoginFormData>({
         email: '',
         password: ''
@@ -17,24 +15,24 @@ export default function SignIn() {
     const [isLoading, setIsLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
 
-    const validateForm = (): boolean => {
-        const newErrors: Partial<LoginFormData> = {};
+    // const validateForm = (): boolean => {
+    //     const newErrors: Partial<LoginFormData> = {};
 
-        if (!formData.email) {
-            newErrors.email = 'Email is required';
-        } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-            newErrors.email = 'Invalid email';
-        }
+    //     if (!formData.email) {
+    //         newErrors.email = 'Email is required';
+    //     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+    //         newErrors.email = 'Invalid email';
+    //     }
 
-        if (!formData.password) {
-            newErrors.password = 'Password is required';
-        } else if (formData.password.length < 8) {
-            newErrors.password = 'Password must be at least 8 characters';
-        }
+    //     if (!formData.password) {
+    //         newErrors.password = 'Password is required';
+    //     } else if (formData.password.length < 8) {
+    //         newErrors.password = 'Password must be at least 8 characters';
+    //     }
 
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
-    };
+    //     setErrors(newErrors);
+    //     return Object.keys(newErrors).length === 0;
+    // };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -154,7 +152,7 @@ export default function SignIn() {
 
                     {/* Sign Up Link */}
                     <div className="text-center">
-                        <span className="text-gray-600">Don't have an account? </span>
+                        <span className="text-gray-600">Don&apost have an account? </span>
                         <Link href="/auth/signup" className="text-primary font-semibold hover:underline">
                             Sign up
                         </Link>

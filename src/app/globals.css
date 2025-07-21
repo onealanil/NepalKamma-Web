@@ -1,7 +1,6 @@
 @import "tailwindcss";
 
 :root {
-  /* Light theme colors - Updated with your green palette */
   --background: #ffffff;
   --foreground: #0a0a0a;
   --card: #ffffff;
@@ -24,9 +23,9 @@
   --radius: 0.5rem;
 }
 
-@media (prefers-color-scheme: dark) {
+/* Remove the dark mode media query to prevent automatic switching */
+/* @media (prefers-color-scheme: dark) {
   :root {
-    /* Dark theme colors - Adapted for your green palette */
     --background: #0a0a0a;
     --foreground: #D0E7D2;
     --card: #1a1a1a;
@@ -47,7 +46,7 @@
     --input: #2a2a2a;
     --ring: #79AC78;
   }
-}
+} */
 
 @theme inline {
   --color-background: var(--background);
@@ -95,9 +94,9 @@ body {
 body {
   position: relative;
   font-family: Arial, sans-serif;
-  background-color: #ffffff;
-  color: #333;
-  min-height: 100vh;
+  background-color: #ffffff !important;
+  color: #333 !important;
+  height: 100vh;
 }
 
 body::before {
@@ -117,7 +116,7 @@ body::before {
 
 body::after {
   content: "";
-  position: absolute;
+  position: fixed;
   top: 50%;
   left: 50%;
   width: 150vmax;
@@ -127,6 +126,7 @@ body::after {
   animation: rotate 40s linear infinite;
   z-index: 0;
   transform: translate(-50%, -50%);
+  pointer-events: none;
 }
 
 @keyframes rotate {

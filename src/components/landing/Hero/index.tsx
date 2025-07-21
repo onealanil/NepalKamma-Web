@@ -2,6 +2,11 @@
 
 import Image from 'next/image';
 
+
+/**
+ * @function Hero
+ * @returns The hero section of the landing page. It includes a floating animation for the title, a call to action, and a unique image.
+ */
 export default function Hero() {
   return (
     <section className="relative min-h-screen pt-24 flex items-center justify-center">

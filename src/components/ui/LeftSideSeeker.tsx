@@ -1,5 +1,6 @@
 "use client";
 
+import Link from 'next/link';
 import { useState } from 'react';
 
 export interface User {
@@ -38,22 +39,22 @@ function LeftSideSeeker() {
                     <div className="bg-white rounded-xl p-6 shadow-sm">
                         <h3 className="font-bold text-gray-900 mb-4">Quick Actions</h3>
                         <div className="space-y-3">
-                            <button className="w-full flex items-center gap-3 p-3 text-left hover:bg-gray-50 rounded-lg transition-colors">
+                            <Link href="/dashboard/job-seeker/completed-jobs" className="w-full flex items-center gap-3 p-3 text-left hover:bg-gray-50 rounded-lg transition-colors">
                                 <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
                                     <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                     </svg>
                                 </div>
-                                <span className="text-gray-700">My Applications</span>
-                            </button>
-                            <button className="w-full flex items-center gap-3 p-3 text-left hover:bg-gray-50 rounded-lg transition-colors">
+                                <span className="text-gray-700">Completed Jobs</span>
+                            </Link>
+                            <Link href="/dashboard/job-seeker/saved-jobs" className="w-full flex items-center gap-3 p-3 text-left hover:bg-gray-50 rounded-lg transition-colors">
                                 <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
                                     <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
                                     </svg>
                                 </div>
                                 <span className="text-gray-700">Saved Jobs</span>
-                            </button>
+                            </Link>
                             <button className="w-full flex items-center gap-3 p-3 text-left hover:bg-gray-50 rounded-lg transition-colors">
                                 <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
                                     <svg className="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -61,6 +62,22 @@ function LeftSideSeeker() {
                                     </svg>
                                 </div>
                                 <span className="text-gray-700">Earnings</span>
+                            </button>
+                            <button className="w-full flex items-center gap-3 p-3 text-left hover:bg-gray-50 rounded-lg transition-colors">
+                                <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                                    <svg className="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                                    </svg>
+                                </div>
+                                <span className="text-gray-700">Review</span>
+                            </button>
+                            <button className="w-full flex items-center gap-3 p-3 text-left hover:bg-gray-50 rounded-lg transition-colors">
+                                <div className="w-8 h-8 bg-yellow-100 rounded-lg flex items-center justify-center">
+                                    <svg className="w-4 h-4 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-5 5v-5zM11 19H6a2 2 0 01-2-2V7a2 2 0 012-2h5m5 0v6m0 0l3-3m-3 3l-3-3" />
+                                    </svg>
+                                </div>
+                                <span className="text-gray-700">Notification</span>
                             </button>
                         </div>
                     </div>

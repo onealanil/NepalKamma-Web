@@ -185,7 +185,7 @@ export default function ProfilePageSeeker() {
                         <p className="text-gray-700 leading-relaxed mb-4">{user.about_me}</p>
                     ) : (
                         <p className="text-red-500 text-center py-4 font-medium">
-                            Complete your profile to unlock more job opportunities and increase your chances of getting hired. Click on "Edit Profile" now to get started!
+                            Complete your profile to unlock more job opportunities and increase your chances of getting hired. Click on &quot;Edit Profile&quot; now to get started!
                         </p>
                     )}
                     
@@ -210,7 +210,7 @@ export default function ProfilePageSeeker() {
                         </div>
                     ) : (
                         <p className="text-red-500 text-center py-4 font-medium">
-                            Skills are very important to get a job recommendation. Just click on the "Edit Profile" button to add your skills.
+                            Skills are very important to get a job recommendation. Just click on the &quot;Edit Profile&quot; button to add your skills.
                         </p>
                     )}
                 </div>

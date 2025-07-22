@@ -4,27 +4,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import LeftSideProvider from '@/components/ui/LeftSideProvider';
-
-interface User {
-    id: string;
-    name: string;
-    email: string;
-    avatar?: string;
-}
-
-interface Gig {
-    _id: string;
-    title: string;
-    description: string;
-    location: string;
-    salary: number;
-    createdAt: string;
-    category: string;
-    urgency: 'low' | 'medium' | 'high';
-    distance?: string;
-    applicants?: number;
-    status: 'active' | 'paused' | 'completed';
-}
+import { Gig, User } from '@/types/job-provider/home';
 
 function JobProviderDashboard() {
     const router = useRouter();
@@ -150,8 +130,8 @@ function JobProviderDashboard() {
                                 <button
                                     onClick={setPopularTrueFunction}
                                     className={`flex-1 py-3 px-4 text-center font-bold text-sm rounded-lg transition-all ${isPopular
-                                            ? 'bg-primary text-white shadow-sm border-b-2 border-primary'
-                                            : 'text-gray-500 hover:text-gray-900'
+                                        ? 'bg-primary text-white shadow-sm border-b-2 border-primary'
+                                        : 'text-gray-500 hover:text-gray-900'
                                         }`}
                                 >
                                     Browse Gigs
@@ -159,8 +139,8 @@ function JobProviderDashboard() {
                                 <button
                                     onClick={setPopularFalseFunction}
                                     className={`flex-1 py-3 px-4 text-center font-bold text-sm rounded-lg transition-all ${!isPopular
-                                            ? 'bg-primary text-white shadow-sm border-b-2 border-primary'
-                                            : 'text-gray-500 hover:text-gray-900'
+                                        ? 'bg-primary text-white shadow-sm border-b-2 border-primary'
+                                        : 'text-gray-500 hover:text-gray-900'
                                         }`}
                                 >
                                     Near by Gigs
@@ -223,8 +203,8 @@ function JobProviderDashboard() {
                                                                 <h3 className="font-bold text-gray-900 text-lg">{gig.title}</h3>
                                                                 <div className="flex items-center gap-2">
                                                                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${gig.urgency === 'high' ? 'bg-red-100 text-red-700' :
-                                                                            gig.urgency === 'medium' ? 'bg-yellow-100 text-yellow-700' :
-                                                                                'bg-green-100 text-green-700'
+                                                                        gig.urgency === 'medium' ? 'bg-yellow-100 text-yellow-700' :
+                                                                            'bg-green-100 text-green-700'
                                                                         }`}>
                                                                         {gig.urgency}
                                                                     </span>

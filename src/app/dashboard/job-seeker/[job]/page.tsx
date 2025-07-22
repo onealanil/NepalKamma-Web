@@ -96,10 +96,16 @@ export default function SingleJobPage() {
     });
 
     useEffect(() => {
+        // Handle missing jobId
+        if (!jobId) {
+            setIsLoading(false);
+            return;
+        }
+
         // Mock data loading
         setTimeout(() => {
             const mockJobData: JobData = {
-                _id: jobId || '1',
+                _id: jobId,
                 title: 'Full Stack Web Developer Needed',
                 description: `<p>We are looking for an experienced full stack developer to build a modern web application. The project involves creating a responsive frontend using React and a robust backend with Node.js.</p>
                 <p><strong>Requirements:</strong></p>
@@ -199,11 +205,17 @@ export default function SingleJobPage() {
         );
     }
 
-    if (!jobData) {
+    if (!jobId || !jobData) {
         return (
             <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
                 <div className="text-center">
-                    <p className="text-red-500">Job not found</p>
+                    <p className="text-red-500 mb-4">Job not found</p>
+                    <button
+                        onClick={() => router.push('/dashboard/job-seeker/explore')}
+                        className="bg-primary text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors"
+                    >
+                        Browse Jobs
+                    </button>
                 </div>
             </div>
         );

@@ -25,10 +25,14 @@ interface ConversationData {
     lastMessage?: Message[];
 }
 
+interface OnlineUser {
+    userId: string;
+}
+
 export default function ChatPageSeeker() {
     const router = useRouter();
     const [conversations, setConversations] = useState<ConversationData[]>([]);
-    const [onlineUsers, setOnlineUsers] = useState<any[]>([]);
+    const [onlineUsers, setOnlineUsers] = useState<OnlineUser[]>([]);
     const [user, setUser] = useState<User>({ _id: '1', username: 'John Doe' });
     const [isLoading, setIsLoading] = useState(false);
 

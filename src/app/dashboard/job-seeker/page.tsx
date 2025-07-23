@@ -289,71 +289,7 @@ function JobSeekerDashboard() {
                                                         </button>
                                                     </div>
                                                 </div>
-                                            ))} {/* Job Modal */}
-                                            {showJobModal && selectedJob && (
-                                                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end z-50">
-                                                    <div className="bg-white w-full rounded-t-3xl p-6 max-h-[85vh] overflow-y-auto">
-                                                        <div className="flex justify-between items-center mb-6">
-                                                            <h2 className="text-2xl font-bold text-gray-900">{selectedJob.title}</h2>
-                                                            <button
-                                                                onClick={() => setShowJobModal(false)}
-                                                                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-                                                            >
-                                                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                                                </svg>
-                                                            </button>
-                                                        </div>
-
-                                                        <div className="space-y-4 mb-6">
-                                                            <div className="flex items-center gap-2">
-                                                                {selectedJob.category && (
-                                                                    <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-medium">
-                                                                        {selectedJob.category}
-                                                                    </span>
-                                                                )}
-                                                                {selectedJob.urgency && (
-                                                                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${getUrgencyColor(selectedJob.urgency)}`}>
-                                                                        {selectedJob.urgency} priority
-                                                                    </span>
-                                                                )}
-                                                            </div>
-
-                                                            <p className="text-gray-700 leading-relaxed">{selectedJob.description}</p>
-
-                                                            <div className="bg-gray-50 rounded-xl p-4">
-                                                                <div className="flex justify-between items-center mb-2">
-                                                                    <span className="text-gray-600 flex items-center gap-1">
-                                                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                                                        </svg>
-                                                                        {selectedJob.location}
-                                                                    </span>
-                                                                    {selectedJob.distance && (
-                                                                        <span className="text-sm text-gray-500">{selectedJob.distance} away</span>
-                                                                    )}
-                                                                </div>
-                                                                <div className="flex justify-between items-center">
-                                                                    <span className="text-gray-600">Payment</span>
-                                                                    <span className="text-2xl font-bold text-primary">₹{selectedJob.salary}</span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-                                                        <div className="flex gap-3">
-                                                            <button
-                                                                onClick={() => setShowJobModal(false)}
-                                                                className="flex-1 bg-gray-100 text-gray-700 py-4 rounded-xl font-bold hover:bg-gray-200 transition-colors"
-                                                            >
-                                                                Save for Later
-                                                            </button>
-                                                            <button className="flex-1 bg-primary text-white py-4 rounded-xl font-bold hover:bg-primary/90 transition-colors">
-                                                                Apply Now
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            )}
+                                            ))} 
                                         </div>
                                     )}
                                 </>

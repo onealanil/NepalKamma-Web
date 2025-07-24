@@ -355,7 +355,7 @@ export default function CompletedJobs() {
                                                 No Completed Jobs
                                             </h3>
                                             <p className="text-red-500 font-medium mb-4">
-                                                Job's not completed yet!!
+                                                Job&apos;s not completed yet!!
                                             </p>
                                             <button
                                                 onClick={() => router.push('/dashboard/job-seeker/explore')}

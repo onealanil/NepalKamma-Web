@@ -30,7 +30,7 @@ interface Job {
 }
 
 const JobCard = ({ data, onClick }: { data: Job; onClick: () => void }) => (
-    <div 
+    <div
         onClick={onClick}
         className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 hover:shadow-md transition-shadow cursor-pointer"
     >
@@ -43,16 +43,16 @@ const JobCard = ({ data, onClick }: { data: Job; onClick: () => void }) => (
                 />
             )}
         </div>
-        
+
         <div className="space-y-2">
             <h3 className="font-bold text-gray-900 text-lg line-clamp-2">
                 {data.title}
             </h3>
-            
+
             <p className="text-gray-600 text-sm line-clamp-3">
                 {data.description.replace(/<[^>]*>/g, '')}
             </p>
-            
+
             <div className="flex items-center justify-between">
                 <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-medium">
                     {data.category}
@@ -65,13 +65,13 @@ const JobCard = ({ data, onClick }: { data: Job; onClick: () => void }) => (
     </div>
 );
 
-const MoreModal = ({ 
-    isOpen, 
-    onClose, 
-    userAddress 
-}: { 
-    isOpen: boolean; 
-    onClose: () => void; 
+const MoreModal = ({
+    isOpen,
+    onClose,
+    userAddress
+}: {
+    isOpen: boolean;
+    onClose: () => void;
     userAddress?: string;
 }) => {
     if (!isOpen) return null;
@@ -88,7 +88,7 @@ const MoreModal = ({
                         ✕
                     </button>
                 </div>
-                
+
                 <div className="space-y-4">
                     <div className="p-4 bg-gray-50 rounded-lg">
                         <h4 className="font-semibold text-gray-900 mb-2">Address</h4>
@@ -96,11 +96,11 @@ const MoreModal = ({
                             {userAddress || 'No address provided'}
                         </p>
                     </div>
-                    
+
                     <button className="w-full bg-red-500 text-white py-3 rounded-lg font-semibold hover:bg-red-600 transition-colors">
                         Report User
                     </button>
-                    
+
                     <button
                         onClick={onClose}
                         className="w-full bg-gray-200 text-gray-800 py-3 rounded-lg font-semibold hover:bg-gray-300 transition-colors"
@@ -113,13 +113,13 @@ const MoreModal = ({
     );
 };
 
-const JobDetailModal = ({ 
-    isOpen, 
-    onClose, 
-    job 
-}: { 
-    isOpen: boolean; 
-    onClose: () => void; 
+const JobDetailModal = ({
+    isOpen,
+    onClose,
+    job
+}: {
+    isOpen: boolean;
+    onClose: () => void;
     job: Job | null;
 }) => {
     if (!isOpen || !job) return null;
@@ -137,7 +137,7 @@ const JobDetailModal = ({
                             ✕
                         </button>
                     </div>
-                    
+
                     {job.images && job.images.length > 0 && (
                         <div className="mb-4">
                             <img
@@ -147,7 +147,7 @@ const JobDetailModal = ({
                             />
                         </div>
                     )}
-                    
+
                     <div className="space-y-4">
                         <div>
                             <h4 className="font-semibold text-gray-900 mb-2">Description</h4>
@@ -155,7 +155,7 @@ const JobDetailModal = ({
                                 {job.description.replace(/<[^>]*>/g, '')}
                             </p>
                         </div>
-                        
+
                         <div className="flex items-center justify-between">
                             <span className="bg-primary/10 text-primary px-4 py-2 rounded-full font-medium">
                                 {job.category}
@@ -164,7 +164,7 @@ const JobDetailModal = ({
                                 Rs. {job.price.toLocaleString()}
                             </span>
                         </div>
-                        
+
                         <div className="pt-4 border-t">
                             <button
                                 onClick={onClose}
@@ -184,7 +184,7 @@ export default function UserProfilePage() {
     const router = useRouter();
     const params = useParams();
     const userId = params.id as string;
-    
+
     const [user, setUser] = useState<User | null>(null);
     const [jobs, setJobs] = useState<Job[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -286,7 +286,7 @@ export default function UserProfilePage() {
             <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
                 <div className="text-center">
                     <h2 className="text-2xl font-bold text-gray-900 mb-2">User Not Found</h2>
-                    <p className="text-gray-600">The user you're looking for doesn't exist.</p>
+                    <p className="text-gray-600">The user you&apos;re looking for doesn&apos;t exist.</p>
                 </div>
             </div>
         );
@@ -300,7 +300,7 @@ export default function UserProfilePage() {
                 <div className="lg:grid lg:grid-cols-12 lg:gap-8">
                     {/* Left Sidebar - Hidden on mobile, visible on desktop */}
                     <LeftSideSeeker />
-                    
+
                     {/* Main Content */}
                     <div className="lg:col-span-6 py-6">
                         {/* Profile Header */}
@@ -389,14 +389,14 @@ export default function UserProfilePage() {
                         {/* Jobs Section */}
                         <div className="bg-white rounded-xl p-6 shadow-sm">
                             <h2 className="text-xl font-bold text-gray-900 mb-4">Jobs</h2>
-                            
+
                             {jobs.length > 0 ? (
                                 <div className="space-y-4">
-                                    <JobCard 
-                                        data={currentJob} 
+                                    <JobCard
+                                        data={currentJob}
                                         onClick={() => handleJobClick(currentJob)}
                                     />
-                                    
+
                                     <button
                                         onClick={handleNextJob}
                                         className="w-full bg-primary text-white py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"

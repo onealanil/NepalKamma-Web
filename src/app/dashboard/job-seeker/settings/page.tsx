@@ -116,4 +116,22 @@ const GeoLocation = ({ setGeometry, setLocationName }: GeoLocationProps) => {
   );
 };
 
-export default GeoLocation;
+export default function SettingsPage() {
+  const [geometry, setGeometry] = useState<Geometry | null>(null);
+  const [locationName, setLocationName] = useState<string>('');
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4">
+      <div className="max-w-md mx-auto">
+        <h1 className="text-2xl font-bold text-gray-900 mb-6">Settings</h1>
+        <div className="bg-white rounded-xl p-6 shadow-sm">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Location Settings</h2>
+          <GeoLocation 
+            setGeometry={setGeometry}
+            setLocationName={setLocationName}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}

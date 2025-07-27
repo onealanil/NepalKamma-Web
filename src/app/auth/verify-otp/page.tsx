@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -8,7 +8,7 @@ import { AxiosError } from 'axios';
 import { ResendOtpData, VerifyOtpData } from '@/types/auth';
 import { resendOTP, verifyOTP } from '@/lib/auth';
 
-export default function VerifyOtp() {
+function VerifyOtpContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -277,5 +277,24 @@ export default function VerifyOtp() {
         </div>
       )}
     </div>
+  );
+}
+
+function VerifyOtpFallback() {
+  return (
+    <div className="min-h-screen bg-white flex items-center justify-center px-4">
+      <div className="w-full max-w-md text-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto"></div>
+        <p className="mt-4 text-gray-600">Loading...</p>
+      </div>
+    </div>
+  );
+}
+
+export default function VerifyOtp() {
+  return (
+    <Suspense fallback={<VerifyOtpFallback />}>
+      <VerifyOtpContent />
+    </Suspense>
   );
 }

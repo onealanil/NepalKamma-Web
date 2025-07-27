@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
+import { AxiosError } from 'axios';
 import { ResendOtpData, VerifyOtpData } from '@/types/auth';
 import { resendOTP, verifyOTP } from '@/lib/auth';
 
@@ -101,14 +102,11 @@ export default function VerifyOtp() {
         setShowModal(true);
       }
     } catch (error: unknown) {
-      if (error instanceof Error) {
-        if ('response' in error && error.response) {
-          const axiosError = error as any;
-          const errorMessage = axiosError.response?.data?.message || 'Invalid OTP';
-          alert(errorMessage);
-        } else {
-          alert('An error occurred during verification');
-        }
+      if (error instanceof AxiosError) {
+        const errorMessage = error.response?.data?.message || 'Invalid OTP';
+        alert(errorMessage);
+      } else if (error instanceof Error) {
+        alert('An error occurred during verification');
       } else {
         alert('An unknown error occurred');
       }
@@ -145,14 +143,11 @@ export default function VerifyOtp() {
         alert(response.message || 'Failed to resend OTP');
       }
     } catch (error: unknown) {
-      if (error instanceof Error) {
-        if ('response' in error && error.response) {
-          const axiosError = error as any;
-          const errorMessage = axiosError.response?.data?.message || 'Failed to resend OTP';
-          alert(errorMessage);
-        } else {
-          alert('An error occurred while resending OTP');
-        }
+      if (error instanceof AxiosError) {
+        const errorMessage = error.response?.data?.message || 'Failed to resend OTP';
+        alert(errorMessage);
+      } else if (error instanceof Error) {
+        alert('An error occurred while resending OTP');
       } else {
         alert('An unknown error occurred');
       }

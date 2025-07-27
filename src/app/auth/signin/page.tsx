@@ -5,6 +5,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { AxiosError } from 'axios';
 import { LoginFormData } from '@/types/auth';
 import { login } from '@/lib/auth';
 
@@ -53,14 +54,11 @@ export default function SignIn() {
             }
 
         } catch (error: unknown) {
-            if (error instanceof Error) {
-                if ('response' in error && error.response) {
-                    const axiosError = error as any;
-                    const errorMessage = axiosError.response?.data?.message || 'Invalid credentials';
-                    alert(errorMessage);
-                } else {
-                    alert('An error occurred during verification');
-                }
+            if (error instanceof AxiosError) {
+                const errorMessage = error.response?.data?.message || 'Invalid credentials';
+                alert(errorMessage);
+            } else if (error instanceof Error) {
+                alert('An error occurred during verification');
             } else {
                 alert('An unknown error occurred');
             }

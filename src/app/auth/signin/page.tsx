@@ -4,39 +4,67 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { AxiosError } from 'axios';
 import { LoginFormData } from '@/types/auth';
+import { login } from '@/lib/auth';
 
 export default function SignIn() {
+    const router = useRouter();
     const [formData, setFormData] = useState<LoginFormData>({
         email: '',
         password: ''
     });
     const [errors, setErrors] = useState<Partial<LoginFormData>>({});
-    const [isLoading, setIsLoading] = useState(false);
-    const [showPassword, setShowPassword] = useState(false);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [showPassword, setShowPassword] = useState<boolean>(false);
 
-    // const validateForm = (): boolean => {
-    //     const newErrors: Partial<LoginFormData> = {};
+    const validateForm = (): boolean => {
+        const newErrors: Partial<LoginFormData> = {};
 
-    //     if (!formData.email) {
-    //         newErrors.email = 'Email is required';
-    //     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-    //         newErrors.email = 'Invalid email';
-    //     }
+        if (!formData.email) {
+            newErrors.email = 'Email is required';
+        } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+            newErrors.email = 'Invalid email';
+        }
 
-    //     if (!formData.password) {
-    //         newErrors.password = 'Password is required';
-    //     } else if (formData.password.length < 8) {
-    //         newErrors.password = 'Password must be at least 8 characters';
-    //     }
+        if (!formData.password) {
+            newErrors.password = 'Password is required';
+        } else if (formData.password.length < 8) {
+            newErrors.password = 'Password must be at least 8 characters';
+        }
 
-    //     setErrors(newErrors);
-    //     return Object.keys(newErrors).length === 0;
-    // };
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
+        if (!validateForm()) return;
+
+        setIsLoading(true);
+
+        try {
+            const response = await login(formData);
+            console.log(response);
+            
+            if (response.status === "success") {
+                // router.push('/dashboard/job-seeker');
+            }
+
+        } catch (error: unknown) {
+            if (error instanceof AxiosError) {
+                const errorMessage = error.response?.data?.message || 'Invalid credentials';
+                alert(errorMessage);
+            } else if (error instanceof Error) {
+                alert('An error occurred during verification');
+            } else {
+                alert('An unknown error occurred');
+            }
+        } finally {
+            setIsLoading(false);
+        }
 
     };
 

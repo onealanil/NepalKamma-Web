@@ -93,7 +93,7 @@ body {
 
 body {
   position: relative;
-  font-family: Arial, sans-serif;
+  font-family: var(--font-geist-sans), Arial, sans-serif;
   background-color: #ffffff;
   color: #333;
   height: 100vh;
@@ -326,4 +326,8 @@ body {
 
 .lottie-animation canvas {
   background: transparent !important;
+}
+
+code, pre {
+  font-family: var(--font-geist-mono), monospace;
 }

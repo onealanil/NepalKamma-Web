@@ -36,9 +36,8 @@ export default function Geolocation() {
                     setIsLoading(false);
                 },
                 {
-                    enableHighAccuracy: true, // High accuracy for better precision
-                    timeout: 10000, // Timeout after 10 seconds
-                    maximumAge: 0, // No cached location
+                    enableHighAccuracy: true, 
+                    maximumAge: 0,
                 }
             );
         } else {
@@ -47,12 +46,10 @@ export default function Geolocation() {
         }
     };
 
-    // Request location on mount
     useEffect(() => {
         getUserLocation();
     }, []);
 
-    // Function to retry location request
     const retryLocation = () => {
         setIsLoading(true);
         setError(null);

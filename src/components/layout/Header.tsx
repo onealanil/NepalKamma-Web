@@ -1,7 +1,27 @@
+'use client'
+
 import Image from 'next/image';
 import Link from 'next/link';
+import { useAuthStore } from '@/store/authStore';
+import { useRouter } from 'next/navigation';
+import { logOut } from '@/lib/auth';
 
 export default function Header() {
+  const { logout } = useAuthStore();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    try {
+      await logOut();
+    } catch (error) {
+      console.error('Logout API error:', error);
+    } finally {
+      logout();
+      router.push('/auth/signin');
+      
+    }
+  };
+
   return (
     // <header className="absolute top-0 left-0 w-full z-10">
     //   <div className="container mx-auto px-4 py-6 flex justify-between items-center">
@@ -47,18 +67,21 @@ export default function Header() {
           <Link href="/dashboard/job-seeker/explore" className="text-black hover:text-gray-500 transition-colors">
             Explore
           </Link>
-            <Link href="/dashboard/job-seeker/chat" className="text-black hover:text-gray-500 transition-colors">
+          <Link href="/dashboard/job-seeker/chat" className="text-black hover:text-gray-500 transition-colors">
             Message
           </Link>
-           <Link href="/dashboard/job-seeker/top-buyer" className="text-black hover:text-gray-500 transition-colors">
+          <Link href="/dashboard/job-seeker/top-buyer" className="text-black hover:text-gray-500 transition-colors">
             Top Buyer
           </Link>
           <Link href="/dashboard/job-seeker/profile" className="text-black hover:text-gray-500 transition-colors">
             Profile
           </Link>
-          <Link href="/auth/signin" className="bg-primary text-white hover:bg-primary-foreground transition-colors px-4 py-2 rounded-md">
+          <button
+            onClick={handleLogout}
+            className="bg-primary text-white hover:bg-primary-foreground transition-colors px-4 py-2 rounded-md"
+          >
             Log out
-          </Link>
+          </button>
         </nav>
       </div>
     </header>

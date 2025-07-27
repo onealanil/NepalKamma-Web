@@ -61,6 +61,19 @@ export async function login(data: loginI) {
     }
 }
 
+//logout user
+export async function logOut() {
+    try {
+        await axiosInstance.get(`/user/logout`);
+
+    } catch (err: unknown) {
+        if (axios.isAxiosError(err)) {
+            throw err;
+        }
+        throw new Error('An unknown error occurred');
+    }
+}
+
 //refresh token 
 export const refreshAccessToken = async () => {
     try {

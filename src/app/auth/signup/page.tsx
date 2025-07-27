@@ -6,15 +6,9 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import Who from '@/components/auth/Who';
+import { SignupFormData } from '@/types/auth';
+import { signup } from '@/lib/auth';
 
-interface SignupFormData {
-  username: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
-  securityAnswer: string;
-  gender: string;
-}
 
 export default function SignUp() {
   const router = useRouter();
@@ -24,13 +18,13 @@ export default function SignUp() {
     email: '',
     password: '',
     confirmPassword: '',
-    securityAnswer: '',
+    security_answer: '',
     gender: 'male'
   });
   const [errors, setErrors] = useState<Partial<SignupFormData>>({});
-  const [isLoading, setIsLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false);
 
   const validateForm = (): boolean => {
     const newErrors: Partial<SignupFormData> = {};
@@ -59,22 +53,56 @@ export default function SignUp() {
       newErrors.confirmPassword = 'Passwords must match';
     }
 
-    if (!formData.securityAnswer) {
-      newErrors.securityAnswer = 'Security answer is required';
+    if (!formData.security_answer) {
+      newErrors.security_answer = 'Security answer is required';
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
+  /**
+   * @function handleSubmit
+   * @param e it is the event object
+   * @returns void
+   */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm()) return;
 
     setIsLoading(true);
-    // TODO: Add API call here
-    console.log('Signup data:', { ...formData, role: who });
-    setIsLoading(false);
+
+    try {
+      const payload = {
+        ...formData,
+        role: who
+      }
+
+      const response = await signup(payload);
+      if (response.status === 'pending' && response.data) {
+        const params = new URLSearchParams({
+          userId: response.data.userId,
+          email: response.data.email,
+          expiresAt: response.data.expiresAt
+        });
+        router.push(`/auth/verify-otp?${params.toString()}`);
+      }
+
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        if ('response' in error && error.response) {
+          const axiosError = error as any;
+          const errorMessage = axiosError.response?.data?.message || 'Something went wrong';
+          alert(errorMessage);
+        } else {
+          alert('An error occurred during verification');
+        }
+      } else {
+        alert('An unknown error occurred');
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleInputChange = (field: keyof SignupFormData) => (
@@ -240,19 +268,19 @@ export default function SignUp() {
 
               {/* Security Question */}
               <div>
-                <label htmlFor="securityAnswer" className="block text-sm font-medium text-black mb-2">
+                <label htmlFor="security_answer" className="block text-sm font-medium text-black mb-2">
                   What is your birthplace? (Security Question)
                 </label>
                 <input
-                  id="securityAnswer"
+                  id="security_answer"
                   type="text"
                   placeholder="Enter your birthplace"
-                  value={formData.securityAnswer}
-                  onChange={handleInputChange('securityAnswer')}
+                  value={formData.security_answer}
+                  onChange={handleInputChange('security_answer')}
                   className="w-full px-4 py-3 rounded-md border border-border  focus:outline-none text-black placeholder-gray-400"
                 />
-                {errors.securityAnswer && (
-                  <p className="text-red-500 text-sm mt-1">{errors.securityAnswer}</p>
+                {errors.security_answer && (
+                  <p className="text-red-500 text-sm mt-1">{errors.security_answer}</p>
                 )}
               </div>
 

@@ -8,7 +8,6 @@ interface User {
     role: string,
     [key: string]: any;
 }
-
 interface AuthState {
     user: User | null;
     accessToken: string | null;

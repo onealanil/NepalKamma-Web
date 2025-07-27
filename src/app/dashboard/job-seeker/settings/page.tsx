@@ -14,11 +14,13 @@
 import { useState } from 'react';
 import debounce from 'lodash.debounce';
 
+interface Geometry {
+  coordinates: number[];
+  type: string;
+}
+
 interface Place {
-  geometry: {
-    coordinates: number[];
-    type: string;
-  };
+  geometry: Geometry;
   properties: {
     city: string;
     country: string;
@@ -32,7 +34,7 @@ interface GeoapifyResponse {
 }
 
 interface GeoLocationProps {
-  setGeometry?: (geometry: any) => void;
+  setGeometry?: (geometry: Geometry) => void;
   setLocationName?: (name: string) => void;
 }
 
@@ -46,7 +48,7 @@ const GeoLocation = ({ setGeometry, setLocationName }: GeoLocationProps) => {
       return;
     }
 
-    const apiKey = '0aa09cb2c0fd4384851d76a77b1225bb';
+    const apiKey = process.env.NEXT_PUBLIC_GEO_API_KEY as string;
     const url = `https://api.geoapify.com/v1/geocode/autocomplete?text=${encodeURIComponent(
       `${value},Nepal`
     )}&limit=5&apiKey=${apiKey}`;
@@ -74,10 +76,10 @@ const GeoLocation = ({ setGeometry, setLocationName }: GeoLocationProps) => {
     const locationName = place.properties.formatted || place.properties.city;
     setInputValue(locationName);
     setSuggestions([]);
-    
+
     if (setGeometry) setGeometry(place.geometry);
     if (setLocationName) setLocationName(locationName);
-    
+
     console.log('Selected place:', locationName);
     console.log('Coordinates:', place.geometry.coordinates);
   };
@@ -91,7 +93,7 @@ const GeoLocation = ({ setGeometry, setLocationName }: GeoLocationProps) => {
         placeholder="Enter Location"
         className="w-full bg-green-50 rounded-md text-black px-3 py-2 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
       />
-      
+
       {suggestions.length > 0 && (
         <div className="absolute top-full left-0 right-0 z-10 mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto">
           {suggestions.map((suggestion, index) => (

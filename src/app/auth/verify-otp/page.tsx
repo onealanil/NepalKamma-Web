@@ -7,6 +7,7 @@ import Image from 'next/image';
 import { AxiosError } from 'axios';
 import { ResendOtpData, VerifyOtpData } from '@/types/auth';
 import { resendOTP, verifyOTP } from '@/lib/auth';
+import { ErrorToast, SuccessToast } from '@/components/ui/Toast';
 
 function VerifyOtpContent() {
   const router = useRouter();
@@ -104,11 +105,11 @@ function VerifyOtpContent() {
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
         const errorMessage = error.response?.data?.message || 'Invalid OTP';
-        alert(errorMessage);
+        ErrorToast(errorMessage);
       } else if (error instanceof Error) {
-        alert('An error occurred during verification');
+        ErrorToast('An error occurred during verification');
       } else {
-        alert('An unknown error occurred');
+        ErrorToast('An unknown error occurred');
       }
     }
     setIsVerifying(false);
@@ -138,18 +139,18 @@ function VerifyOtpContent() {
         const diff = Math.max(0, Math.floor((Date.parse(newExpiryTime) - Date.now()) / 1000));
         setCounter(diff);
 
-        alert('OTP has been sent to your email');
+        SuccessToast('OTP has been sent to your email');
       } else {
         alert(response.message || 'Failed to resend OTP');
       }
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
         const errorMessage = error.response?.data?.message || 'Failed to resend OTP';
-        alert(errorMessage);
+        ErrorToast(errorMessage);
       } else if (error instanceof Error) {
-        alert('An error occurred while resending OTP');
+        ErrorToast('An error occurred while resending OTP');
       } else {
-        alert('An unknown error occurred');
+        ErrorToast('An unknown error occurred');
       }
     }
     setIsResending(false);
@@ -256,7 +257,7 @@ function VerifyOtpContent() {
 
       {/* Success Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 backdrop-blur-xs bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 max-w-sm mx-4">
             <div className="text-center">
               <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">

@@ -9,6 +9,7 @@ import { AxiosError } from 'axios';
 import { LoginFormData } from '@/types/auth';
 import { login } from '@/lib/auth';
 import { useAuthStore } from '@/store/authStore';
+import { ErrorToast, SuccessToast } from '@/components/ui/Toast';
 
 export default function SignIn() {
     const router = useRouter();
@@ -48,6 +49,7 @@ export default function SignIn() {
 
         try {
             const response = await login(formData);
+            SuccessToast("Successfully Loggedin");
             if (response.status === 'success') {
                 const user = useAuthStore.getState().user;
                 if (user?.role === "job_seeker") {
@@ -57,17 +59,18 @@ export default function SignIn() {
                 } else {
                     router.push('/auth/signin');
                 }
+                return;
             }
 
         } catch (error: unknown) {
             if (error instanceof AxiosError) {
                 const errorMessage = error.response?.data?.message || 'Invalid credentials';
-                alert(errorMessage);
+                ErrorToast(errorMessage);
             } else if (error instanceof Error) {
                 console.log(error)
-                alert('An error occurred during verification');
+                ErrorToast('An error occurred during verification');
             } else {
-                alert('An unknown error occurred');
+                ErrorToast('An unknown error occurred');
             }
         } finally {
             setIsLoading(false);

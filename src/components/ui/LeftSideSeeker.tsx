@@ -1,22 +1,42 @@
 "use client";
 
+import { useAuthStore } from '@/store/authStore';
 import Link from 'next/link';
-import { useState } from 'react';
-
-export interface User {
-    id: string;
-    name: string;
-    email: string;
-    avatar?: string;
-}
 
 function LeftSideSeeker() {
-    const [user] = useState<User>({
-        id: '1',
-        name: 'John Doe',
-        email: 'john@example.com',
-        avatar: '/images/avatar.jpg'
-    });
+    const { user, hasHydrated } = useAuthStore();
+
+    if (!hasHydrated || !user) {
+        return (
+            <div className="hidden lg:block lg:col-span-3 py-6">
+                <div className="sticky top-6 space-y-6">
+                    {/* Profile Card Skeleton */}
+                    <div className="bg-white rounded-xl p-6 shadow-sm">
+                        <div className="text-center">
+                            <div className="w-20 h-20 bg-gray-200 rounded-full mx-auto mb-4 animate-pulse"></div>
+                            <div className="h-6 bg-gray-200 rounded mb-2 animate-pulse"></div>
+                            <div className="h-4 bg-gray-200 rounded mb-4 animate-pulse"></div>
+                            <div className="h-10 bg-gray-200 rounded animate-pulse"></div>
+                        </div>
+                    </div>
+
+                    {/* Quick Actions Skeleton */}
+                    <div className="bg-white rounded-xl p-6 shadow-sm">
+                        <div className="h-6 bg-gray-200 rounded mb-4 animate-pulse"></div>
+                        <div className="space-y-3">
+                            {[1, 2, 3, 4, 5].map((i) => (
+                                <div key={i} className="flex items-center gap-3 p-3">
+                                    <div className="w-8 h-8 bg-gray-200 rounded-lg animate-pulse"></div>
+                                    <div className="h-4 bg-gray-200 rounded flex-1 animate-pulse"></div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <>
             <div className="hidden lg:block lg:col-span-3 py-6">
@@ -25,10 +45,10 @@ function LeftSideSeeker() {
                     <div className="bg-white rounded-xl p-6 shadow-sm">
                         <div className="text-center">
                             <div className="w-20 h-20 bg-gradient-to-r from-primary to-green-600 rounded-full flex items-center justify-center text-white font-bold text-2xl mx-auto mb-4 shadow-lg">
-                                {user.name.charAt(0)}
+                                {user?.username.charAt(0)}
                             </div>
-                            <h3 className="font-bold text-lg text-gray-900">{user.name}</h3>
-                            <p className="text-gray-500 text-sm mb-4">{user.email}</p>
+                            <h3 className="font-bold text-lg text-gray-900">{user?.username}</h3>
+                            <p className="text-gray-500 text-sm mb-4">{user?.email}</p>
                             <button className="w-full bg-primary/10 text-primary py-2 rounded-lg font-semibold hover:bg-primary/20 transition-colors">
                                 Edit Profile
                             </button>

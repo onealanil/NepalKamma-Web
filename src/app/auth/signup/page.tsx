@@ -9,6 +9,7 @@ import Who from '@/components/auth/Who';
 import { SignupFormData } from '@/types/auth';
 import { signup } from '@/lib/auth';
 import { AxiosError } from 'axios';
+import { ErrorToast } from '@/components/ui/Toast';
 
 
 
@@ -93,11 +94,11 @@ export default function SignUp() {
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
         const errorMessage = error.response?.data?.message || 'Something went wrong';
-        alert(errorMessage);
+        ErrorToast(errorMessage);
       } else if (error instanceof Error) {
-        alert('An error occurred during verification');
+        ErrorToast('An error occurred during verification');
       } else {
-        alert('An unknown error occurred');
+        ErrorToast('An unknown error occurred');
       }
     } finally {
       setIsLoading(false);

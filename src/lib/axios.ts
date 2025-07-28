@@ -30,6 +30,7 @@ axiosInstance.interceptors.response.use(
       !originalRequest._retry
     ) {
       originalRequest._retry = true;
+      
       try {
         const { data } = await axios.post(
           `${baseURL}/auth/refresh-token`,
@@ -38,13 +39,14 @@ axiosInstance.interceptors.response.use(
         );
 
         const { accessToken } = data;
-
         useAuthStore.getState().setAccessToken(accessToken);
 
+        // Retry the original request with new token
         originalRequest.headers["Authorization"] = `Bearer ${accessToken}`;
-
         return axiosInstance(originalRequest);
+        
       } catch (refreshError) {
+        console.log("Refresh token failed:", refreshError);
         useAuthStore.getState().logout();
         return Promise.reject(refreshError);
       }

@@ -15,8 +15,7 @@ export function middleware(request: NextRequest) {
 
     return response;
   }
-
-  // Add no-cache headers to dashboard routes even when authenticated
+  
   if (pathname.startsWith('/dashboard')) {
     const response = NextResponse.next();
     response.headers.set('Cache-Control', 'no-cache, no-store, must-revalidate');

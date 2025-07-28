@@ -3,23 +3,8 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
-
-interface User {
-    id: string;
-    name: string;
-    email: string;
-    username: string;
-    title?: string;
-    bio?: string;
-    location?: string;
-    about_me?: string;
-    profilePic: { url: string };
-    isDocumentVerified: 'verified' | 'pending' | 'rejected';
-    role: 'job_seeker' | 'job_provider';
-    skills: string[];
-    averageRating: number;
-}
+import { useAuth } from '@/hooks/useAuth';
+import Loader from '@/components/global/Loader';
 
 interface Gig {
     _id: string;
@@ -32,26 +17,11 @@ interface Gig {
 
 export default function ProfilePageSeeker() {
     const router = useRouter();
+    const { userData, isLoading, isError } = useAuth();
+
     const [currentGigIndex, setCurrentGigIndex] = useState(0);
     const [isUploadingImage, setIsUploadingImage] = useState(false);
     
-    // Mock user data
-    const [user] = useState<User>({
-        id: '1',
-        name: 'John Doe',
-        email: 'john@example.com',
-        username: 'johndoe',
-        title: 'Full Stack Developer',
-        bio: 'Passionate developer with 5+ years experience',
-        location: 'Kathmandu, Nepal',
-        about_me: 'I am a dedicated full-stack developer with expertise in React, Node.js, and modern web technologies. I love creating efficient and user-friendly applications.',
-        profilePic: { url: '/images/avatar.jpg' },
-        isDocumentVerified: 'verified',
-        role: 'job_seeker',
-        skills: ['React', 'Node.js', 'TypeScript', 'MongoDB', 'Next.js'],
-        averageRating: 4.8
-    });
-
     // Mock gigs data
     const [gigs] = useState<Gig[]>([
         {
@@ -73,7 +43,6 @@ export default function ProfilePageSeeker() {
     ]);
 
     const handleImagePicker = () => {
-        // Handle image upload logic
         console.log('Image picker opened');
     };
 
@@ -84,6 +53,10 @@ export default function ProfilePageSeeker() {
             setCurrentGigIndex(0);
         }
     };
+
+    if (isLoading) return <Loader />;
+    if (isError) return <p>Error fetching user data</p>;
+    if (!userData) return <p>No user data found</p>;
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
@@ -108,7 +81,7 @@ export default function ProfilePageSeeker() {
                             ) : (
                                 <div className="relative">
                                     <img
-                                        src={"https://picsum.photos/600/400?random=6"}
+                                        src={userData.profilePic?.url || "https://picsum.photos/600/400?random=6"}
                                         alt="Profile"
                                         width={96}
                                         height={96}
@@ -116,7 +89,7 @@ export default function ProfilePageSeeker() {
                                     />
                                     <button
                                         onClick={handleImagePicker}
-                                        className="absolute -bottom-1 -right-1 bg-primary text-white p-2 rounded-full hover:bg-primary/90 transition-colors"
+                                        className="absolute bottom-[20px] -right-1 bg-primary text-white p-2 rounded-full hover:bg-primary/90 transition-colors"
                                     >
                                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
@@ -129,31 +102,31 @@ export default function ProfilePageSeeker() {
                         {/* Profile Details */}
                         <div className="flex-1">
                             <div className="flex items-center gap-2 mb-2">
-                                <h1 className="text-2xl font-bold text-gray-900">{user.username}</h1>
-                                {user.isDocumentVerified === 'verified' && (
+                                <h1 className="text-2xl font-bold text-gray-900">{userData.username}</h1>
+                                {userData.isDocumentVerified === 'verified' && (
                                     <svg className="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
                                         <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                                     </svg>
                                 )}
                             </div>
                             
-                            <p className="text-lg font-semibold text-gray-700 mb-2">{user.title || 'Edit your title'}</p>
+                            <p className="text-lg font-semibold text-gray-700 mb-2">{userData.title || 'Edit your title'}</p>
                             
                             <div className="flex items-center gap-1 mb-2">
                                 <svg className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
                                     <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                                 </svg>
-                                <span className="font-semibold text-gray-900">{user.averageRating.toFixed(1)}</span>
+                                <span className="font-semibold text-gray-900">0.0</span>
                             </div>
                             
-                            <p className="text-gray-600 mb-3 leading-relaxed">{user.bio || 'Edit your bio'}</p>
+                            <p className="text-gray-600 mb-3 leading-relaxed">{userData.bio || 'Edit your bio'}</p>
                             
                             <div className="flex items-center gap-1 text-gray-600">
                                 <svg className="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                                 </svg>
-                                <span>{user.location || 'Edit your location'}</span>
+                                <span>{userData.location || 'Edit your location'}</span>
                             </div>
                         </div>
                     </div>
@@ -181,8 +154,8 @@ export default function ProfilePageSeeker() {
                 {/* About Me Section */}
                 <div className="bg-white rounded-xl p-6 shadow-sm mb-6">
                     <h2 className="text-xl font-bold text-gray-900 mb-4">About me</h2>
-                    {user.about_me ? (
-                        <p className="text-gray-700 leading-relaxed mb-4">{user.about_me}</p>
+                    {userData.about_me ? (
+                        <p className="text-gray-700 leading-relaxed mb-4">{userData.about_me}</p>
                     ) : (
                         <p className="text-red-500 text-center py-4 font-medium">
                             Complete your profile to unlock more job opportunities and increase your chances of getting hired. Click on &quot;Edit Profile&quot; now to get started!
@@ -190,16 +163,16 @@ export default function ProfilePageSeeker() {
                     )}
                     
                     <div className="border border-red-500 rounded-lg p-3 inline-block">
-                        <p className="text-gray-700">{user.email}</p>
+                        <p className="text-gray-700">{userData.email}</p>
                     </div>
                 </div>
 
                 {/* Skills Section */}
                 <div className="bg-white rounded-xl p-6 shadow-sm mb-6">
                     <h2 className="text-xl font-bold text-gray-900 mb-4">Skills</h2>
-                    {user.skills.length > 0 ? (
+                    {userData.skills && userData.skills.length > 0 ? (
                         <div className="flex flex-wrap gap-2">
-                            {user.skills.map((skill, index) => (
+                            {userData.skills.map((skill:string, index:number) => (
                                 <span
                                     key={index}
                                     className="border border-primary text-gray-700 px-3 py-1 rounded-lg text-sm"

@@ -1,6 +1,7 @@
 "use client";
 
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
 
 /**
@@ -8,6 +9,8 @@ import Image from 'next/image';
  * @returns The hero section of the landing page. It includes a floating animation for the title, a call to action, and a unique image.
  */
 export default function Hero() {
+  const router = useRouter();
+
   return (
     <section className="relative min-h-screen pt-24 flex items-center justify-center">
       <div className='container mx-auto p-4'>
@@ -24,7 +27,7 @@ export default function Hero() {
                 Nepal&apos;s first local gig marketplace. Find quick jobs near you or hire skilled locals for everyday tasks. From fan repairs to home services - earn extra income or get things done with trusted neighbors.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                <button className="bg-primary cursor-pointer hover:bg-primary text-white px-8 py-4 rounded-lg font-semibold text-lg shadow-lg">
+                <button onClick={() => router.push('/auth/signin')} className="bg-primary cursor-pointer hover:bg-primary text-white px-8 py-4 rounded-lg font-semibold text-lg shadow-lg">
                   Get Started
                 </button>
                 <button className="border-2 cursor-pointer border-primary text-primary hover:text-black px-8 py-4 rounded-lg font-semibold text-lg transition-all duration-300">

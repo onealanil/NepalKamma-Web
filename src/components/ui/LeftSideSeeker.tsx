@@ -2,9 +2,11 @@
 
 import { useAuthStore } from '@/store/authStore';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 function LeftSideSeeker() {
     const { user, hasHydrated } = useAuthStore();
+    const router = useRouter();
 
     if (!hasHydrated || !user) {
         return (
@@ -49,7 +51,7 @@ function LeftSideSeeker() {
                             </div>
                             <h3 className="font-bold text-lg text-gray-900">{user?.username}</h3>
                             <p className="text-gray-500 text-sm mb-4">{user?.email}</p>
-                            <button className="w-full bg-primary/10 text-primary py-2 rounded-lg font-semibold hover:bg-primary/20 transition-colors">
+                            <button onClick={() => router.push("/dashboard/job-seeker/profile/edit-profile")} className="w-full bg-primary/10 text-primary py-2 rounded-lg font-semibold hover:bg-primary/20 transition-colors">
                                 Edit Profile
                             </button>
                         </div>

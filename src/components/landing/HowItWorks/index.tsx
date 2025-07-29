@@ -2,30 +2,32 @@
 
 import LandingAnimation from "@/components/animation/LandingAnimation";
 
+interface HowItWorksProps {
+  dict: any;
+}
 
-const steps = [
-  {
-    title: "Create Your Skill Profile",
-    description: "Sign up and showcase your local skills - from home repairs to tutoring. Set your location and availability.",
-    icon: "👤",
-    color: "from-[var(--primary)] to-[var(--accent)]"
-  },
-  {
-    title: "Browse Local Gigs",
-    description: "Discover quick jobs near you. Filter by skill type, location, and payment. See what your neighbors need help with.",
-    icon: "🌍",
-    color: "from-[var(--primary)] to-[var(--accent)]"
-  },
-  {
-    title: "Complete & Get Paid",
-    description: "Accept jobs, complete tasks offline, and receive instant payment. Build your reputation in the local community.",
-    icon: "💰",
-    color: "from-[var(--primary)] to-[var(--accent)]"
-  },
-];
+export default function HowItWorks({ dict }: HowItWorksProps) {
+  const steps = [
+    {
+      title: dict.landing.howItWorks.steps.profile.title,
+      description: dict.landing.howItWorks.steps.profile.description,
+      icon: "👤",
+      color: "from-[var(--primary)] to-[var(--accent)]"
+    },
+    {
+      title: dict.landing.howItWorks.steps.browse.title,
+      description: dict.landing.howItWorks.steps.browse.description,
+      icon: "🌍",
+      color: "from-[var(--primary)] to-[var(--accent)]"
+    },
+    {
+      title: dict.landing.howItWorks.steps.complete.title,
+      description: dict.landing.howItWorks.steps.complete.description,
+      icon: "💰",
+      color: "from-[var(--primary)] to-[var(--accent)]"
+    },
+  ];
 
-
-export default function HowItWorks() {
   return (
     <section className="py-16 md:py-24 bg-black relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-br from-[var(--background)] via-transparent to-[var(--background)] opacity-90 z-0"></div>
@@ -38,15 +40,15 @@ export default function HowItWorks() {
           {/* Text Content */}
           <div className="flex-1 text-center lg:text-left">
             <h2 className="text-4xl md:text-4xl lg:text-5xl font-extrabold text-white mb-6 leading-tight">
-              Unlock Opportunities, <br className="hidden md:inline" /> Simplified.
+              {dict.landing.howItWorks.title}
             </h2>
             <p className="text-gray-300 text-xl md:text-2xl mb-8 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
-              A simple process to launch your career and find your dream opportunities.
+              {dict.landing.howItWorks.subtitle}
             </p>
             <div className="flex items-center justify-center lg:justify-start gap-4">
               {/* Pulsing dot for attention, using primary color */}
               <div className="w-3 h-3 bg-[var(--primary)] rounded-full animate-pulse shadow-lg"></div>
-              <span className="text-lg text-gray-200">Get started in minutes</span>
+              <span className="text-lg text-gray-200">{dict.landing.howItWorks.getStarted}</span>
             </div>
           </div>
 

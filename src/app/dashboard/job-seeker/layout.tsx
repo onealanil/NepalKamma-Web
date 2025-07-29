@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useAuthStore } from "@/store/authStore";
 import Loader from "@/components/global/Loader";
+import Header from "@/components/layout/Header";
 
 export default function DashboardLayout({
     children,
@@ -27,7 +28,7 @@ export default function DashboardLayout({
 
     if (!hasHydrated || !user) {
         return (
-            <Loader/>
+            <Loader />
         );
     }
 
@@ -35,6 +36,7 @@ export default function DashboardLayout({
         <div className="min-h-screen pt-25 bg-gradient-to-br from-gray-50 to-gray-100">
             {/* Main Content Area */}
             <div className="flex-1">
+                <Header />
                 {children}
             </div>
         </div>

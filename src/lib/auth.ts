@@ -83,3 +83,8 @@ export const refreshAccessToken = async () => {
         useAuthStore.getState().logout();
     }
 };
+
+export const updateProfile = async (userId: string, profileData: any) => {
+  const response = await axiosInstance.put(`/users/${userId}/profile`, profileData);
+  return response.data;
+};

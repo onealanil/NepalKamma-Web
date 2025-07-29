@@ -1,10 +1,10 @@
-import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import "./globals.css";
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,10 +33,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <meta name="google-translate-customization" content="your-customization-id" />
+      </head>
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        <Header />
+
         {children}
         <Footer />
+
         <ToastContainer
           position="top-right"
           autoClose={3000}

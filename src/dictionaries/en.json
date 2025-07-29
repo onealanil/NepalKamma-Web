@@ -1,0 +1,49 @@
+{
+  "landing": {
+    "hero": {
+      "title": "In Every Skill, We Find a Unique Story, and in Every Story, We Find Purpose",
+      "description": "Nepal's first local gig marketplace. Find quick jobs near you or hire skilled locals for everyday tasks. From fan repairs to home services - earn extra income or get things done with trusted neighbors.",
+      "getStarted": "Get Started",
+      "learnMore": "Learn More",
+      "localSkills": "Local Skills, Real Jobs",
+      "trustedNeighbors": "Trusted Neighbors"
+    },
+    "valueProps": {
+      "title": "Why Choose Our Platform?",
+      "subtitle": "Nepal's first local gig marketplace connecting skilled neighbors with quick jobs and linking talented professionals with those who need them.",
+      "features": {
+        "location": {
+          "title": "Location-Based Job Discovery",
+          "description": "Find gig opportunities in your neighborhood or discover hidden talent near you. Connect with skilled professionals within walking distance."
+        },
+        "skill": {
+          "title": "Skill-Based Matching",
+          "description": "Whether you repair fans, fix plumbing, or teach music - showcase your skills and get matched with relevant local jobs. We link you with talented professionals."
+        },
+        "earnings": {
+          "title": "Instant Earnings & Quick Solutions",
+          "description": "Complete tasks and get paid immediately. Perfect for students seeking extra income or homeowners needing quick fixes from trusted local experts."
+        }
+      }
+    },
+    "howItWorks": {
+      "title": "Unlock Opportunities, Simplified.",
+      "subtitle": "A simple process to launch your career and find your dream opportunities.",
+      "getStarted": "Get started in minutes",
+      "steps": {
+        "profile": {
+          "title": "Create Your Skill Profile",
+          "description": "Sign up and showcase your local skills - from home repairs to tutoring. Set your location and availability."
+        },
+        "browse": {
+          "title": "Browse Local Gigs",
+          "description": "Discover quick jobs near you. Filter by skill type, location, and payment. See what your neighbors need help with."
+        },
+        "complete": {
+          "title": "Complete & Get Paid",
+          "description": "Accept jobs, complete tasks offline, and receive instant payment. Build your reputation in the local community."
+        }
+      }
+    }
+  }
+}

@@ -24,3 +24,35 @@ export const updatePhoneNumber = async (phoneNumber: string) => {
   const response = await axiosInstance.put(`/user/update-phone`, { phone: phoneNumber });
   return response;
 };
+
+/**
+ * @function verifyDocument
+ * @description This function is used to verify the document of the user
+ * @param formData Form data containing the document images
+ * @returns Response from the server
+ * @route POST /user/upload-document
+ */
+export const verifyDocument = async (formData: FormData) => {
+  const response = await axiosInstance.post(`/user/upload-document`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+  return response;
+};
+
+/**
+ * @function updateProfilePicture
+ * @description This function is used to update the profile picture of the user
+ * @param formData Form data containing the profile picture
+ * @returns Response from the server
+ * @route PUT /user/update-picture
+ */
+export const updateProfilePicture = async (formData: FormData) => {
+  const response = await axiosInstance.put(`/user/update-picture`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+  return response;
+};

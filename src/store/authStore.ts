@@ -1,17 +1,14 @@
-import { User } from "@/types/user";
+import { AuthState } from "@/types/store/authStoreI";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-interface AuthState {
-    user: User | null;
-    accessToken: string | null;
-    setUser: (user: User) => void;
-    setAccessToken: (token: string) => void;
-    logout: () => void;
-    hasHydrated: boolean;
-    setHasHydrated: (value: boolean) => void;
-}
 
+
+/**
+ * @function useAuthStore
+ * @description This hook is used to manage the auth state. It returns the user, access token, and functions to set them.
+ * @returns {user: User | null, accessToken: string | null, setUser: (user: User) => void, setAccessToken: (token: string) => void, logout: () => void, hasHydrated: boolean, setHasHydrated: (value: boolean) => void}
+ */
 export const useAuthStore = create<AuthState>()(
     persist(
         (set) => ({

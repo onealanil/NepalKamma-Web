@@ -9,13 +9,26 @@ import Loader from '@/components/global/Loader';
 import { MotivationalQuotes } from '@/components/ui/MotivationalQuotes';
 import SkillsGuide from '@/components/ui/SkillsGuide';
 import { X, Upload, Phone, CheckCircle, Clock, AlertCircle } from 'lucide-react';
+import { verifyDocument } from '@/lib/profile/profile-api';
+import { useEnsureAuth } from '@/hooks/useEnsureAuth';
 
+/**
+ * @function VerifyDocument
+ * @description This page is used to verify the document of the user
+ * @returns {JSX.Element}
+ */
 export default function VerifyDocument() {
     const router = useRouter();
-    const { user } = useAuthStore();
+    const { user, setUser } = useAuthStore();
+    const { isLoading, isReady } = useEnsureAuth();
     const [images, setImages] = useState<File[]>([]);
-    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
+    /**
+     * @function handleImagePicker
+     * @description Handle the image picker
+     * @returns void
+     */
     const handleImagePicker = useCallback(() => {
         const input = document.createElement('input');
         input.type = 'file';
@@ -23,24 +36,56 @@ export default function VerifyDocument() {
         input.multiple = true;
         input.onchange = (e) => {
             const files = Array.from((e.target as HTMLInputElement).files || []);
-            setImages(files.slice(0, 2)); // Only first 2 images
+            setImages(files.slice(0, 2));
         };
         input.click();
     }, []);
 
+    /**
+     * @function verifyDocumentHandler
+     * @description Handle the document verification
+     * @returns void
+     */
     const verifyDocumentHandler = useCallback(async () => {
         if (images.length === 0) {
             ErrorToast('Please select at least one document image');
             return;
         }
+        if (!user) {
+            ErrorToast('User not found');
+            return;
+        }
+        if (user.phoneNumber === null) {
+            ErrorToast('Please verify your phone number first');
+            return;
+        }
+        if (user.isDocumentVerified === 'verified') {
+            ErrorToast('Your document is already verified');
+            return;
+        }
+        if (images.length < 2 || images.length > 2) {
+            ErrorToast('Please select front and back of your document');
+            return;
+        }
+
+        if (!isReady) {
+            ErrorToast('Authentication not ready');
+            return;
+        }
 
         setIsSubmitting(true);
         try {
-            // Add your document verification API call here
-            // const response = await verifyDocument(formData);
-            
-            SuccessToast('Document verification request submitted successfully');
-            router.push('/dashboard/job-seeker/profile');
+            const formData = new FormData();
+            images.forEach(image => {
+                formData.append('files', image);
+            });
+
+            const response = await verifyDocument(formData);
+            if (response.status === 201) {
+                setUser({ ...user, isDocumentVerified: 'Pending' });
+                SuccessToast('Document verification request submitted successfully');
+                router.push('/dashboard/job-seeker/profile');
+            }
         } catch (error: unknown) {
             if (error instanceof AxiosError) {
                 const errorMessage = error.response?.data?.message || 'Failed to submit verification request';
@@ -57,6 +102,15 @@ export default function VerifyDocument() {
         return <Loader />
     }
 
+    if (isLoading) {
+        return <Loader />
+    }
+
+    /**
+     * @function renderVerifiedContent
+     * @returns {JSX.Element}
+     * @description This function is used to render the verified content
+     */
     const renderVerifiedContent = () => (
         <div className="space-y-6">
             <div className="bg-green-50 border border-green-200 rounded-xl p-6">
@@ -65,7 +119,7 @@ export default function VerifyDocument() {
                     <h3 className="text-lg font-semibold text-green-800">Document Verified</h3>
                 </div>
                 <p className="text-green-700">
-                    Your documents are verified. You can now create a gig.
+                    Your documents are verified. You can now create a gig. And many features are unlocked.
                 </p>
             </div>
 
@@ -74,7 +128,7 @@ export default function VerifyDocument() {
                 <div className="flex items-center justify-between">
                     <div>
                         <h4 className="text-lg font-semibold text-gray-900 mb-1">Phone Number</h4>
-                        {/* <p className="text-primary font-medium">{user?.phoneNumber || 'Not added'}</p> */}
+                        <p className="text-primary font-medium">{user?.phoneNumber || 'Not added'}</p>
                     </div>
                     <button
                         onClick={() => router.push('/dashboard/job-seeker/profile/verify-phone')}
@@ -90,19 +144,24 @@ export default function VerifyDocument() {
             <div className="bg-white rounded-xl p-6 shadow-sm">
                 <h4 className="text-lg font-semibold text-gray-900 mb-4">Verified Documents</h4>
                 <div className="grid grid-cols-2 gap-4">
-                    {/* {user?.documents?.map((doc: any, index: number) => (
+                    {user?.documents?.map((doc: { url: string }, index: number) => (
                         <img
                             key={index}
-                            src={doc.url}
+                            src={doc?.url || ''}
                             alt={`Document ${index + 1}`}
                             className="w-full h-32 object-cover rounded-lg border border-gray-200"
                         />
-                    ))} */}
+                    ))}
                 </div>
             </div>
         </div>
     );
 
+    /**
+     * @function renderPendingContent
+     * @returns {JSX.Element}
+     * @description This function is used to render the pending content
+     */
     const renderPendingContent = () => (
         <div className="space-y-6">
             <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-6">
@@ -111,7 +170,7 @@ export default function VerifyDocument() {
                     <h3 className="text-lg font-semibold text-yellow-800">Verification Pending</h3>
                 </div>
                 <p className="text-yellow-700 mb-4">
-                    Your documents are pending. NepalKamma is currently reviewing them. 
+                    Your documents are pending. NepalKamma is currently reviewing them.
                     We will email you once your documents have been verified. Thank you for your patience.
                 </p>
                 <button
@@ -124,6 +183,11 @@ export default function VerifyDocument() {
         </div>
     );
 
+    /**
+     * @function renderUnverifiedContent
+     * @returns {JSX.Element}
+     * @description This function is used to render the unverified content
+     */
     const renderUnverifiedContent = () => (
         <div className="space-y-6">
             <div className="bg-red-50 border border-red-200 rounded-xl p-6">
@@ -132,7 +196,7 @@ export default function VerifyDocument() {
                     <h3 className="text-lg font-semibold text-red-800">Document Verification Required</h3>
                 </div>
                 <p className="text-red-700">
-                    Note: You can't create a gig without verifying your document. This is to ensure that you are a real person and not a bot.
+                    Note: You can't create a gig or access important features without verifying your document. This is to ensure that you are a real person and not a bot.
                 </p>
             </div>
 
@@ -141,7 +205,7 @@ export default function VerifyDocument() {
                 <div className="flex items-center justify-between">
                     <div>
                         <h4 className="text-lg font-semibold text-gray-900 mb-1">Phone Number</h4>
-                        {/* <p className="text-primary font-medium">{user?.phoneNumber || 'Not added'}</p> */}
+                        <p className="text-primary font-medium">{user?.phoneNumber || 'Not added'}</p>
                     </div>
                     <button
                         onClick={() => router.push('/dashboard/job-seeker/profile/verify-phone')}
@@ -157,7 +221,7 @@ export default function VerifyDocument() {
             <div className="bg-white rounded-xl p-6 shadow-sm">
                 <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
                     <p className="text-red-700 text-sm">
-                        Note: You can upload your citizenship card or passport or driving license. 
+                        Note: You can upload your citizenship card or passport or driving license.
                         Please make sure the document is clear and visible.
                     </p>
                 </div>
@@ -237,7 +301,7 @@ export default function VerifyDocument() {
                 <div className="lg:grid lg:grid-cols-12 lg:gap-8">
                     {/* Left Sidebar - Hidden on mobile, visible on desktop */}
                     <SkillsGuide />
-                    
+
                     {/* Main Content */}
                     <div className="lg:col-span-6 py-6">
                         <div className="max-w-2xl mx-auto">

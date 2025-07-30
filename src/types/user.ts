@@ -19,13 +19,13 @@ export interface User {
   bio: string;
   isTick: boolean;
   isVerified: boolean;
-  isDocumentVerified: 'is_verified' | 'is_not_verified' | string;
+  isDocumentVerified: 'verified' | 'is_not_verified' | 'Pending' | string;
   location: string;
   gender: 'male' | 'female' | 'other' | string;
   phoneNumber: string;
   fcm_token: string;
-  can_review: unknown[]; 
-  documents: unknown[];
+  can_review: unknown[];
+  documents: [{ url: string, public_id: string }];
   createdAt: string;
   updatedAt: string;
   savedPostGig: unknown[];

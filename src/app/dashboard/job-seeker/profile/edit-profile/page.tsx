@@ -1,106 +1,55 @@
 
 "use client";
 
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import { Formik } from 'formik';
 import { SuccessToast, ErrorToast } from '@/components/ui/Toast';
-import { updateProfile } from '@/lib/auth';
+import { updateProfile } from '@/lib/profile/profile-api';
 import { AxiosError } from 'axios';
 import { Skills_data } from '@/utils/data/data';
 import Loader from '@/components/global/Loader';
 import { MotivationalQuotes } from '@/components/ui/MotivationalQuotes';
 import SkillsGuide from '@/components/ui/SkillsGuide';
-
-interface EditProfileProps {
-    username: string;
-    title: string;
-    bio: string;
-    about_me: string;
-}
-
-interface Geometry {
-    coordinates: number[];
-    type: string;
-}
-
-const GeoLocationComponent = ({
-    setGeometry,
-    setLocationName
-}: {
-    setGeometry: (geometry: Geometry) => void;
-    setLocationName: (name: string) => void;
-}) => {
-    const [suggestions, setSuggestions] = useState<any[]>([]);
-    const [inputValue, setInputValue] = useState('');
-
-    //   const fetchSuggestions = async (value: string) => {
-    //     if (!value) {
-    //       setSuggestions([]);
-    //       return;
-    //     }
-
-    //     const apiKey = process.env.NEXT_PUBLIC_GEO_API_KEY;
-    //     const url = `https://api.geoapify.com/v1/geocode/autocomplete?text=${encodeURIComponent(
-    //       `${value},Nepal`
-    //     )}&limit=5&apiKey=${apiKey}`;
-
-    //     try {
-    //       const response = await fetch(url);
-    //       const data = await response.json();
-    //       setSuggestions(data.features);
-    //     } catch (error) {
-    //       console.error('Error fetching suggestions:', error);
-    //     }
-    //   };
-
-    const handleSuggestionClick = (place: any) => {
-        const locationName = place.properties.formatted || place.properties.city;
-        setInputValue(locationName);
-        setSuggestions([]);
-        setGeometry(place.geometry);
-        setLocationName(locationName);
-    };
-
-    return (
-        <div className="relative">
-            <input
-                type="text"
-                value={inputValue}
-                onChange={(e) => {
-                    setInputValue(e.target.value);
-                    //   fetchSuggestions(e.target.value);
-                }}
-                placeholder="Search location..."
-                className="w-full px-4 py-3 rounded-md border border-border focus:outline-none text-black placeholder-gray-400"
-            />
-            {suggestions.length > 0 && (
-                <div className="absolute z-10 w-full bg-white border border-gray-200 rounded-md mt-1 max-h-60 overflow-y-auto">
-                    {suggestions.map((place, index) => (
-                        <div
-                            key={index}
-                            onClick={() => handleSuggestionClick(place)}
-                            className="p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100"
-                        >
-                            <span className="text-gray-900">
-                                {place.properties.formatted || place.properties.city}
-                            </span>
-                        </div>
-                    ))}
-                </div>
-            )}
-        </div>
-    );
-};
+import { Geometry } from '@/types/AutoSuggestionT';
+import AutoSuggestionGeoLocation from '@/components/geolocation/AutoSuggestionGeoLocation';
+import { EditProfileProps } from '@/types/job-seeker/EditProfileT';
 
 export default function EditProfile() {
     const router = useRouter();
     const { user, setUser } = useAuthStore();
     const [selectedSkills, setSelectedSkills] = useState<number[]>([]);
     const [locationName, setLocationName] = useState<string>('');
-    const [geometry, setGeometry] = useState<Geometry>({ coordinates: [], type: 'Point' });
+    const [geometry, setGeometry] = useState<Geometry | null>({ coordinates: [], type: 'Point' });
     const [isLoading, setIsLoading] = useState(false);
+
+    //setting the initial values
+    useEffect(() => {
+        if (user?.skills && Array.isArray(user.skills)) {
+            const skillIds = user.skills
+                .map(skillName => Skills_data.find(skill => skill.name === skillName)?.id)
+                .filter(Boolean) as number[];
+
+            setSelectedSkills(skillIds);
+        }
+        if (
+            user?.address &&
+            typeof user.address === 'object' &&
+            'coordinates' in user.address &&
+            Array.isArray((user.address as { coordinates?: unknown }).coordinates) &&
+            ((user.address as { coordinates: unknown[] }).coordinates.length > 1)
+        ) {
+            setLocationName(
+                user.location as string
+            );
+            setGeometry({
+                coordinates: (user.address as { coordinates: number[] }).coordinates,
+                type: 'Point'
+            });
+        }
+    }, [user]);
+
 
     const initialValues = useMemo(
         () => ({
@@ -122,18 +71,22 @@ export default function EditProfile() {
                     (index: number) => Skills_data[index - 1]?.name
                 ).filter(Boolean);
 
+                if (!locationName || !geometry || !geometry.coordinates) {
+                    setIsLoading(false);
+                    ErrorToast('Please select a location');
+                    return;
+                }
+
                 const newValues = {
                     ...values,
                     skills: skillsRequired,
                     location: locationName,
-                    latitude: geometry.coordinates[1],
-                    longitude: geometry.coordinates[0],
+                    latitude: geometry?.coordinates?.[1],
+                    longitude: geometry?.coordinates?.[0],
                 };
-
                 const response = await updateProfile(user._id, newValues);
 
                 if (response) {
-                    // Update user in store
                     setUser({ ...user, ...newValues });
                     SuccessToast('Profile Updated Successfully');
                     router.push('/dashboard/job-seeker/profile');
@@ -169,7 +122,7 @@ export default function EditProfile() {
             <div className="w-full max-w-md lg:max-w-7xl mx-auto px-4 pb-20">
                 <div className="lg:grid lg:grid-cols-12 lg:gap-8">
                     {/* Left Sidebar - Hidden on mobile, visible on desktop */}
-                   <SkillsGuide/>
+                    <SkillsGuide />
                     {/* Main Content */}
                     <div className="lg:col-span-6 py-6">
                         <div className="max-w-2xl mx-auto">
@@ -237,13 +190,34 @@ export default function EditProfile() {
 
                                             {/* Location */}
                                             <div>
-                                                <label className="block text-sm font-medium text-black mb-2">
-                                                    Location
-                                                </label>
-                                                <GeoLocationComponent
+                                                <div className="flex items-center justify-between mb-2">
+                                                    <label className="block text-sm font-medium text-black">
+                                                        Location
+                                                    </label>
+                                                    {locationName && (
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => {
+                                                                setLocationName('');
+                                                                setGeometry({ coordinates: [], type: 'Point' });
+                                                            }}
+                                                            className="flex items-center justify-center w-6 h-6 rounded-full hover:bg-red-200 text-red-600 hover:text-red-700 transition-colors"
+                                                            title="Clear location"
+                                                        >
+                                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                                            </svg>
+                                                        </button>
+                                                    )}
+                                                </div>
+                                                <AutoSuggestionGeoLocation
                                                     setGeometry={setGeometry}
                                                     setLocationName={setLocationName}
                                                 />
+                                                <div className='flex gap-x-2 mt-2'>
+                                                    <span className='text-black text-sm font-semibold'>Location: </span>
+                                                    <span className='text-primary'>{locationName || 'Not selected'}</span>
+                                                </div>
                                             </div>
 
                                             {/* About Me */}

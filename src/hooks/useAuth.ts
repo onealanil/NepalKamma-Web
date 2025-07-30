@@ -15,6 +15,6 @@ export const useAuth = () => {
     return {
         userData: data?.user,
         isLoading,
-        isError: !!error
+        isError: !!error,
     }
 }

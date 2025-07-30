@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useAuthStore } from "@/store/authStore";
 import Loader from "@/components/global/Loader";
+import Header from "@/components/layout/Header";
 
 export default function JobProviderLayout({
     children,
@@ -25,7 +26,7 @@ export default function JobProviderLayout({
 
     if (!hasHydrated || !user || user.role !== 'job_provider') {
         return (
-          <Loader/>
+            <Loader />
         );
     }
 
@@ -33,6 +34,7 @@ export default function JobProviderLayout({
         <div className="min-h-screen pt-25 bg-gradient-to-br from-gray-50 to-gray-100">
             {/* Main Content Area */}
             <div className="flex-1">
+                <Header />
                 {children}
             </div>
         </div>

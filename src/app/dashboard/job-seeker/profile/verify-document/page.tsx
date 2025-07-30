@@ -77,7 +77,7 @@ export default function VerifyDocument() {
                         {/* <p className="text-primary font-medium">{user?.phoneNumber || 'Not added'}</p> */}
                     </div>
                     <button
-                        onClick={() => router.push('/dashboard/job-seeker/phone-verify')}
+                        onClick={() => router.push('/dashboard/job-seeker/profile/verify-phone')}
                         className="flex items-center gap-2 text-primary hover:text-primary/80 font-medium"
                     >
                         <Phone className="w-4 h-4" />
@@ -90,14 +90,14 @@ export default function VerifyDocument() {
             <div className="bg-white rounded-xl p-6 shadow-sm">
                 <h4 className="text-lg font-semibold text-gray-900 mb-4">Verified Documents</h4>
                 <div className="grid grid-cols-2 gap-4">
-                    {user?.documents?.map((doc: any, index: number) => (
+                    {/* {user?.documents?.map((doc: any, index: number) => (
                         <img
                             key={index}
                             src={doc.url}
                             alt={`Document ${index + 1}`}
                             className="w-full h-32 object-cover rounded-lg border border-gray-200"
                         />
-                    ))}
+                    ))} */}
                 </div>
             </div>
         </div>
@@ -144,7 +144,7 @@ export default function VerifyDocument() {
                         {/* <p className="text-primary font-medium">{user?.phoneNumber || 'Not added'}</p> */}
                     </div>
                     <button
-                        onClick={() => router.push('/dashboard/job-seeker/phone-verify')}
+                        onClick={() => router.push('/dashboard/job-seeker/profile/verify-phone')}
                         className="flex items-center gap-2 text-primary hover:text-primary/80 font-medium"
                     >
                         <Phone className="w-4 h-4" />
@@ -169,7 +169,7 @@ export default function VerifyDocument() {
                         </label>
                         <button
                             onClick={handleImagePicker}
-                            className="w-full bg-green-50 border-2 border-dashed border-green-300 rounded-lg p-6 text-center hover:bg-green-100 transition-colors"
+                            className="w-full border-2 border-dashed border-green-300 rounded-lg p-6 text-center transition-colors"
                         >
                             <Upload className="w-8 h-8 text-green-600 mx-auto mb-2" />
                             <p className="text-green-700 font-medium">

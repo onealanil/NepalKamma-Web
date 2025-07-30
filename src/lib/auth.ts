@@ -84,7 +84,3 @@ export const refreshAccessToken = async () => {
     }
 };
 
-export const updateProfile = async (userId: string, profileData: any) => {
-  const response = await axiosInstance.put(`/users/${userId}/profile`, profileData);
-  return response.data;
-};

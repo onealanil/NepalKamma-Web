@@ -17,6 +17,9 @@ const nextConfig: NextConfig = {
         hostname: "** piscum.photos",
       }
     ]
+  },
+  experimental: {
+    optimizePackageImports: ['lucide-react', 'react-icons']
   }
 };
 

@@ -4,7 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import "./globals.css";
-
+import SWRProvider from '@/components/providers/SWRProvider';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,31 +28,17 @@ export const metadata: Metadata = {
  */
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en">
-      <head>
-        <meta name="google-translate-customization" content="your-customization-id" />
-      </head>
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>
-
-        {children}
-        <Footer />
-
-        <ToastContainer
-          position="top-right"
-          autoClose={3000}
-          hideProgressBar={false}
-          newestOnTop={false}
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-          theme="light"
-        />
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <SWRProvider>
+          {children}
+          <Footer/>
+          <ToastContainer />
+        </SWRProvider>
       </body>
     </html>
   );

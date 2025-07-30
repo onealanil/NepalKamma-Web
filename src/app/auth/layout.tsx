@@ -6,6 +6,12 @@ import { useAuthStore } from "@/store/authStore";
 import { useAuthInit } from "@/hooks/useAuthInit";
 import Loader from "@/components/global/Loader";
 
+/**
+ * @function AuthLayout
+ * @param children The children of the layout.
+ * @returns The layout for the authentication pages.
+ * @description This layout is used for the authentication pages. It checks if the user is already logged in and redirects them to the dashboard if they are.
+ */
 export default function AuthLayout({
     children,
 }: {
@@ -34,7 +40,7 @@ export default function AuthLayout({
     }
 
     if (user) {
-        return <Loader/>; // Show loader while redirecting
+        return <Loader/>;
     }
 
     return <>{children}</>;

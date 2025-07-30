@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import { SuccessToast, ErrorToast } from '@/components/ui/Toast';
@@ -11,14 +11,27 @@ import SkillsGuide from '@/components/ui/SkillsGuide';
 import { ArrowLeft, Phone } from 'lucide-react';
 import Image from 'next/image';
 import { updatePhoneNumber } from '@/lib/profile/profile-api';
+import { useEnsureAuth } from '@/hooks/useEnsureAuth';
 
-export default function VerifyPhone() {
+/**
+ * @function VerifyPhone
+ * @description This page is used to verify the phone number of the user
+ * @returns {JSX.Element}
+ */
+export default function VerifyPhone(){
     const router = useRouter();
+    const { isReady, isLoading } = useEnsureAuth();
     const { user } = useAuthStore();
     const [phoneNumber, setPhoneNumber] = useState<string>(user?.phoneNumber || '');
     const [countryCode, setCountryCode] = useState<string>('+977');
     const [isVerifying, setIsVerifying] = useState<boolean>(false);
 
+    /**
+     * @function validatePhoneNumber
+     * @description Validate the phone number
+     * @param phone {string} it is the phone number
+     * @returns boolean
+     */
     const validatePhoneNumber = async (phone: string): Promise<boolean> => {
         const nepalPhoneRegex = /^9[0-9]{9}$/;
         const isValid = nepalPhoneRegex.test(phone);
@@ -42,7 +55,6 @@ export default function VerifyPhone() {
                 if (response?.data.E164Format !== 'Invalid') {
                     return true;
                 } else {
-                    ErrorToast('Invalid Number');
                     return false;
                 }
             } catch (error) {
@@ -54,10 +66,20 @@ export default function VerifyPhone() {
         }
     };
 
+    /**
+     * @function updatePhoneDatabase
+     * @returns void
+     * @description Update the phone number in the database
+     */
     const updatePhoneDatabase = async () => {
+        if (!isReady) {
+            ErrorToast('Authentication not ready');
+            return;
+        }
+
         try {
-            const response = await updatePhoneNumber(countryCode + phoneNumber);
-            if(response.status === 200){
+            const response = await updatePhoneNumber(phoneNumber);
+            if (response.status === 200) {
                 SuccessToast('Phone number added successfully');
             }
             // router.push('/dashboard/job-seeker/profile');
@@ -73,22 +95,35 @@ export default function VerifyPhone() {
         }
     };
 
+    /**
+     * @function handlePhoneVerification
+     * @description Handle the phone verification button click
+     * @returns void
+     */
     const handlePhoneVerification = async () => {
-        if (!phoneNumber) {
-            ErrorToast('Please enter a phone number');
-            return;
-        }
-        setIsVerifying(true);
-        const isValid = await validatePhoneNumber(phoneNumber);
-        if (!isValid) {
-            ErrorToast('Invalid phone number!');
-            return;
-        }
+        try {
+            if (!phoneNumber) {
+                ErrorToast('Please enter a phone number');
+                return;
+            }
+            setIsVerifying(true);
+            const isValid = await validatePhoneNumber(phoneNumber);
+            if (!isValid) {
+                ErrorToast('Invalid phone number!');
+                return;
+            }
 
-        updatePhoneDatabase();
+            await updatePhoneDatabase();
+        }
+        catch (error) {
+            ErrorToast('An error occurred while validating phone number, Try again Later');
+        }
+        finally {
+            setIsVerifying(false);
+        }
     };
 
-    if (!user) {
+    if (isLoading) {
         return <Loader />
     }
 
@@ -106,7 +141,7 @@ export default function VerifyPhone() {
                             <div className="flex items-center gap-4 mb-6">
                                 <button
                                     onClick={() => router.push('/dashboard/job-seeker/profile')}
-                                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                                    className="p-2 rounded-lg transition-colors"
                                 >
                                     <ArrowLeft className="w-6 h-6 text-gray-600" />
                                 </button>

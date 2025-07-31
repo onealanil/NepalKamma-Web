@@ -4,6 +4,11 @@ import { useAuthStore } from '@/store/authStore';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
+/**3
+ * @function LeftSideSeeker
+ * @returns The left side of the dashboard for job seekers. It includes the profile card and quick actions.
+ * @description This component is used to display the left side of the dashboard for job seekers. It includes the profile card and quick actions.
+ */
 function LeftSideSeeker() {
     const { user, hasHydrated } = useAuthStore();
     const router = useRouter();
@@ -61,6 +66,14 @@ function LeftSideSeeker() {
                     <div className="bg-white rounded-xl p-6 shadow-sm">
                         <h3 className="font-bold text-gray-900 mb-4">Quick Actions</h3>
                         <div className="space-y-3">
+                            <Link href="/dashboard/job-seeker/my-gigs" className="w-full flex items-center gap-3 p-3 text-left hover:bg-gray-50 rounded-lg transition-colors">
+                                <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                                    <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2-2v2m8 0H8m8 0v2a2 2 0 01-2 2H10a2 2 0 01-2-2V6m8 0H8m0 10v4a2 2 0 002 2h4a2 2 0 002-2v-4M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h2v12z" />
+                                    </svg>
+                                </div>
+                                <span className="text-gray-700">My Gigs</span>
+                            </Link>
                             <Link href="/dashboard/job-seeker/completed-jobs" className="w-full flex items-center gap-3 p-3 text-left hover:bg-gray-50 rounded-lg transition-colors">
                                 <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
                                     <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">

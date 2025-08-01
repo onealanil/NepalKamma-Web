@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ChevronLeft, Upload, X, Image as ImageIcon } from 'lucide-react';
+import { ChevronLeft, X, Image as ImageIcon } from 'lucide-react';
 import { Formik } from 'formik';
 import CreateGigTips from '@/components/ui/CreateGigTips';
 import { MotivationalQuotes } from '@/components/ui/MotivationalQuotes';
@@ -14,6 +14,8 @@ import { useGigStore } from '@/store/gigStore';
 import { useEnsureAuth } from '@/hooks/useEnsureAuth';
 import { GigI } from '@/types/gig';
 import { AxiosError } from 'axios';
+import { gigSchema } from '@/types/schema/gigSchema';
+import { ZodError } from 'zod';
 
 const initialValues: GigI = {
     title: '',
@@ -30,6 +32,11 @@ const CreateGigPage = () => {
     const [images, setImages] = useState<File[]>([]);
     const [imagePreviews, setImagePreviews] = useState<string[]>([]);
 
+    /**
+     * @function handleImageUpload
+     * @description this function is for handling the image upload
+     * @param e event of the input element
+     */
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = Array.from(e.target.files || []);
         const maxImages = 3;
@@ -54,20 +61,24 @@ const CreateGigPage = () => {
         setImagePreviews(newPreviews);
     };
 
+    /**
+     * @function handleSubmit
+     * @param values values for Gig 
+     * @returns Message to the user if the Gig is successfully created or not
+     * @description this function is for creating the gigs
+     */
     const handleSubmit = async (values: GigI) => {
-        //validation
-        if (!values.title.trim() || values.title.length < 50) {
-            ErrorToast('Please enter a gig title, minimum 50 characters');
-            return;
+        try {
+            //validation
+            gigSchema.parse(values);
+        } catch (error: unknown) {
+            if (error instanceof ZodError) {
+                const firstError = error.issues[0]?.message || "Validation failed";
+                ErrorToast(firstError);
+                return;
+            }
         }
-        if (!values.gig_description.trim() || values.gig_description.length < 100) {
-            ErrorToast('Please enter a description, minimum 100 characters');
-            return;
-        }
-        if (!values.category) {
-            ErrorToast('Please select a category');
-            return;
-        }
+
         if (images.length === 0) {
             ErrorToast('Please add at least one image');
             return;
@@ -155,7 +166,7 @@ const CreateGigPage = () => {
                                             </label>
                                             <input
                                                 type="text"
-                                                placeholder="I will create a modern website for your business"
+                                                placeholder="I will provide home services at any time."
                                                 className="w-full px-4 py-3 border border-green-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                                                 onChange={handleChange('title')}
                                                 onBlur={handleBlur('title')}

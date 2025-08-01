@@ -11,15 +11,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { SuccessToast, ErrorToast } from '@/components/ui/Toast';
 import { updateProfilePicture } from '@/lib/profile/profile-api';
 import { useEnsureAuth } from '@/hooks/useEnsureAuth';
-
-interface Gig {
-    _id: string;
-    title: string;
-    description: string;
-    price: number;
-    category: string;
-    images: string[];
-}
+import { useUserGigs } from '@/hooks/gigs/useGigs';
 
 /**
  * @function ProfilePageSeeker
@@ -31,31 +23,12 @@ export default function ProfilePageSeeker() {
     const { isLoading } = useAuth();
     const { isReady } = useEnsureAuth();
     const { user: userData, setUser } = useAuthStore();
+    const { gigs } = useUserGigs(userData?._id ? userData?._id : "");
     const [currentGigIndex, setCurrentGigIndex] = useState<number>(0);
     const [isUploadingImage, setIsUploadingImage] = useState<boolean>(false);
     const [image, setImage] = useState<File | null>(null);
     const [showImageModal, setShowImageModal] = useState<boolean>(false);
     const [imagePreview, setImagePreview] = useState<string>('');
-
-    // Mock gigs data
-    const [gigs] = useState<Gig[]>([
-        {
-            _id: '1',
-            title: 'Build Modern Website',
-            description: 'Create a responsive website using React and Tailwind CSS',
-            price: 15000,
-            category: 'Web Development',
-            images: ['/images/gig1.jpg']
-        },
-        {
-            _id: '2',
-            title: 'Mobile App Development',
-            description: 'Develop a cross-platform mobile app using React Native',
-            price: 25000,
-            category: 'Mobile Development',
-            images: ['/images/gig2.jpg']
-        }
-    ]);
 
     /**
      * @function handleImagePicker
@@ -138,7 +111,7 @@ export default function ProfilePageSeeker() {
 
     if (isLoading) return <Loader />;
     if (!userData) return <p>No user data found</p>;
-    if (!isReady) return <Loader/>
+    if (!isReady) return <Loader />
 
     return (
         <>
@@ -231,7 +204,7 @@ export default function ProfilePageSeeker() {
                                     <button className="hidden md:flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-lg font-semibold hover:bg-primary/90 transition-colors">
                                         Share Profile
                                     </button>
-                                    <button onClick={() => router.push("/dashboard/job-seeker/profile/verify-document")} className="flex font-semibold items-center gap-2 bg-primary text-white px-8 py-2 rounded-lg hover:bg-primary/90 transition-colors">
+                                    <button onClick={() => router.push("/dashboard/job-seeker/profile/verify-document")} className="flex font-semibold items-center gap-2 bg-primary text-white px-5 md:px-8 py-2 rounded-lg hover:bg-primary/90 transition-colors">
                                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />

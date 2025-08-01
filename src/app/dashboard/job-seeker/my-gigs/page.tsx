@@ -1,43 +1,57 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ChevronLeft, Eye, Edit, Trash2, MoreHorizontal, Calendar, DollarSign } from 'lucide-react';
 import LeftSideSeeker from '@/components/ui/LeftSideSeeker';
 import { MotivationalQuotes } from '@/components/ui/MotivationalQuotes';
 import { GigI } from '@/types/gig';
-import { useGigStore } from '@/store/gigStore';
 import { useAuthStore } from '@/store/authStore';
-import { useEnsureAuth } from '@/hooks/useEnsureAuth';
-import { ErrorToast } from '@/components/ui/Toast';
+import { ErrorToast, SuccessToast } from '@/components/ui/Toast';
 import Loader from '@/components/global/Loader';
+import { useUserGigs } from '@/hooks/gigs/useGigs';
+import { GigCard } from '@/components/gig/GigCard';
+import { deleteGig } from '@/lib/gig/gig-api';
+import SafeHTML from '@/components/global/SafeHTML';
+212
 
 const MyGigsPage = () => {
     const router = useRouter();
-    const { hasHydrated, gigs, fetchUserGigs } = useGigStore();
     const { user } = useAuthStore();
-    const [isLoading, setIsLoading] = useState(true);
+    const { gigs, isLoading, mutate } = useUserGigs(user?._id || "");
     const [selectedGig, setSelectedGig] = useState<GigI | null>(null);
     const [showGigModal, setShowGigModal] = useState(false);
-
-    useEffect(() => {
-        const loadGigs = async () => {
-            setIsLoading(true);
-            await fetchUserGigs(user?._id || '');
-            setIsLoading(false);
-        };
-
-        loadGigs();
-    }, [fetchUserGigs]);
+    const [gigToDelete, setGigToDelete] = useState<GigI | null>(null);
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [isDeleteLoading, setIsDeleteLoading] = useState<boolean>(false);
 
     const handleViewGig = (gig: GigI) => {
         setSelectedGig(gig);
         setShowGigModal(true);
     };
 
-    if (!hasHydrated) {
-        return <Loader />
+    const handleDeleteGig = (gig: GigI) => {
+        setGigToDelete(gig || null);
+        setShowDeleteConfirm(true);
     }
+
+    const handleDeleteGigFunction = async (gigId: string) => {
+        setIsDeleteLoading(true);
+        try {
+            await deleteGig(gigId);
+            setShowDeleteConfirm(false);
+            setGigToDelete(null);
+            SuccessToast("Successfully, Deleted your gig")
+            mutate();
+        } catch (err) {
+            ErrorToast("Failed to delete gig.");
+        } finally {
+            setIsDeleteLoading(false);
+        }
+    }
+
+    if (isLoading) return <Loader />
+
     const GigDetailModal = ({ isOpen, onClose, gig }: { isOpen: boolean; onClose: () => void; gig: GigI | null }) => {
         if (!isOpen || !gig) return null;
 
@@ -68,7 +82,8 @@ const MyGigsPage = () => {
                         <div className="space-y-6">
                             <div>
                                 <h4 className="font-semibold text-gray-900 mb-2">Description</h4>
-                                <p className="text-gray-600 leading-relaxed">{gig.gig_description}</p>
+                                <SafeHTML html={gig?.gig_description || ''} />
+
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -92,15 +107,16 @@ const MyGigsPage = () => {
                                 </div>
                                 <div className="bg-gray-50 p-4 rounded-lg">
                                     <h5 className="font-semibold text-gray-900 mb-1">Created</h5>
-                                    {/* <p className="text-gray-700">{new Date(gig.createdAt).toLocaleDateString()}</p> */}
+                                    <p className="text-gray-700">
+                                        {
+                                            gig.createdAt ?
+                                                new Date(gig.createdAt).toLocaleDateString() : "N/A"
+                                        }
+                                    </p>
                                 </div>
                             </div>
 
                             <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t">
-                                <button className="flex-1 bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center gap-2">
-                                    <Edit className="w-4 h-4" />
-                                    Edit Gig
-                                </button>
                                 <button className="flex-1 bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700 transition-colors flex items-center justify-center gap-2">
                                     <Trash2 className="w-4 h-4" />
                                     Delete Gig
@@ -119,71 +135,6 @@ const MyGigsPage = () => {
         );
     };
 
-    const GigCard = ({ gig }: { gig: GigI }) => (
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-            <div className="flex items-start gap-4">
-                <div className="w-16 h-16 bg-gradient-to-br from-primary/20 to-green-100 rounded-xl flex items-center justify-center overflow-hidden">
-                    {gig.images?.[0]?.url ? (
-                        <img
-                            src={gig.images[0].url}
-                            alt={gig.title}
-                            className="w-full h-full object-cover"
-                        />
-                    ) : (
-                        <span className="text-2xl">
-                            {gig.category === 'Web Development' ? '💻' :
-                                gig.category === 'Design' ? '🎨' : '🔧'}
-                        </span>
-                    )}
-                </div>
-
-                <div className="flex-1">
-                    <div className="flex items-start justify-between mb-2">
-                        <h3 className="font-bold text-gray-900 text-lg">{gig.title}</h3>
-                        <div className="flex items-center gap-2">
-                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${gig.visibility === 'public' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'
-                                }`}>
-                                {gig.visibility}
-                            </span>
-                            <button className="p-1 hover:bg-gray-100 rounded-full">
-                                <MoreHorizontal className="w-4 h-4 text-gray-500" />
-                            </button>
-                        </div>
-                    </div>
-
-                    <p className="text-gray-600 text-sm mb-3 line-clamp-2">{gig.gig_description}</p>
-
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4 text-sm text-gray-500">
-                            <div className="flex items-center gap-1">
-                                <DollarSign className="w-4 h-4" />
-                                <span className="font-semibold text-primary">₹{gig.price.toLocaleString()}</span>
-                            </div>
-                            <div className="flex items-center gap-1">
-                                <Calendar className="w-4 h-4" />
-                                {/* <span>{new Date(gig.createdAt).toLocaleDateString()}</span> */}
-                            </div>
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                            <button
-                                onClick={() => handleViewGig(gig)}
-                                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                            >
-                                <Eye className="w-4 h-4 text-gray-600" />
-                            </button>
-                            <button className="p-2 hover:bg-blue-100 rounded-lg transition-colors">
-                                <Edit className="w-4 h-4 text-blue-600" />
-                            </button>
-                            <button className="p-2 hover:bg-red-100 rounded-lg transition-colors">
-                                <Trash2 className="w-4 h-4 text-red-600" />
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
 
     const LoadingCard = () => (
         <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 animate-pulse">
@@ -232,7 +183,7 @@ const MyGigsPage = () => {
                             <div className="bg-white rounded-xl p-4 shadow-sm">
                                 <div className="text-center">
                                     <p className="text-2xl font-bold text-green-600">
-                                        {gigs.filter(g => g.visibility === 'public').length}
+                                        {gigs.filter((g: GigI) => g.visibility === 'public').length}
                                     </p>
                                     <p className="text-gray-600 text-sm">Active Gigs</p>
                                 </div>
@@ -260,8 +211,8 @@ const MyGigsPage = () => {
                                     ))}
                                 </>
                             ) : gigs.length > 0 ? (
-                                gigs.map((gig) => (
-                                    <GigCard key={gig._id} gig={gig} />
+                                gigs.map((gig: GigI) => (
+                                    <GigCard key={gig._id} gig={gig} onView={handleViewGig} onDelete={handleDeleteGig} />
                                 ))
                             ) : (
                                 <div className="bg-white rounded-xl p-8 text-center shadow-sm">
@@ -288,6 +239,39 @@ const MyGigsPage = () => {
                 onClose={() => setShowGigModal(false)}
                 gig={selectedGig}
             />
+            {showDeleteConfirm && gigToDelete && (
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-xl max-w-md w-full p-6 text-center">
+                        <h3 className="text-xl font-bold mb-4 text-gray-900">Delete Gig</h3>
+                        <p className="text-gray-700 mb-6">
+                            Are you sure you want to delete <span className="font-semibold">{gigToDelete.title}</span>? This action cannot be undone.
+                        </p>
+                        <div className="flex justify-center gap-4">
+                            <button
+                                onClick={() => setShowDeleteConfirm(false)}
+                                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={() => gigToDelete._id && handleDeleteGigFunction(gigToDelete._id)}
+                                disabled={isDeleteLoading}
+                                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
+                            >
+                                {isDeleteLoading ? (
+                                    <div className="flex items-center justify-center gap-3">
+                                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                        Deleting Gig...
+                                    </div>
+                                ) : (
+                                    'Delete Gig'
+                                )}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
         </div>
     );
 };

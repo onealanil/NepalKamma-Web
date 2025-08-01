@@ -56,3 +56,15 @@ export async function fetchUserGigs(id: string) {
         ErrorToast("Something Went wrong while fetching your gigs!");
     }
 }
+
+
+export async function deleteGig(id: string) {
+    try {
+        const res = await axiosInstance.delete(`/gig/deleteUsergig/${id}`);
+        return res.data;
+    }
+    catch (error: unknown) {
+        ErrorToast("Something Went wrong while fetching your gigs!");
+    }
+}
+

@@ -10,6 +10,7 @@ export interface GigI {
     images?: [{ url: string, public_id: string }];
     postedBy?: User;
     visibility?: 'public' | 'private' | string;
-    createdAt?: string;
-    updatedAt?: string;
+    createdAt?: Date;
+    updatedAt?: Date;
 }
+

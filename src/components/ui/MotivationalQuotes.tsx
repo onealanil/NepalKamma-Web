@@ -2,7 +2,7 @@
 
 import React from "react";
 
-export const MotivationalQuotes = () => {
+export const MotivationalQuotes = ({ isProvider }: {isProvider:boolean}) => {
     const quotes = [
         {
             text: "Your skills are your currency. Keep investing in yourself.",
@@ -76,7 +76,12 @@ export const MotivationalQuotes = () => {
                     <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
                         <div className="w-2 h-2 bg-primary rounded-full mt-2"></div>
                         <p className="text-sm text-gray-700">
-                            Complete your skills section to get better job matches
+                            {
+                                isProvider ?
+                                    "Complete your job listings to attract more freelancers" :
+                                    "Complete your skills section to get better job matches"
+
+                            }
                         </p>
                     </div>
                     <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">

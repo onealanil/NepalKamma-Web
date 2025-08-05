@@ -36,7 +36,7 @@ export default function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <SWRProvider>
           {children}
-          <Footer/>
+          {/* <Footer/> */}
           <ToastContainer />
         </SWRProvider>
       </body>

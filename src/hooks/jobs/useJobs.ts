@@ -1,17 +1,18 @@
-import useSWR, { mutate } from "swr";
-import { fetchUserGigs } from "@/lib/gig/gig-api";
+import useSWR, {mutate} from "swr";
+import { fetchUserJobs } from "@/lib/job/job-api";
 
-export const useUserJobs = (userId: string) => {
-    const key = userId ? `/gig/getSingleUserGig/${userId}` : null;
+export const useUserJobs = (userId?: string) => {
+    const key = userId ? `/job/getSingleUserJob/${userId}` : null;
     
     const { data, error, isLoading, mutate: revalidate } = useSWR(
         key,
-        () => fetchUserGigs(userId),
+        () => fetchUserJobs(userId as string),
         { revalidateOnFocus: false }
     );
 
+
     return {
-        gigs: data?.userGigs || [],
+        jobs: data?.userJobs || [],
         isLoading,
         isError: !!error,
         mutate: revalidate,

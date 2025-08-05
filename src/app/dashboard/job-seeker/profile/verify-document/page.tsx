@@ -322,7 +322,7 @@ export default function VerifyDocument() {
 
                     {/* Right Sidebar - Hidden on mobile, visible on desktop */}
                     <div className="hidden lg:block lg:col-span-3 py-6">
-                        <MotivationalQuotes />
+                        <MotivationalQuotes isProvider={false} />
                     </div>
                 </div>
             </div>

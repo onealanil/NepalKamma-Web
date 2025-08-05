@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ChevronLeft, Eye, Edit, Trash2, MoreHorizontal, Calendar, DollarSign } from 'lucide-react';
+import { ChevronLeft, Trash2} from 'lucide-react';
 import LeftSideSeeker from '@/components/ui/LeftSideSeeker';
 import { MotivationalQuotes } from '@/components/ui/MotivationalQuotes';
 import { GigI } from '@/types/gig';
@@ -13,7 +13,6 @@ import { useUserGigs } from '@/hooks/gigs/useGigs';
 import { GigCard } from '@/components/gig/GigCard';
 import { deleteGig } from '@/lib/gig/gig-api';
 import SafeHTML from '@/components/global/SafeHTML';
-212
 
 const MyGigsPage = () => {
     const router = useRouter();
@@ -229,7 +228,7 @@ const MyGigsPage = () => {
 
                     {/* Right Sidebar */}
                     <div className="hidden lg:block lg:col-span-3 py-6">
-                        <MotivationalQuotes />
+                        <MotivationalQuotes isProvider={false} />
                     </div>
                 </div>
             </div>

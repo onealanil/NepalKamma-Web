@@ -7,9 +7,10 @@ import { GeoapifyResponse, GeoLocationProps, Place } from '@/types/AutoSuggestio
 const AutoSuggestionGeoLocation = ({ setGeometry, setLocationName }: GeoLocationProps) => {
     const [suggestions, setSuggestions] = useState<Place[]>([]);
     const [inputValue, setInputValue] = useState('');
+    const [hasSelected, setHasSelected] = useState(false); // ✅ NEW
 
     const fetchSuggestions = debounce(async (value: string) => {
-        if (!value) {
+        if (!value || hasSelected) { // ✅ prevent fetch if already selected
             setSuggestions([]);
             return;
         }
@@ -21,10 +22,8 @@ const AutoSuggestionGeoLocation = ({ setGeometry, setLocationName }: GeoLocation
 
         try {
             const response = await fetch(url);
-            if (!response.ok) {
-                console.error('Network response was not ok');
-                throw new Error('Network response was not ok');
-            }
+            if (!response.ok) throw new Error('Network response was not ok');
+
             const data: GeoapifyResponse = await response.json();
             setSuggestions(data.features);
         } catch (error) {
@@ -35,12 +34,14 @@ const AutoSuggestionGeoLocation = ({ setGeometry, setLocationName }: GeoLocation
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
         setInputValue(value);
+        setHasSelected(false);
         fetchSuggestions(value);
     };
 
     const handleSuggestionPress = (place: Place) => {
         const locationName = place.properties.formatted || place.properties.city;
         setInputValue(locationName);
+        setHasSelected(true);
         setSuggestions([]);
 
         if (setGeometry) setGeometry(place.geometry);
@@ -60,7 +61,7 @@ const AutoSuggestionGeoLocation = ({ setGeometry, setLocationName }: GeoLocation
                 className="w-full rounded-md text-black px-3 py-2 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
             />
 
-            {suggestions.length > 0 && (
+            {!hasSelected && suggestions.length > 0 && ( // ✅ prevent showing if selected
                 <div className="absolute top-full left-0 right-0 z-20 mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto">
                     {suggestions.map((suggestion, index) => (
                         <div

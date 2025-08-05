@@ -5,13 +5,13 @@ import { useCallback, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import Loader from '@/components/global/Loader';
-import LeftSideSeeker from '@/components/ui/LeftSideSeeker';
 import { MotivationalQuotes } from '@/components/ui/MotivationalQuotes';
 import { useAuth } from '@/hooks/useAuth';
 import { SuccessToast, ErrorToast } from '@/components/ui/Toast';
 import { updateProfilePicture } from '@/lib/profile/profile-api';
 import { useEnsureAuth } from '@/hooks/useEnsureAuth';
-import { useUserGigs } from '@/hooks/gigs/useGigs';
+import LeftSideProvider from '@/components/ui/LeftSideProvider';
+import { useUserJobs } from '@/hooks/jobs/useJobs';
 
 /**
  * @function ProfilePageProvider
@@ -23,8 +23,8 @@ export default function ProfilePageProvider() {
     const { isLoading } = useAuth();
     const { isReady } = useEnsureAuth();
     const { user: userData, setUser } = useAuthStore();
-    const { gigs } = useUserGigs(userData?._id ? userData?._id : "");
-    const [currentGigIndex, setCurrentGigIndex] = useState<number>(0);
+    const { jobs } = useUserJobs(userData?._id || '');
+    const [currentJobIndex, setcurrentJobIndex] = useState<number>(0);
     const [isUploadingImage, setIsUploadingImage] = useState<boolean>(false);
     const [image, setImage] = useState<File | null>(null);
     const [showImageModal, setShowImageModal] = useState<boolean>(false);
@@ -100,11 +100,11 @@ export default function ProfilePageProvider() {
         setShowImageModal(false);
     };
 
-    const handleNextGig = () => {
-        if (currentGigIndex < gigs.length - 1) {
-            setCurrentGigIndex(currentGigIndex + 1);
+    const handleNextJob = () => {
+        if (currentJobIndex < jobs.length - 1) {
+            setcurrentJobIndex(currentJobIndex + 1);
         } else {
-            setCurrentGigIndex(0);
+            setcurrentJobIndex(0);
         }
     };
 
@@ -118,7 +118,7 @@ export default function ProfilePageProvider() {
                 <div className="w-full max-w-md lg:max-w-7xl mx-auto px-4 pb-20">
                     <div className="lg:grid lg:grid-cols-12 lg:gap-8">
                         {/* Left Sidebar - Hidden on mobile, visible on desktop */}
-                        <LeftSideSeeker />
+                        <LeftSideProvider />
 
                         {/* Main Content */}
                         <div className="lg:col-span-6 py-6">
@@ -229,31 +229,31 @@ export default function ProfilePageProvider() {
                                 </div>
                             </div>
 
-                            {/* My Gigs Section */}
+                            {/* My jobs Section */}
                             <div className="bg-white rounded-xl p-6 shadow-sm">
                                 <h2 className="text-xl font-bold text-gray-900 mb-4">My Gigs</h2>
-                                {gigs.length > 0 ? (
+                                {jobs.length > 0 ? (
                                     <div>
                                         <div className="border rounded-xl p-4 mb-4">
                                             <div className="flex justify-between items-start mb-3">
-                                                <h3 className="text-lg font-semibold text-gray-900">{gigs[currentGigIndex].title}</h3>
+                                                <h3 className="text-lg font-semibold text-gray-900">{jobs[currentJobIndex].title}</h3>
                                                 <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-medium">
-                                                    ₹{gigs[currentGigIndex].price.toLocaleString()}
+                                                    ₹{jobs[currentJobIndex].price.toLocaleString()}
                                                 </span>
                                             </div>
-                                            <p className="text-gray-600 mb-3">{gigs[currentGigIndex].description}</p>
+                                            <p className="text-gray-600 mb-3">{jobs[currentJobIndex].description}</p>
                                             <div className="flex items-center justify-between">
                                                 <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">
-                                                    {gigs[currentGigIndex].category}
+                                                    {jobs[currentJobIndex].category}
                                                 </span>
                                                 <span className="text-sm text-gray-500">
-                                                    {currentGigIndex + 1} of {gigs.length}
+                                                    {currentJobIndex + 1} of {jobs.length}
                                                 </span>
                                             </div>
                                         </div>
 
                                         <button
-                                            onClick={handleNextGig}
+                                            onClick={handleNextJob}
                                             className="w-full bg-primary text-white py-3 rounded-xl font-semibold hover:bg-primary/90 transition-colors"
                                         >
                                             Next
@@ -269,7 +269,7 @@ export default function ProfilePageProvider() {
 
                         {/* Right Sidebar - Hidden on mobile, visible on desktop */}
                         <div className="hidden lg:block lg:col-span-3 py-6">
-                            <MotivationalQuotes />
+                            <MotivationalQuotes isProvider={true} />
                         </div>
                     </div>
                 </div>

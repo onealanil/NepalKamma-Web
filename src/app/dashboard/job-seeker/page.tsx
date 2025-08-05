@@ -125,7 +125,7 @@ function JobSeekerDashboard() {
                         <div className="mb-6">
                             <div className="text-center lg:text-left mb-6">
                                 <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-2">
-                                    Find Your Next <span className="text-primary">Gig</span>
+                                    Find Your Next <span className="text-primary">Job</span>
                                 </h1>
                                 <p className="text-gray-600">Discover local opportunities in your neighborhood</p>
                             </div>

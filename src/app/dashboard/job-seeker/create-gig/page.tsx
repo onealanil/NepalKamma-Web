@@ -294,7 +294,7 @@ const CreateGigPage = () => {
 
                     {/* Right Sidebar */}
                     <div className="hidden lg:block lg:col-span-3 py-6">
-                        <MotivationalQuotes />
+                        <MotivationalQuotes isProvider={false} />
                     </div>
                 </div>
             </div>

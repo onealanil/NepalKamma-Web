@@ -10,8 +10,7 @@ import { ErrorToast } from "@/components/ui/Toast";
  * @returns Response from the server
  * @route POST /job/createJob
 */
- * @returns 
- */
+
 export async function createJob(job: JobI) {
     try {
         const response = await axiosInstance.post(`/job/createJob`, job);
@@ -21,3 +20,22 @@ export async function createJob(job: JobI) {
         ErrorToast("Something Went wrong while creating jobs!");
     }
 }
+
+/**
+ * 
+ * @function fetchUserJobs
+ * @description this function helps to fetch the user jobs
+ * @param userId: User ID
+ * @returns Response from the server
+ * @route GET /job/getSingleUserJob/:userId
+*/
+export async function fetchUserJobs(userId: string) {
+    try {
+        const response = await axiosInstance.get(`/job/getSingleUserJob/${userId}`);
+        return response.data;
+    }
+    catch (error: unknown) {
+        ErrorToast("Something Went wrong while fetching user jobs!");
+    }
+}
+

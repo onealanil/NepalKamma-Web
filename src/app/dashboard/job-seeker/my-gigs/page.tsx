@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ChevronLeft, Trash2} from 'lucide-react';
+import { ChevronLeft, Trash2 } from 'lucide-react';
 import LeftSideSeeker from '@/components/ui/LeftSideSeeker';
 import { MotivationalQuotes } from '@/components/ui/MotivationalQuotes';
 import { GigI } from '@/types/gig';
@@ -13,11 +13,20 @@ import { useUserGigs } from '@/hooks/gigs/useGigs';
 import { GigCard } from '@/components/gig/GigCard';
 import { deleteGig } from '@/lib/gig/gig-api';
 import SafeHTML from '@/components/global/SafeHTML';
+import { LoadingCard } from '@/components/ui/loader/LoadingCard';
 
 const MyGigsPage = () => {
     const router = useRouter();
-    const { user } = useAuthStore();
-    const { gigs, isLoading, mutate } = useUserGigs(user?._id || "");
+    const { user, hasHydrated } = useAuthStore();
+
+    if (!hasHydrated || !user) {
+        return <Loader />;
+    }
+
+    const userId = user._id;
+    const { gigs, isLoading, mutate } = useUserGigs(userId);
+
+
     const [selectedGig, setSelectedGig] = useState<GigI | null>(null);
     const [showGigModal, setShowGigModal] = useState(false);
     const [gigToDelete, setGigToDelete] = useState<GigI | null>(null);
@@ -45,7 +54,7 @@ const MyGigsPage = () => {
         } catch (err) {
             ErrorToast("Failed to delete gig.");
         } finally {
-            setIsDeleteLoading(false);
+            setIsDeleteLoading(false); ``
         }
     }
 
@@ -133,20 +142,6 @@ const MyGigsPage = () => {
             </div>
         );
     };
-
-
-    const LoadingCard = () => (
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 animate-pulse">
-            <div className="flex items-start gap-4">
-                <div className="w-16 h-16 bg-gray-200 rounded-xl"></div>
-                <div className="flex-1">
-                    <div className="h-5 bg-gray-200 rounded mb-2 w-3/4"></div>
-                    <div className="h-4 bg-gray-200 rounded mb-3 w-full"></div>
-                    <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-                </div>
-            </div>
-        </div>
-    );
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">

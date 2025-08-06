@@ -57,7 +57,12 @@ export async function fetchUserGigs(id: string) {
     }
 }
 
-
+/**
+ * @param id Gig ID
+ * @description This function is used to delete the gig
+ * @route DELETE /gig/deleteUsergig/:id
+ * @returns Response from the server
+ */
 export async function deleteGig(id: string) {
     try {
         const res = await axiosInstance.delete(`/gig/deleteUsergig/${id}`);

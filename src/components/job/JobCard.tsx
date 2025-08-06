@@ -5,9 +5,11 @@ import { Calendar, Eye, Trash2 } from "lucide-react";
 
 type JobCardProps = {
     job: JobI;
+    onDelete: (job: JobI) => void;
+    onView: (job: JobI) => void;
 };
 
-export default function JobCard({ job }: JobCardProps) {
+export default function JobCard({ job, onDelete, onView }: JobCardProps) {
     const getUrgencyColor = (urgency?: string) => {
         switch (urgency) {
             case 'Urgent': return 'bg-red-100 text-red-600';
@@ -73,15 +75,15 @@ export default function JobCard({ job }: JobCardProps) {
 
                     <div className="flex items-center gap-2">
                         <button
-                            // onClick={() => onView(gig)}
+                            onClick={() => onView(job)}
                             className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
                         >
                             <Eye className="w-4 h-4 text-gray-600" />
                         </button>
                         <button
-                            // onClick={() => {
-                            //     if (job._id) onDelete(job);
-                            // }}
+                            onClick={() => {
+                                if (job._id) onDelete(job);
+                            }}
                             className="p-2 hover:bg-red-100 rounded-lg transition-colors"
                         >
                             <Trash2 className="w-4 h-4 text-red-600" />

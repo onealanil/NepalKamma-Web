@@ -1,13 +1,23 @@
-import useSWR, { mutate } from "swr";
+import useSWR from "swr";
 import { fetchUserGigs } from "@/lib/gig/gig-api";
 
-export const useUserGigs = (userId: string) => {
+export const useUserGigs = (userId?: string) => {
     const key = userId ? `/gig/getSingleUserGig/${userId}` : null;
-    
+
     const { data, error, isLoading, mutate: revalidate } = useSWR(
         key,
-        () => fetchUserGigs(userId),
-        { revalidateOnFocus: false }
+        () => userId ? fetchUserGigs(userId) : null,
+        {
+            revalidateOnFocus: false,
+            onErrorRetry: (error, key, config, revalidate, { retryCount }) => {
+                if (error.status === 404) return;
+
+
+                if (retryCount >= 3) return;
+
+                setTimeout(() => revalidate({ retryCount }), 5000);
+            }
+        }
     );
 
     return {

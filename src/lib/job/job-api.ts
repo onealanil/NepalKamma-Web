@@ -39,3 +39,39 @@ export async function fetchUserJobs(userId: string) {
     }
 }
 
+/**
+ * 
+ * @function deleteJob
+ * @description this function helps to delete the job
+ * @param jobId: Job ID
+ * @returns Response from the server
+ * @route DELETE /job/deleteJob/:jobId
+*/
+export async function deleteJob(jobId: string) {
+    try {
+        const response = await axiosInstance.delete(`/job/deleteJob/${jobId}`);
+        return response.data;
+    }
+    catch (error: unknown) {
+        ErrorToast("Something Went wrong while deleting the job!");
+    }
+}
+
+/**
+ * @function updateJob
+ * @description this function helps to update the job
+ * @param jobId: Job ID
+ * @param jobData: Updated job data
+ * @returns Response from the server
+ * @route PUT /job/updateJob/:jobId
+ */
+
+export async function updateJob(jobId: string, jobData: JobI) {
+    try {
+        const response = await axiosInstance.put(`/job/updateJobStatus/${jobId}`, jobData);
+        return response.data;
+    }
+    catch (error: unknown) {
+        ErrorToast("Something Went wrong while updating the job!");
+    }
+}

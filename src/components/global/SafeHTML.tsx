@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import parse from 'html-react-parser';
 
-export default function SafeHTML({ html }: { html: string }) {
+export default function SafeHTML({ html, isFullDescription }: { html: string, isFullDescription?: boolean }) {
   const [parsed, setParsed] = useState<React.ReactNode>(null);
 
   useEffect(() => {
@@ -15,7 +15,7 @@ export default function SafeHTML({ html }: { html: string }) {
   }, [html]);
 
   return (
-    <div className="text-gray-600 text-sm mb-3 line-clamp-2">
+    <div className={`text-gray-600 text-sm mb-3 ${isFullDescription ? "" : "line-clamp-2"}`}>
       {parsed ?? <span className="text-gray-300">No description available</span>}
     </div>
   );

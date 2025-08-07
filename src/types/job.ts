@@ -18,8 +18,8 @@ export interface JobI {
     experiesIn?: Date;
     visibility?: "public" | "private" | string;
     priority?: "low" | "medium" | "Urgent" | string;
-    experiesInHrs?: number;
+    experiesInHrs?: string;
     createdAt?: Date;
     updatedAt?: Date;
-
+    recommendationReason?: string;
 }

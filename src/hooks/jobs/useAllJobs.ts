@@ -1,27 +1,25 @@
 import useSWR from "swr";
-import { fetchUserJobs } from "@/lib/job/job-api";
+import { fetchAllJobs } from "@/lib/job/job-api";
 
 /**
- * @function useUserJobs
- * @param userId : User Id who posted the job
+ * @function useAllJobs
  * @returns: {jobs: JobI[], isLoading: boolean, isError: boolean, mutate: () => void}
  * @description: This hook is for the job-provider, who posted the job
  */
-export const useUserJobs = (userId?: string) => {
-    const key = userId ? `/job/getSingleUserJob/${userId}` : null;
+export const useAllJobs = () => {
+    const key = `/job`
 
     const { data, error, isLoading, mutate: revalidate } = useSWR(
         key,
         async () => {
-            if (!userId) return null;
-            const response = await fetchUserJobs(userId);
+            const response = await fetchAllJobs();
             return response.success ? response.data : null;
         },
         { revalidateOnFocus: false }
     );
 
     return {
-        jobs: data?.userJobs || [],
+        jobs: data || [],
         isLoading,
         isError: !!error,
         mutate: revalidate,

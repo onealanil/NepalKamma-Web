@@ -4,44 +4,78 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import LeftSideSeeker from "@/components/ui/LeftSideSeeker";
 import { Job } from "@/types/job-seeker/home";
+import { useAllJobs } from "@/hooks/jobs/useAllJobs";
+import { JobI } from "@/types/job";
+import JobCardSeeker from "@/components/job/JobCardSeeker";
 
+
+// Object { job: (2) [\u2026], totalPages: 1, totalJobs: 2, currentPage: 1 }
+// \u200b
+// currentPage: 1
+// \u200b
+// job: Array [ {\u2026}, {\u2026} ]
+// \u200b\u200b
+// 0: Object { _id: "6894116a05eed6f8c1231144", title: "Maths teacher needed at itahari", location: "Itahari, Nepal", \u2026 }
+// \u200b\u200b\u200b
+// __v: 0
+// \u200b\u200b\u200b
+// _id: "6894116a05eed6f8c1231144"
+// \u200b\u200b\u200b
+// address: Object { coordinates: (2) [\u2026], type: "Point" }
+// \u200b\u200b\u200b
+// assignedTo: null
+// \u200b\u200b\u200b
+// category: "education_training"
+// \u200b\u200b\u200b
+// createdAt: "2025-08-07T02:37:30.991Z"
+// \u200b\u200b\u200b
+// experiesIn: "2025-08-07T14:37:30.988Z"
+// \u200b\u200b\u200b
+// job_description: "<p>I will provide home service at any time I will provide home service at any time I will provide home service at any time I will provide home service at any time I will provide home service at any time I will provide home service at any time </p>"
+// \u200b\u200b\u200b
+// job_status: "Pending"
+// \u200b\u200b\u200b
+// location: "Itahari, Nepal"
+// \u200b\u200b\u200b
+// payment_method: Array [ "cash" ]
+// \u200b\u200b\u200b
+// phoneNumber: "9804077722"
+// \u200b\u200b\u200b
+// postedBy: Object { _id: "688746faaaa35c1c80ec3d00", username: "Emily Clarke", email: "23bhandarianil@gmail.com", \u2026 }
+// \u200b\u200b\u200b
+// price: 500
+// \u200b\u200b\u200b
+// priority: "Medium"
+// \u200b\u200b\u200b
+// rating: 0
+// \u200b\u200b\u200b
+// skills_required: Array [ "teaching" ]
+// \u200b\u200b\u200b
+// title: "Maths teacher needed at itahari"
+// \u200b\u200b\u200b
+// updatedAt: "2025-08-07T02:37:30.991Z"
+// \u200b\u200b\u200b
+// visibility: "public"
+// \u200b\u200b\u200b
+// <prototype>: Object { \u2026 }
+// \u200b\u200b
+// 1: Object { _id: "6894114005eed6f8c1231137", title: "Databases Teacher needed at biratchowk", location: "Biratchok, Koshi Province, Nepal", \u2026 }
+// \u200b\u200b
+// length: 2
+// \u200b\u200b
+// <prototype>: Array []
+// \u200b
+// totalJobs: 2
+// \u200b
+// totalPages: 1
 
 function ExplorePage() {
     const router = useRouter();
-    const [currentTab, setCurrentTab] = useState<'Best Matches' | 'Most Recent' | 'Nearby'>('Best Matches');
+    const { jobs } = useAllJobs();
     const [isLoading, setIsLoading] = useState(true);
-    const [locationPermissionDenied, setLocationPermissionDenied] = useState(false);
     const [selectedJob, setSelectedJob] = useState<Job | null>(null);
     const [showJobModal, setShowJobModal] = useState(false);
-
-    // Mock data with more realistic content
-    const [recommendedJobs, setRecommendedJobs] = useState<Job[]>([
-        {
-            _id: '1',
-            title: 'Fix Ceiling Fan',
-            description: 'Need someone to repair my ceiling fan that stopped working. Quick job, should take 1-2 hours.',
-            location: 'Thamel, Kathmandu',
-            salary: 1500,
-            createdAt: '2024-01-15',
-            category: 'Electrical',
-            urgency: 'medium',
-            distance: '0.5 km'
-        },
-        {
-            _id: '2',
-            title: 'Guitar Lessons',
-            description: 'Looking for a guitar teacher for my 12-year-old son. Beginner level, 2 sessions per week.',
-            location: 'Lalitpur',
-            salary: 3000,
-            createdAt: '2024-01-14',
-            category: 'Teaching',
-            urgency: 'low',
-            distance: '1.2 km'
-        }
-    ]);
-    const [recentJobs, setRecentJobs] = useState<Job[]>([]);
-    const [nearbyJobs, setNearbyJobs] = useState<Job[]>([]);
-
+    
     useEffect(() => {
         // Simulate loading
         setTimeout(() => {
@@ -49,69 +83,19 @@ function ExplorePage() {
         }, 1500);
     }, []);
 
-    const setCurrentTabHandler = (tab: 'Best Matches' | 'Most Recent' | 'Nearby') => {
-        setCurrentTab(tab);
-    };
-
     const handleJobSelect = (job: Job) => {
         setSelectedJob(job);
         setShowJobModal(true);
     };
 
-    const handleRetryPermission = () => {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                () => setLocationPermissionDenied(false),
-                () => setLocationPermissionDenied(true)
-            );
-        }
-    };
-
-    const getCurrentJobs = () => {
-        switch (currentTab) {
-            case 'Best Matches':
-                return recommendedJobs;
-            case 'Most Recent':
-                return recentJobs;
-            case 'Nearby':
-                return nearbyJobs;
-            default:
-                return [];
-        }
-    };
-
-    const getUrgencyColor = (urgency?: string) => {
-        switch (urgency) {
-            case 'high': return 'bg-red-100 text-red-600';
-            case 'medium': return 'bg-yellow-100 text-yellow-600';
-            case 'low': return 'bg-green-100 text-green-600';
-            default: return 'bg-gray-100 text-gray-600';
-        }
-    };
 
     const getEmptyMessage = () => {
-        switch (currentTab) {
-            case 'Best Matches':
-                return {
-                    title: 'No recommended jobs available',
-                    subtitle: 'Complete your profile to get personalized job recommendations',
-                    icon: '🎯'
-                };
-            case 'Most Recent':
-                return {
-                    title: 'No recent jobs available',
-                    subtitle: 'Check back later for new opportunities',
-                    icon: '⏰'
-                };
-            case 'Nearby':
-                return {
-                    title: 'No nearby jobs available',
-                    subtitle: 'Enable location to find jobs in your area',
-                    icon: '📍'
-                };
-            default:
-                return { title: '', subtitle: '', icon: '' };
-        }
+        return {
+            title: 'No jobs available',
+            subtitle: 'Complete your profile to get job recommendations',
+            icon: '🎯'
+        };
+
     };
 
 
@@ -168,28 +152,9 @@ function ExplorePage() {
                                 </div>
                             )}
 
-                            {locationPermissionDenied && (
-                                <div className="bg-white rounded-xl p-8 text-center shadow-sm">
-                                    <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                        <svg className="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        </svg>
-                                    </div>
-                                    <h3 className="text-lg font-bold text-gray-900 mb-2">Location Access Needed</h3>
-                                    <p className="text-gray-600 mb-6">Enable location to discover gigs in your neighborhood</p>
-                                    <button
-                                        onClick={handleRetryPermission}
-                                        className="bg-primary text-white px-6 py-3 rounded-xl font-semibold hover:bg-primary/90 transition-colors"
-                                    >
-                                        Enable Location
-                                    </button>
-                                </div>
-                            )}
-
-                            {!isLoading && !locationPermissionDenied && (
+                            {!isLoading && (
                                 <>
-                                    {getCurrentJobs().length === 0 ? (
+                                    {Array.isArray(jobs?.job) && jobs.totalJobs < 1 ? (
                                         <div className="bg-white rounded-xl p-8 text-center shadow-sm">
                                             <div className="text-4xl mb-4">{getEmptyMessage().icon}</div>
                                             <h3 className="text-lg font-bold text-gray-900 mb-2">
@@ -207,50 +172,12 @@ function ExplorePage() {
                                         </div>
                                     ) : (
                                         <div className="space-y-4">
-                                            {getCurrentJobs().map((job) => (
-                                                <div
+                                            {jobs?.job.map((job: JobI) => (
+                                                <JobCardSeeker
                                                     key={job._id}
-                                                    onClick={() => handleJobSelect(job)}
-                                                    className="bg-white rounded-xl p-4 cursor-pointer hover:shadow-lg transition-all duration-200 border border-gray-100 hover:border-primary/20"
-                                                >
-                                                    <div className="flex justify-between items-start mb-3">
-                                                        <div className="flex-1">
-                                                            <h3 className="font-bold text-lg text-gray-900 mb-1">{job.title}</h3>
-                                                            <div className="flex items-center gap-2 mb-2">
-                                                                {job.category && (
-                                                                    <span className="bg-primary/10 text-primary px-2 py-1 rounded-full text-xs font-medium">
-                                                                        {job.category}
-                                                                    </span>
-                                                                )}
-                                                                {job.urgency && (
-                                                                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getUrgencyColor(job.urgency)}`}>
-                                                                        {job.urgency}
-                                                                    </span>
-                                                                )}
-                                                            </div>
-                                                        </div>
-                                                        <div className="text-right">
-                                                            <div className="text-xl font-bold text-primary">₹{job.salary}</div>
-                                                            {job.distance && (
-                                                                <div className="text-xs text-gray-500">{job.distance}</div>
-                                                            )}
-                                                        </div>
-                                                    </div>
-
-                                                    <p className="text-gray-600 mb-3 line-clamp-2">{job.description} adf</p>
-
-                                                    <div className="flex items-center justify-between">
-                                                        <div className="flex items-center gap-1 text-gray-500">
-                                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                                            </svg>
-                                                            <span className="text-sm">{job.location}</span>
-                                                        </div>
-                                                        <button className="bg-primary text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-primary/90 transition-colors" onClick={()=> router.push(`/dashboard/job-seeker/job?id=${job._id}`)}>
-                                                            Apply Now
-                                                        </button>
-                                                    </div>
-                                                </div>
+                                                    data={job}
+                                                    onSelect={handleJobSelect}
+                                                />
                                             ))}
                                         </div>
                                     )}

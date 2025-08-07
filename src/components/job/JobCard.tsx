@@ -19,11 +19,22 @@ export default function JobCard({ job, onDelete, onView }: JobCardProps) {
         }
     };
 
+    const getStatusColor = (status?: string) => {
+        switch (status) {
+            case 'Pending': return 'bg-yellow-100 text-yellow-700';
+            case 'In_Progress': return 'bg-blue-100 text-blue-700';
+            case 'Completed': return 'bg-green-100 text-green-700';
+            case 'Cancelled': return 'bg-red-100 text-red-700';
+            case 'Paid': return 'bg-green-100 text-green-700';
+            default: return 'bg-gray-100 text-gray-700';
+        }
+    };
+
+
     return (
         <div className="space-y-4">
             <div
                 key={job._id}
-                // onClick={() => handleJobSelect(job)}
                 className="bg-white rounded-xl p-4 cursor-pointer hover:shadow-lg transition-all duration-200 border border-gray-100 hover:border-primary/20"
             >
                 <div className="flex justify-between items-start mb-3">
@@ -40,6 +51,13 @@ export default function JobCard({ job, onDelete, onView }: JobCardProps) {
                                     {job.priority}
                                 </span>
                             )}
+                            {
+                                job.job_status && (
+                                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(job.job_status)}`}>
+                                        {job.job_status}
+                                    </span>
+                                )
+                            }
                         </div>
                     </div>
                     <div className="text-right">
@@ -74,12 +92,21 @@ export default function JobCard({ job, onDelete, onView }: JobCardProps) {
                     </div>
 
                     <div className="flex items-center gap-2">
-                        <button
-                            onClick={() => onView(job)}
-                            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                        >
-                            <Eye className="w-4 h-4 text-gray-600" />
-                        </button>
+                        {
+                            (job.job_status === "Paid" || job.job_status === "Cancelled") ? (
+                                <span className={`px-2 py-1 rounded-full text-xs font-medium ${job.job_status === "Paid" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
+                                    {job.job_status}
+                                </span>
+                            ) : (
+                                <button
+                                    onClick={() => onView(job)}
+                                    className="p-2 rounded-lg transition-colors"
+                                >
+                                    <Eye className="w-4 h-4 text-gray-600" />
+                                </button>
+
+                            )
+                        }
                         <button
                             onClick={() => {
                                 if (job._id) onDelete(job);

@@ -1,7 +1,7 @@
 
 'use client'
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -10,6 +10,7 @@ import { SignupFormData } from '@/types/auth';
 import { signup } from '@/lib/auth';
 import { AxiosError } from 'axios';
 import { ErrorToast } from '@/components/ui/Toast';
+import AutoSuggestionGeoLocation from '@/components/geolocation/AutoSuggestionGeoLocation';
 
 
 
@@ -22,12 +23,34 @@ export default function SignUp() {
     password: '',
     confirmPassword: '',
     security_answer: '',
-    gender: 'male'
+    gender: 'male',
+    location: '',
+    latitude: 0,
+    longitude: 0
   });
   const [errors, setErrors] = useState<Partial<SignupFormData>>({});
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [geometry, setGeometry] = useState<{ coordinates: number[]; type: string }>({
+    coordinates: [],
+    type: 'Point',
+  });
+  const [locationName, setLocationName] = useState<string>('');
   const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false);
+
+  // Sync location data when both locationName and geometry are available
+  useEffect(() => {
+    if (locationName && geometry.coordinates.length === 2) {
+      setFormData(prev => ({
+        ...prev,
+        location: locationName,
+        latitude: geometry.coordinates[1],
+        longitude: geometry.coordinates[0]
+      }));
+    }
+  }, [locationName, geometry]);
+
+
 
   const validateForm = (): boolean => {
     const newErrors: Partial<SignupFormData> = {};
@@ -58,6 +81,10 @@ export default function SignUp() {
 
     if (!formData.security_answer) {
       newErrors.security_answer = 'Security answer is required';
+    }
+
+    if (!formData.location || !formData.latitude || !formData.longitude) {
+      newErrors.location = "Location is required, Select one from the suggestions";
     }
 
     setErrors(newErrors);
@@ -299,6 +326,24 @@ export default function SignUp() {
                   <option value="female">Female</option>
                   <option value="other">Other</option>
                 </select>
+              </div>
+
+              {/* Location Field */}
+              <div>
+                <label htmlFor="location" className="block text-sm font-medium text-black mb-2">
+                  Location *
+                </label>
+                <AutoSuggestionGeoLocation
+                  setGeometry={setGeometry}
+                  setLocationName={setLocationName}
+                />
+                <div className='flex gap-x-2 mt-2'>
+                  <span className='text-black text-sm font-semibold'>Selected: </span>
+                  <span className='text-primary'>{formData.location || 'No location selected'}</span>
+                </div>
+                {errors.location && (
+                  <p className="text-red-500 text-sm mt-1">{errors.location}</p>
+                )}
               </div>
 
               {/* Submit Button */}

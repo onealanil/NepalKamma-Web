@@ -86,7 +86,16 @@ export default function EditProfile() {
                 const response = await updateProfile(user._id, newValues);
 
                 if (response) {
-                    setUser({ ...user, ...newValues });
+                    // Update user with properly formatted coordinates
+                    const updatedUser = {
+                        ...user,
+                        ...newValues,
+                        address: {
+                            ...user.address,
+                            coordinates: [newValues.longitude, newValues.latitude] as [number, number]
+                        }
+                    };
+                    setUser(updatedUser);
                     SuccessToast('Profile Updated Successfully');
                     router.push('/dashboard/job-provider/profile');
                 }

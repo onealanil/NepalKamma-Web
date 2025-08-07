@@ -10,12 +10,16 @@ const nextConfig: NextConfig = {
     },
   },
   images: {
+    domains: ['picsum.photos', 'res.cloudinary.com'],
     formats: ["image/avif", "image/webp"],
     remotePatterns: [
       {
         protocol: "https",
         hostname: "** piscum.photos",
-      }
+      }, {
+        protocol: "https",
+        hostname: "res.cloudinary.com",
+      },
     ]
   },
   experimental: {

@@ -11,6 +11,9 @@ export interface SignupI {
     password: string;
     security_answer: string;
     gender: string;
+    location: string;
+    latitude: number;
+    longitude: number;
 }
 
 //login interface /lib/auth.ts
@@ -27,6 +30,9 @@ export interface SignupFormData {
     confirmPassword: string;
     security_answer: string;
     gender: string;
+    location: string;
+    latitude: number;
+    longitude: number;
 }
 
 //verify opt /auth/verify-otp/page.tsx

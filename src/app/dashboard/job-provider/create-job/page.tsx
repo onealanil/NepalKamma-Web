@@ -76,14 +76,15 @@ const CreateJobPage = () => {
                 location: locationName,
                 latitude: geometry?.coordinates?.[1],
                 longitude: geometry?.coordinates?.[0],
-                phoneNumber: user?.phoneNumber || '9804077726',
+                phoneNumber: user?.phoneNumber || '9804077722',
             }
 
             const response = await createJob(newValues);
-            if (response) {
+            if (response.success) {
                 SuccessToast("Successfully Created your Job!");
-                // mutate(`/job/getSingleUserJob/${user?._id}`);
                 router.push('/dashboard/job-provider/my-jobs');
+            } else {
+                ErrorToast(response.error || "Failed to create job. Please try again.");
             }
         } catch (error: unknown) {
             if (error instanceof AxiosError) {

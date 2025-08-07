@@ -1,5 +1,8 @@
+
 import { profilePros } from "@/types/job-seeker/profile-api";
 import axiosInstance from "../axios";
+import { useAuthStore } from "@/store/authStore";
+import { mutate } from 'swr';
 
 /**
  * @function updateProfile 
@@ -11,6 +14,28 @@ import axiosInstance from "../axios";
  */
 export const updateProfile = async (userId: string, profileData: profilePros) => {
   const response = await axiosInstance.put(`/user/edit-profile/${userId}`, profileData);
+
+  // Update the user in auth store with new location data
+  const currentUser = useAuthStore.getState().user;
+  if (currentUser && (profileData.latitude || profileData.longitude)) {
+    const updatedUser = {
+      ...currentUser,
+      location: profileData.location,
+      address: {
+        ...currentUser.address,
+        coordinates: [profileData.longitude, profileData.latitude] as [number, number]
+      }
+    };
+    useAuthStore.getState().setUser(updatedUser);
+    
+    // Clear all nearby job caches when location changes
+    mutate(
+      key => typeof key === 'string' && key.startsWith('/job/getNearbyJob/'),
+      undefined,
+      { revalidate: false }
+    );
+  }
+
   return response.data;
 };
 

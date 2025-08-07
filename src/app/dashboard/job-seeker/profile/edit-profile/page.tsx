@@ -87,7 +87,15 @@ export default function EditProfile() {
                 const response = await updateProfile(user._id, newValues);
 
                 if (response) {
-                    setUser({ ...user, ...newValues });
+                    const updatedUser = {
+                        ...user,
+                        ...newValues,
+                        address: {
+                            ...user.address,
+                            coordinates: [newValues.longitude, newValues.latitude] as [number, number]
+                        }
+                    };
+                    setUser(updatedUser);
                     SuccessToast('Profile Updated Successfully');
                     router.push('/dashboard/job-seeker/profile');
                 }

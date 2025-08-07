@@ -7,5 +7,5 @@ export const initialValues: JobI = {
     job_description: '',
     phoneNumber: '',
     payment_method: 'cash',
-    experiesInHrs: 6,
+    experiesInHrs: '6',
 };

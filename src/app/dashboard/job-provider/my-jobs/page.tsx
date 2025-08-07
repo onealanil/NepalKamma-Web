@@ -1,7 +1,8 @@
+
 "use client";
 
 import LeftSideProvider from "@/components/ui/LeftSideProvider";
-import { ChevronLeft, Trash2 } from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 import { useRouter } from 'next/navigation';
 import { useUserJobs } from "@/hooks/jobs/useJobs";
 import { useAuthStore } from "@/store/authStore";
@@ -14,7 +15,7 @@ import { LoadingCard } from "@/components/ui/loader/LoadingCard";
 import { useState } from "react";
 import { ErrorToast, SuccessToast } from "@/components/ui/Toast";
 import { deleteJob } from "@/lib/job/job-api";
-import SafeHTML from "@/components/global/SafeHTML";
+import { JobDetailsModal } from "@/components/ui/modals/JobDetailsModal";
 
 export default function MyJobsPage() {
     const router = useRouter();
@@ -32,8 +33,6 @@ export default function MyJobsPage() {
         setSelectedJob(job);
         setShowJobModal(true);
     };
-
-
 
     /**
      * @function handleDeleteJob
@@ -57,17 +56,17 @@ export default function MyJobsPage() {
             setIsDeleteLoading(false);
             return;
         }
-        try {
-            await deleteJob(jobId);
+
+        const response = await deleteJob(jobId);
+        if (response.success) {
             setShowDeleteConfirm(false);
             setJobToDelete(null);
-            SuccessToast("Successfully, Deleted your Job")
+            SuccessToast("Successfully deleted your job!");
             mutate();
-        } catch (err) {
-            ErrorToast("Failed to delete job.");
-        } finally {
-            setIsDeleteLoading(false);
+        } else {
+            ErrorToast(response.error || "Failed to delete job.");
         }
+        setIsDeleteLoading(false);
     }
 
 
@@ -83,85 +82,6 @@ export default function MyJobsPage() {
     if (!user) {
         return <Loader />
     }
-
-    /**
-     * Single job modal
-     */
-    const JobDetailsModal = ({ isOpen, onClose, job }: { isOpen: boolean; onClose: () => void; job: JobI | null }) => {
-        if (!isOpen || !job) return null;
-
-        return (
-            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-                <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-                    <div className="p-6">
-                        <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-xl font-bold text-gray-900">{job.title}</h3>
-                            <button
-                                onClick={onClose}
-                                className="text-gray-500 hover:text-gray-700 p-2 hover:bg-gray-100 rounded-full transition-colors"
-                            >
-                                ✕
-                            </button>
-                        </div>
-
-                        <div className="space-y-6">
-                            <div>
-                                <h4 className="font-semibold text-gray-900 mb-2">Description</h4>
-                                <SafeHTML html={job?.job_description || ''} isFullDescription={true} />
-
-                            </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div className="bg-gray-50 p-4 rounded-lg">
-                                    <h5 className="font-semibold text-gray-900 mb-1">Price</h5>
-                                    <p className="text-2xl font-bold text-primary">₹{job.price.toLocaleString()}</p>
-                                </div>
-                                <div className="bg-gray-50 p-4 rounded-lg">
-                                    <h5 className="font-semibold text-gray-900 mb-1">Category</h5>
-                                    <p className="text-gray-700">{job.category}</p>
-                                </div>
-                            </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div className="bg-gray-50 p-4 rounded-lg">
-                                    <h5 className="font-semibold text-gray-900 mb-1">Status</h5>
-                                    <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${job.visibility === 'public' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'
-                                        }`}>
-                                        {job.visibility}
-                                    </span>
-                                </div>
-                                <div className="bg-gray-50 p-4 rounded-lg">
-                                    <h5 className="font-semibold text-gray-900 mb-1">Created</h5>
-                                    <p className="text-gray-700">
-                                        {
-                                            job.createdAt ?
-                                                new Date(job.createdAt).toLocaleDateString() : "N/A"
-                                        }
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t">
-                                <button className="flex-1 bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700 transition-colors flex items-center justify-center gap-2">
-                                    <Trash2 className="w-4 h-4" />
-                                    Delete Job
-                                </button>
-                                <button
-                                    onClick={onClose}
-                                    className="flex-1 bg-gray-200 text-gray-800 py-3 rounded-lg font-semibold hover:bg-gray-300 transition-colors"
-                                >
-                                    Close
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        );
-    };
-
-
-
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
@@ -188,7 +108,7 @@ export default function MyJobsPage() {
 
                         {/* stats  */}
                         <div className="flex flex-wrap gap-2 mb-4">
-                            {['Pending', 'In Progress', 'Completed', 'Cancelled', 'Paid'].map((status) => (
+                            {['Pending', 'In_Progress', 'Completed', 'Cancelled', 'Paid'].map((status) => (
                                 <button
                                     key={status}
                                     className={`
@@ -231,10 +151,18 @@ export default function MyJobsPage() {
                                     ))}
                                 </>
                             ) : jobs.length > 0 ? (
-                                jobs.map((job: JobI) => (
-                                    <JobCard key={job._id} onView={handleViewJob} job={job} onDelete={handleDeleteJob} />
-
-                                ))
+                                jobs
+                                    .filter((job: JobI) => {
+                                        if (activeTab === "pending") return job.job_status === "Pending";
+                                        if (activeTab === "in progress") return job.job_status === "In_Progress";
+                                        if (activeTab === "completed") return job.job_status === "Completed";
+                                        if (activeTab === "cancelled") return job.job_status === "Cancelled";
+                                        if (activeTab === "paid") return job.job_status === "Paid";
+                                        return true;
+                                    })
+                                    .map((job: JobI) => (
+                                        <JobCard key={job._id} onView={handleViewJob} job={job} onDelete={handleDeleteJob} />
+                                    ))
                             ) : (
                                 <div className="bg-white rounded-xl p-8 text-center shadow-sm">
                                     <div className="text-4xl mb-4">📝</div>

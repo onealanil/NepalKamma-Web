@@ -10,6 +10,8 @@ import { JobI } from '@/types/job';
 import { LoadingCard } from '@/components/ui/loader/LoadingCard';
 import { useRecommendedJobs } from '@/hooks/jobs/useRecommendedJobs';
 import ErrorNearBy from '@/components/ui/dashboard/job-seeker/ErrorNearBy';
+import { useMostRecent } from '@/hooks/jobs/useMostRecent';
+import ErrorMostRecent from '@/components/ui/dashboard/job-seeker/ErrorMostRecent';
 
 function JobSeekerDashboard() {
     const router = useRouter();
@@ -25,6 +27,9 @@ function JobSeekerDashboard() {
 
     // Use for the recommened jobs hook
     const { jobs: recommendedJobs, isLoading: recommendedLoading, isError: recommendedError, mutate: recommendedMutate } = useRecommendedJobs();
+
+    // Use for the most recent jobs hook
+    const { jobs: recentJobs, isLoading: recentLoading, isError: recentError, mutate: recentMutate } = useMostRecent();
 
     // Handle missing coordinates
     if (!latitude || !longitude) {
@@ -73,6 +78,13 @@ function JobSeekerDashboard() {
         );
     }
 
+    //recent
+    if (recentError) {
+        return (
+            <ErrorMostRecent mutate={recentMutate} />
+        );
+    }
+
     const handleTabChange = (tab: 'Best Matches' | 'Most Recent' | 'Nearby') => {
         setCurrentTab(tab);
     };
@@ -113,7 +125,7 @@ function JobSeekerDashboard() {
                             {/* Content */}
                             <div className="p-6">
                                 {/* Loading State */}
-                                {isLoading && (
+                                {isLoading && recommendedLoading && recentLoading && (
                                     <div className="space-y-4">
                                         {[1, 2, 3].map((item) => (
                                             <div key={item} className="bg-gray-50 rounded-xl p-4">
@@ -146,7 +158,7 @@ function JobSeekerDashboard() {
                                                     </div>
                                                 ) : (
                                                     <div className="space-y-4">
-                                                        <div className="flex items-center justify-between mb-4 border border-gray-100 rounded-lg p-4">
+                                                        <div className="flex bg-gradient-to-r from-primary/5 to-green-50 items-center justify-between mb-4 border border-gray-100 rounded-lg p-4">
                                                             <p className="text-sm font-bold text-gray-600">
                                                                 Found {nearByJobs.length} jobs within 10km of your location
                                                             </p>
@@ -168,6 +180,10 @@ function JobSeekerDashboard() {
                                                 )}
                                             </>
                                         )}
+
+                                        {/* near by  */}
+
+
 
                                         {
                                             !recommendedLoading && (
@@ -282,21 +298,49 @@ function JobSeekerDashboard() {
 
 
                                         {currentTab === 'Most Recent' && (
-                                            <div className="text-center py-12">
-                                                <div className="text-4xl mb-4">⏰</div>
-                                                <h3 className="text-lg font-bold text-gray-900 mb-2">
-                                                    Recent Jobs Coming Soon
-                                                </h3>
-                                                <p className="text-gray-600 mb-6">
-                                                    We're working on showing the most recently posted jobs in your area.
-                                                </p>
-                                                <button
-                                                    onClick={() => setCurrentTab('Nearby')}
-                                                    className="bg-primary text-white px-6 py-3 rounded-xl font-semibold hover:bg-primary/90 transition-colors"
-                                                >
-                                                    View Nearby Jobs
-                                                </button>
-                                            </div>
+                                            <>
+                                                {
+                                                    recentJobs?.length === 0 ? (
+                                                        <div className="text-center py-12">
+                                                            <div className="text-4xl mb-4">⏰</div>
+                                                            <h3 className="text-lg font-bold text-gray-900 mb-2">
+                                                                Recent Jobs Coming Soon
+                                                            </h3>
+                                                            <p className="text-gray-600 mb-6">
+                                                                We're working on showing the most recently posted jobs in your area.
+                                                            </p>
+                                                            <button
+                                                                onClick={() => setCurrentTab('Nearby')}
+                                                                className="bg-primary text-white px-6 py-3 rounded-xl font-semibold hover:bg-primary/90 transition-colors"
+                                                            >
+                                                                View Nearby Jobs
+                                                            </button>
+                                                        </div>
+                                                    ) : (
+                                                        <div className="space-y-4">
+                                                            <div className="flex items-center bg-gradient-to-r from-primary/5 to-green-50 justify-between mb-4 border border-gray-100 rounded-lg p-4">
+                                                                <p className="text-sm font-bold text-gray-600">
+                                                                    Here is the 5 most recent jobs for you
+                                                                </p>
+                                                                <button
+                                                                    onClick={() => recentMutate()}
+                                                                    className="text-primary hover:text-primary/80 text-sm font-medium"
+                                                                >
+                                                                    Refresh
+                                                                </button>
+                                                            </div>
+                                                            {recentJobs.map((job: JobI) => (
+                                                                <JobCardSeeker
+                                                                    key={job._id}
+                                                                    data={job}
+                                                                    onSelect={() => { }}
+                                                                />
+                                                            ))}
+                                                        </div>
+                                                    )
+                                                }
+
+                                            </>
                                         )}
                                     </>
                                 )}

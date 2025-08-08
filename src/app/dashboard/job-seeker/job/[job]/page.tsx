@@ -96,12 +96,10 @@ export default function SingleJobPage() {
     // Handle loading and error states
     useEffect(() => {
         if (jobData) {
-            // Set initial values when job data is loaded
-            setAverageRating(4.5); // TODO: Calculate from actual reviews
+            setAverageRating(4.5);
             setIsFetchAverageRating(false);
             setIsFetchReview(false);
 
-            // TODO: Fetch actual reviews for this job
             const mockReviews: Review[] = [
                 {
                     _id: 'review1',
@@ -118,6 +116,7 @@ export default function SingleJobPage() {
             ];
             setReviewData(mockReviews);
         }
+        console.log(jobData)
     }, [jobData]);
 
     const handleContactProvider = () => {
@@ -383,8 +382,16 @@ export default function SingleJobPage() {
                                             {isApplying ? 'Applying...' : 'Apply Now'}
                                         </button>
                                         <button
-                                            onClick={() => setIsLocationModalVisible(true)}
-                                            className="bg-primary text-white px-6 py-3 rounded-lg font-semibold  transition-colors"
+                                            onClick={() => {
+                                                const lat = jobData?.address?.coordinates?.[1];
+                                                const lng = jobData?.address?.coordinates?.[0];
+                                                if (lat && lng) {
+                                                    router.push(`/dashboard/job-seeker/map?lat=${lat}&lng=${lng}`);
+                                                } else {
+                                                    alert('Job location not available');
+                                                }
+                                            }}
+                                            className="bg-primary text-white px-6 py-3 rounded-lg font-semibold transition-colors"
                                         >
                                             View on Map
                                         </button>

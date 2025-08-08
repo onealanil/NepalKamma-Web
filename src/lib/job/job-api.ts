@@ -299,7 +299,7 @@ export async function fetchNearbyJobs(
     longitude: number,
 ): Promise<ApiResponse> {
     try {
-        if(!latitude || !longitude) {
+        if (!latitude || !longitude) {
             throw new Error("Latitude and longitude are required");
         }
         const response = await axiosInstance.get(`/job/getNearbyJob/${latitude}/${longitude}`);
@@ -339,3 +339,25 @@ export async function fetchRecommendedJobs(): Promise<ApiResponse> {
         return handleApiError(error, "Failed to fetch recommended jobs. Please try again.");
     }
 }
+
+/**
+ * @function fetchRecentJobs
+ * @description Fetches recent jobs based on most recently posted jobs
+ * @returns Promise<ApiResponse> - Response from the server
+ * @route GET /job/getRecentJob
+ */
+export async function fetchRecentJobs(): Promise<ApiResponse> {
+    try {
+        const response = await axiosInstance.get(`/job/getRecentJob`);
+        return {
+            success: true,
+            data: response.data.jobs || [],
+            message: response.data.message || "Recent jobs fetched successfully"
+        };
+    }
+    catch (error: unknown) {
+        return handleApiError(error, "Failed to fetch recent jobs. Please try again.");
+    }
+}
+
+

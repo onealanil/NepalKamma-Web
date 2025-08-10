@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { useAuthStore } from "@/store/authStore";
 import { useAuthInit } from "@/hooks/useAuthInit";
 import Loader from "@/components/global/Loader";
+import { useSavedJobsStore } from "@/store/savedJobsStore";
 
 /**
  * @function AuthLayout
@@ -20,6 +21,7 @@ export default function AuthLayout({
     const router = useRouter();
     const { user, hasHydrated } = useAuthStore();
     const { isInitialized } = useAuthInit(true);
+    const {fetchSavedJobs} = useSavedJobsStore();
     const [isRedirecting, setIsRedirecting] = useState(false);
 
     useEffect(() => {
@@ -27,6 +29,7 @@ export default function AuthLayout({
 
         if (user) {
             setIsRedirecting(true);
+            fetchSavedJobs();
             if (user.role === 'job_seeker') {
                 router.push('/dashboard/job-seeker');
             } else if (user.role === 'job_provider') {

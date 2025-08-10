@@ -8,7 +8,9 @@ import LeftSideSeeker from '@/components/ui/LeftSideSeeker';
 import SafeHTML from '@/components/global/SafeHTML';
 import Image from 'next/image';
 import { useSingleJob } from '@/hooks/jobs/useSingleJob';
-import { applyToJob, saveJob, unsaveJob } from '@/lib/job/job-api';
+import { applyToJob } from '@/lib/job/job-api';
+import { useSavedJobs, useJobSaveStatus } from "@/hooks/jobs/useSavedJobs";
+
 import { ErrorToast, SuccessToast } from '@/components/ui/Toast';
 
 
@@ -74,7 +76,8 @@ export default function SingleJobPage() {
     const jobId = params.job as string;
     const { job: jobData, isLoading, isError, mutate } = useSingleJob(jobId);
 
-    const [isPostSaved, setIsPostSaved] = useState(false);
+    // Use saved jobs store instead of local state
+    const { isSaved: isPostSaved } = useJobSaveStatus(jobId);
     const [averageRating, setAverageRating] = useState(0);
     const [isFetchAverageRating, setIsFetchAverageRating] = useState(false);
     const [isLocationModalVisible, setIsLocationModalVisible] = useState(false);
@@ -116,7 +119,6 @@ export default function SingleJobPage() {
             ];
             setReviewData(mockReviews);
         }
-        console.log(jobData)
     }, [jobData]);
 
     const handleContactProvider = () => {
@@ -125,37 +127,26 @@ export default function SingleJobPage() {
         }
     };
 
+    // Use saved jobs store for save/unsave functionality
+    const { toggleSaveJob } = useSavedJobs();
+
     const saveJobHandler = async () => {
-        if (!jobId) return;
+        if (!jobId || !jobData) return;
 
-        try {
-            const response = await saveJob(jobId);
-            if (response.success) {
-                setIsPostSaved(true);
-                SuccessToast("Job saved successfully!");
-            } else {
-                ErrorToast("Failed to save job. Please try again.");
-            }
-        } catch (error) {
-            ErrorToast("Failed to save job. Please try again.");
-        }
-    };
-
-    const unsaveJobHandler = async () => {
-        if (!jobId) return;
-
-        try {
-            const response = await unsaveJob(jobId);
-            if (response.success) {
-                setIsPostSaved(false);
+        const success = await toggleSaveJob(jobData);
+        if (success) {
+            if (isPostSaved) {
                 SuccessToast("Job removed from saved list!");
             } else {
-                ErrorToast("Failed to unsave job. Please try again.");
+                SuccessToast("Job saved successfully!");
             }
-        } catch (error) {
-            ErrorToast("Failed to unsave job. Please try again.");
+        } else {
+            ErrorToast("Failed to update saved jobs. Please try again.");
         }
     };
+
+    // Keep the same handler for both save and unsave
+    const unsaveJobHandler = saveJobHandler;
 
     const applyJobHandler = async () => {
         if (!jobId) return;
@@ -311,6 +302,14 @@ export default function SingleJobPage() {
                                     </div>
                                 </div>
 
+                                {/* category start  */}
+                                  <div className="flex gap-x-3 lg:hidden">
+                                    <span className="text-black font-bold ">Category:</span>
+                                    <span className="font-medium">{jobData.category}</span>
+                                </div>
+
+                                {/* category end  */}
+
                                 {/* About this Job */}
                                 <div className="space-y-4">
                                     <h2 className="text-lg font-bold text-gray-900">About this Job</h2>
@@ -369,6 +368,17 @@ export default function SingleJobPage() {
                                     <span className="font-medium">{jobData.location}</span>
                                 </div>
                                 {/* location end */}
+
+                                {/* priority start  */}
+                                <div className="lg:hidden flex gap-x-3">
+                                    <span className="font-bold text-black">Priority:</span>
+                                    <span className={`font-medium ${jobData.priority === 'Urgent' ? 'text-red-600' :
+                                        jobData.priority === 'Medium' ? 'text-yellow-600' :
+                                            'text-green-600'
+                                        }`}>
+                                        {jobData.priority}
+                                    </span>
+                                </div>
 
                                 {/* Action Buttons */}
                                 <div className="space-y-4">
@@ -435,8 +445,8 @@ export default function SingleJobPage() {
                                                                 key={star}
                                                                 onClick={() => setRating(star)}
                                                                 className={`${star <= rating
-                                                                        ? 'text-yellow-500 fill-current'
-                                                                        : 'text-gray-300'
+                                                                    ? 'text-yellow-500 fill-current'
+                                                                    : 'text-gray-300'
                                                                     } hover:text-yellow-500 transition-colors`}
                                                             >
                                                                 <Star size={20} />
@@ -515,7 +525,7 @@ export default function SingleJobPage() {
                                     <span className="font-medium">₹{jobData.price.toLocaleString()}</span>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span className="text-gray-600">Location:</span>
+                                    <span className="text-gray-600 mr-5">Location:</span>
                                     <span className="font-medium">{jobData.location}</span>
                                 </div>
                                 <div className="flex justify-between">
@@ -527,9 +537,9 @@ export default function SingleJobPage() {
                                 <div className="flex justify-between">
                                     <span className="text-gray-600">Status:</span>
                                     <span className={`font-medium ${jobData.job_status === 'Pending' ? 'text-yellow-600' :
-                                            jobData.job_status === 'In_Progress' ? 'text-blue-600' :
-                                                jobData.job_status === 'Completed' ? 'text-green-600' :
-                                                    'text-gray-600'
+                                        jobData.job_status === 'In_Progress' ? 'text-blue-600' :
+                                            jobData.job_status === 'Completed' ? 'text-green-600' :
+                                                'text-gray-600'
                                         }`}>
                                         {jobData.job_status}
                                     </span>
@@ -537,8 +547,8 @@ export default function SingleJobPage() {
                                 <div className="flex justify-between">
                                     <span className="text-gray-600">Priority:</span>
                                     <span className={`font-medium ${jobData.priority === 'Urgent' ? 'text-red-600' :
-                                            jobData.priority === 'Medium' ? 'text-yellow-600' :
-                                                'text-green-600'
+                                        jobData.priority === 'Medium' ? 'text-yellow-600' :
+                                            'text-green-600'
                                         }`}>
                                         {jobData.priority}
                                     </span>
@@ -554,10 +564,10 @@ export default function SingleJobPage() {
 
                             <div className="mt-6 space-y-3">
                                 <button
-                                    onClick={() => setIsPostSaved(!isPostSaved)}
+                                    onClick={saveJobHandler}
                                     className={`w-full flex items-center justify-center gap-2 py-3 rounded-lg font-semibold transition-colors ${isPostSaved
-                                            ? 'bg-primary text-white hover:bg-primary/90'
-                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                        ? 'bg-primary text-white hover:bg-primary/90'
+                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                         }`}
                                 >
                                     {isPostSaved ? <BookmarkCheck size={20} /> : <Bookmark size={20} />}

@@ -1,7 +1,7 @@
 import { User } from "./user";
 
 export interface JobI {
-    _id?: string;
+    _id: string;
     title: string;
     address?: { type: { type: string, enum: ["Point"], default: "Point" }, coordinates: { type: number[] } };
     location?: string;

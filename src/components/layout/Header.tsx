@@ -8,6 +8,7 @@ import { useState } from 'react';
 import { Menu, X } from 'lucide-react';
 import { logOut } from '@/lib/auth';
 import { ErrorToast } from '../ui/Toast';
+import { useSavedJobsStore } from '@/store/savedJobsStore';
 
 export default function Header() {
   const { logout, user } = useAuthStore();
@@ -21,6 +22,7 @@ export default function Header() {
       ErrorToast('Logout API error');
     } finally {
       logout();
+      useSavedJobsStore.getState().clearSavedJobs();
       router.push('/auth/signin');
 
     }

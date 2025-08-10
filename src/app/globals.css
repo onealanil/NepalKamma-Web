@@ -454,3 +454,17 @@ select.language-selector:focus {
 .dark .mapboxgl-popup-anchor-right .mapboxgl-popup-tip {
   border-left-color: var(--card);
 }
+
+/* Floating Animation */
+@keyframes floating {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.floating-animation {
+  animation: floating 3s ease-in-out infinite;
+}

@@ -14,8 +14,6 @@ import { ApiResponse } from "@/types/job-provider/job-api";
  * @returns Formatted error response
  */
 function handleApiError(error: unknown, defaultMessage: string): ApiResponse {
-    console.error('API Error:', error);
-
     if (error instanceof AxiosError) {
         const message = error.response?.data?.message || error.message || defaultMessage;
         ErrorToast(message);
@@ -169,13 +167,15 @@ export async function searchUser(username: string): Promise<ApiResponse> {
 
 /**
  * @function fetchAllJobs
- * @description Fetches all the jobs
+ * @description Fetches all the jobs with pagination
+ * @param page - Page number (default: 1)
+ * @param limit - Number of jobs per page (default: 5)
  * @returns Promise<ApiResponse> - Response from the server
  * @route GET /job
  */
-export async function fetchAllJobs(): Promise<ApiResponse> {
+export async function fetchAllJobs(page: number = 1, limit: number = 5): Promise<ApiResponse> {
     try {
-        const response = await axiosInstance.get(`/job`);
+        const response = await axiosInstance.get(`/job?page=${page}&limit=${limit}`);
         return {
             success: true,
             data: response.data,
@@ -242,7 +242,7 @@ export async function applyToJob(jobId: string): Promise<ApiResponse> {
  * @description Save/bookmark a job
  * @param jobId - Job ID
  * @returns Promise<ApiResponse> - Response from the server
- * @route POST /job/save/:jobId
+ * @route PUT /user/save-job/:jobId
  */
 export async function saveJob(jobId: string): Promise<ApiResponse> {
     try {
@@ -250,7 +250,7 @@ export async function saveJob(jobId: string): Promise<ApiResponse> {
             throw new Error("Job ID is required");
         }
 
-        const response = await axiosInstance.post(`/job/save/${jobId}`);
+        const response = await axiosInstance.put(`/user/save-job/${jobId}`);
         return {
             success: true,
             data: response.data,
@@ -262,12 +262,14 @@ export async function saveJob(jobId: string): Promise<ApiResponse> {
     }
 }
 
+
+
 /**
  * @function unsaveJob
  * @description Remove job from saved/bookmarks
  * @param jobId - Job ID
  * @returns Promise<ApiResponse> - Response from the server
- * @route DELETE /job/save/:jobId
+ * @route PUT /user/unsave-job/:jobId
  */
 export async function unsaveJob(jobId: string): Promise<ApiResponse> {
     try {
@@ -275,7 +277,7 @@ export async function unsaveJob(jobId: string): Promise<ApiResponse> {
             throw new Error("Job ID is required");
         }
 
-        const response = await axiosInstance.delete(`/job/save/${jobId}`);
+        const response = await axiosInstance.put(`/user/unsave-job/${jobId}`);
         return {
             success: true,
             data: response.data,
@@ -284,6 +286,27 @@ export async function unsaveJob(jobId: string): Promise<ApiResponse> {
     }
     catch (error: unknown) {
         return handleApiError(error, "Failed to unsave job. Please try again.");
+    }
+}
+
+/**
+ * @function getSavedJobs
+ * @description Get all saved/bookmarked jobs for the current user
+ * @returns Promise<ApiResponse> - Response from the server with saved jobs
+ * @route GET /user/saved-jobs
+ */
+export async function getSavedJobs(): Promise<ApiResponse> {
+    try {
+        const response = await axiosInstance.get(`/user/saved-jobs`);
+        console.log("this is fectch saved jobs return functiuon", response.data);
+        return {
+            success: true,
+            data: response.data,
+            message: "Saved jobs fetched successfully"
+        };
+    }
+    catch (error: unknown) {
+        return handleApiError(error, "Failed to fetch saved jobs. Please try again.");
     }
 }
 

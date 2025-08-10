@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import { useAuthStore } from "@/store/authStore";
 import Loader from "@/components/global/Loader";
 import Header from "@/components/layout/Header";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function DashboardLayout({
     children,
@@ -14,7 +15,8 @@ export default function DashboardLayout({
 }) {
 
     const router = useRouter();
-    const { user, hasHydrated } = useAuthStore();
+    const { user, hasHydrated, setUser } = useAuthStore();
+    const { userData, isLoading } = useAuth();
 
     useEffect(() => {
         if (!hasHydrated) return;
@@ -23,10 +25,13 @@ export default function DashboardLayout({
             router.push('/auth/signin');
         } else if (user.role !== 'job_seeker') {
             router.push('/unauthorized');
+        } else if (userData) {
+            setUser(userData);
         }
-    }, [user, hasHydrated, router]);
+    }, [user, hasHydrated, userData, router]);
 
-    if (!hasHydrated || !user) {
+    // Show loader until everything is ready
+    if (!hasHydrated || isLoading || !user || (user && !userData)) {
         return (
             <Loader />
         );

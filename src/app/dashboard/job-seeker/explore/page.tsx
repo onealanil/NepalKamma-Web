@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import LeftSideSeeker from "@/components/ui/LeftSideSeeker";
-import { Job } from "@/types/job-seeker/home";
+
 import { useAllJobs } from "@/hooks/jobs/useAllJobs";
 import { JobI } from "@/types/job";
 import JobCardSeeker from "@/components/job/JobCardSeeker";
+import Pagination from "@/components/ui/Pagination";
 
 
 // Object { job: (2) [\u2026], totalPages: 1, totalJobs: 2, currentPage: 1 }
@@ -71,21 +72,25 @@ import JobCardSeeker from "@/components/job/JobCardSeeker";
 
 function ExplorePage() {
     const router = useRouter();
-    const { jobs } = useAllJobs();
-    const [isLoading, setIsLoading] = useState(true);
-    const [selectedJob, setSelectedJob] = useState<Job | null>(null);
-    const [showJobModal, setShowJobModal] = useState(false);
-    
-    useEffect(() => {
-        // Simulate loading
-        setTimeout(() => {
-            setIsLoading(false);
-        }, 1500);
-    }, []);
+    const [currentPage, setCurrentPage] = useState(1);
+    // Use pagination hook
+    const {
+        jobs,
+        totalPages,
+        totalJobs,
+        isLoading,
+        isError
+    } = useAllJobs(currentPage, 5);
 
-    const handleJobSelect = (job: Job) => {
-        setSelectedJob(job);
-        setShowJobModal(true);
+    const handleJobSelect = (job: JobI) => {
+        // Navigate to job detail page
+        router.push(`/dashboard/job-seeker/job/${job._id}`);
+    };
+
+    const handlePageChange = (page: number) => {
+        setCurrentPage(page);
+        // Scroll to top when page changes
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
 
@@ -154,7 +159,23 @@ function ExplorePage() {
 
                             {!isLoading && (
                                 <>
-                                    {Array.isArray(jobs?.job) && jobs.totalJobs < 1 ? (
+                                    {isError ? (
+                                        <div className="bg-white rounded-xl p-8 text-center shadow-sm">
+                                            <div className="text-4xl mb-4">⚠️</div>
+                                            <h3 className="text-lg font-bold text-gray-900 mb-2">
+                                                Failed to Load Jobs
+                                            </h3>
+                                            <p className="text-gray-600 mb-6">
+                                                Something went wrong while fetching jobs. Please try again.
+                                            </p>
+                                            <button
+                                                onClick={() => window.location.reload()}
+                                                className="bg-primary text-white px-6 py-3 rounded-xl font-semibold hover:bg-primary/90 transition-colors"
+                                            >
+                                                Try Again
+                                            </button>
+                                        </div>
+                                    ) : totalJobs === 0 ? (
                                         <div className="bg-white rounded-xl p-8 text-center shadow-sm">
                                             <div className="text-4xl mb-4">{getEmptyMessage().icon}</div>
                                             <h3 className="text-lg font-bold text-gray-900 mb-2">
@@ -171,15 +192,27 @@ function ExplorePage() {
                                             </button>
                                         </div>
                                     ) : (
-                                        <div className="space-y-4">
-                                            {jobs?.job.map((job: JobI) => (
-                                                <JobCardSeeker
-                                                    key={job._id}
-                                                    data={job}
-                                                    onSelect={handleJobSelect}
-                                                />
-                                            ))}
-                                        </div>
+                                        <>
+                                            {/* Jobs List */}
+                                            <div className="space-y-4 mb-6">
+                                                {jobs.map((job: JobI) => (
+                                                    <JobCardSeeker
+                                                        key={job._id}
+                                                        data={job}
+                                                        onSelect={handleJobSelect}
+                                                    />
+                                                ))}
+                                            </div>
+
+                                            {/* Pagination */}
+                                            <Pagination
+                                                currentPage={currentPage}
+                                                totalPages={totalPages}
+                                                totalJobs={totalJobs}
+                                                onPageChange={handlePageChange}
+                                                isLoading={isLoading}
+                                            />
+                                        </>
                                     )}
                                 </>
                             )}

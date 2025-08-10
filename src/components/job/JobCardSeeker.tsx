@@ -1,11 +1,11 @@
 import { JobI } from "@/types/job";
-import { Job } from "@/types/job-seeker/home";
 import SafeHTML from "../global/SafeHTML";
 import { useRouter } from "next/navigation";
+import SaveJobButton from "./SaveJobButton";
 
 type JobCardProps = {
     data: JobI;
-    onSelect: (job: Job) => void;
+    onSelect: (job: JobI) => void;
 };
 
 export default function JobCardSeeker({ data: job, onSelect }: JobCardProps) {
@@ -24,16 +24,7 @@ export default function JobCardSeeker({ data: job, onSelect }: JobCardProps) {
         <div className="space-y-4">
             <div
                 key={job._id}
-                onClick={() => onSelect({
-                    _id: job._id || '',
-                    title: job.title,
-                    description: job.job_description,
-                    location: job.location || '',
-                    salary: job.price,
-                    createdAt: job.createdAt?.toString() || '',
-                    category: job.category,
-                    urgency: job.priority as 'low' | 'medium' | 'high'
-                })}
+                onClick={() => onSelect(job)}
                 className="bg-white rounded-xl p-4 cursor-pointer hover:shadow-lg transition-all duration-200 border border-gray-100 hover:border-primary/20"
             >
                 <div className="flex justify-between items-start mb-3">
@@ -62,16 +53,26 @@ export default function JobCardSeeker({ data: job, onSelect }: JobCardProps) {
 
                 <SafeHTML html={job?.job_description || ''} />
 
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1 text-gray-500">
+                <div className="">
+                    <div className="flex items-center gap-1 text-gray-500 flex-1 mb-2">
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                         </svg>
                         <span className="text-sm">{job.location}</span>
                     </div>
-                    <button className="bg-primary text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-primary/90 transition-colors" onClick={() => router.push(`/dashboard/job-seeker/job/${job._id}`)}>
-                        View Details
-                    </button>
+                    <div className="flex justify-end items-center gap-2">
+                        <SaveJobButton
+                            job={job}
+                            variant="icon"
+                            size="md"
+                        />
+                        <button
+                            className="bg-primary text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-primary/90 transition-colors"
+                            onClick={() => router.push(`/dashboard/job-seeker/job/${job._id}`)}
+                        >
+                            View Details
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

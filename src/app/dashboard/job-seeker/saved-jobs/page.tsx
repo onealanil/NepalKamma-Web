@@ -1,29 +1,14 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { ChevronLeft, Bookmark, MapPin, Clock, DollarSign } from 'lucide-react';
+import { ChevronLeft, LucideEqualApproximately } from 'lucide-react';
 import LeftSideSeeker from '@/components/ui/LeftSideSeeker';
-
-interface SavedJob {
-    _id: string;
-    title: string;
-    description: string;
-    category: string;
-    skills_required: string[];
-    payment_method: string[];
-    price: number;
-    address: string;
-    location: string;
-    urgency?: 'high' | 'medium' | 'low';
-    experiesIn: string;
-    postedBy: {
-        _id: string;
-        username: string;
-        profilePic?: { url: string };
-        onlineStatus: boolean;
-    };
-}
+import { JobI } from '@/types/job';
+import { useSavedJobs } from '@/hooks/jobs/useSavedJobs';
+import JobCardSeeker from '@/components/job/JobCardSeeker';
+import { useSavedJobsStore } from '@/store/savedJobsStore';
+import RefreshingButton from '@/components/ui/RefreshingButton';
 
 const JobCardLoader = () => (
     <div className="bg-white rounded-xl p-4 mb-4 shadow-sm animate-pulse">
@@ -38,150 +23,32 @@ const JobCardLoader = () => (
     </div>
 );
 
-const JobCard = ({ data, onSelect }: { data: SavedJob; onSelect: (job: SavedJob) => void }) => {
-    const getUrgencyColor = (urgency?: string) => {
-        switch (urgency) {
-            case 'high': return 'bg-red-100 text-red-600';
-            case 'medium': return 'bg-yellow-100 text-yellow-600';
-            case 'low': return 'bg-green-100 text-green-600';
-            default: return 'bg-gray-100 text-gray-600';
-        }
-    };
-
-    return (
-        <div 
-            onClick={() => onSelect(data)}
-            className="bg-white rounded-xl p-4 mb-4 shadow-sm hover:shadow-md transition-shadow cursor-pointer border border-gray-100"
-        >
-            <div className="flex items-start gap-3">
-                <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
-                    {data.postedBy.profilePic?.url ? (
-                        <img 
-                            src={data.postedBy.profilePic.url} 
-                            alt={data.postedBy.username}
-                            className="w-full h-full rounded-full object-cover"
-                        />
-                    ) : (
-                        <span className="text-primary font-semibold text-lg">
-                            {data.postedBy.username.charAt(0).toUpperCase()}
-                        </span>
-                    )}
-                </div>
-                
-                <div className="flex-1">
-                    <div className="flex items-start justify-between mb-2">
-                        <h3 className="font-bold text-gray-900 text-lg leading-tight">
-                            {data.title}
-                        </h3>
-                        <Bookmark className="w-5 h-5 text-primary fill-current" />
-                    </div>
-                    
-                    <p className="text-gray-600 text-sm mb-3 line-clamp-2">
-                        {data.description.replace(/<[^>]*>/g, '')}
-                    </p>
-                    
-                    <div className="flex items-center gap-4 text-sm text-gray-500 mb-3">
-                        <div className="flex items-center gap-1">
-                            <MapPin size={14} />
-                            <span>{data.location}</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                            <DollarSign size={14} />
-                            <span>Rs. {data.price.toLocaleString()}</span>
-                        </div>
-                    </div>
-                    
-                    <div className="flex items-center justify-between">
-                        <div className="flex flex-wrap gap-1">
-                            {data.skills_required.slice(0, 2).map((skill, index) => (
-                                <span 
-                                    key={index}
-                                    className="px-2 py-1 bg-primary/10 text-primary text-xs rounded-full"
-                                >
-                                    {skill}
-                                </span>
-                            ))}
-                            {data.skills_required.length > 2 && (
-                                <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
-                                    +{data.skills_required.length - 2}
-                                </span>
-                            )}
-                        </div>
-                        
-                        {data.urgency && (
-                            <span className={`px-2 py-1 text-xs rounded-full font-medium ${getUrgencyColor(data.urgency)}`}>
-                                {data.urgency}
-                            </span>
-                        )}
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-};
-
 export default function SavedJobs() {
     const router = useRouter();
-    const [isLoading, setIsLoading] = useState(true);
-    const [savedJobs, setSavedJobs] = useState<SavedJob[]>([]);
-    const [selectedJob, setSelectedJob] = useState<SavedJob | null>(null);
+    const {
+        savedJobs,
+        isLoading,
+        error,
+        fetchSavedJobs,
+        clearError,
+        savedJobsCount
+    } = useSavedJobs();
 
     useEffect(() => {
-        // Simulate loading saved jobs
-        setTimeout(() => {
-            const mockSavedJobs: SavedJob[] = [
-                {
-                    _id: '1',
-                    title: 'Full Stack Web Developer Needed',
-                    description: 'We are looking for an experienced full stack developer to build a modern web application.',
-                    category: 'Web Development',
-                    skills_required: ['React', 'Node.js', 'MongoDB', 'TypeScript'],
-                    payment_method: ['Bank Transfer', 'Digital Wallet'],
-                    price: 50000,
-                    address: 'Thamel, Kathmandu',
-                    location: 'Kathmandu',
-                    urgency: 'high',
-                    experiesIn: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-                    postedBy: {
-                        _id: '2',
-                        username: 'Tech Solutions Ltd',
-                        profilePic: { url: 'https://picsum.photos/100/100?random=1' },
-                        onlineStatus: true
-                    }
-                },
-                {
-                    _id: '2',
-                    title: 'Mobile App UI/UX Design',
-                    description: 'Looking for a creative designer to design mobile app interfaces.',
-                    category: 'Design',
-                    skills_required: ['Figma', 'Adobe XD', 'UI Design'],
-                    payment_method: ['Cash', 'Bank Transfer'],
-                    price: 25000,
-                    address: 'Lalitpur, Nepal',
-                    location: 'Lalitpur',
-                    urgency: 'medium',
-                    experiesIn: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
-                    postedBy: {
-                        _id: '3',
-                        username: 'Creative Agency',
-                        profilePic: { url: 'https://picsum.photos/100/100?random=2' },
-                        onlineStatus: false
-                    }
-                }
-            ];
-            
-            setSavedJobs(mockSavedJobs);
-            setIsLoading(false);
-        }, 1500);
+        fetchSavedJobs();
     }, []);
 
-    const handleJobSelect = (job: SavedJob) => {
-        setSelectedJob(job);
-        router.push(`/dashboard/job-seeker/job?id=${job._id}`);
+    const handleJobSelect = (job: JobI) => {
+        router.push(`/dashboard/job-seeker/job/${job._id}`);
     };
 
     const handleBackPress = () => {
         router.push('/dashboard/job-seeker');
+    };
+
+    const handleRetry = () => {
+        clearError();
+        fetchSavedJobs();
     };
 
     return (
@@ -195,15 +62,24 @@ export default function SavedJobs() {
                     <div className="lg:col-span-6 py-6">
                         {/* Header */}
                         <div className="mb-6">
-                            <button 
-                                onClick={handleBackPress}
-                                className="flex items-center gap-2 mb-4 text-gray-600 hover:text-gray-900 transition-colors"
-                            >
-                                <ChevronLeft size={24} />
-                                <span className="font-bold text-xl text-gray-900">
-                                    Saved Jobs List
-                                </span>
-                            </button>
+                            <div className="flex items-center justify-between mb-4">
+                                <button
+                                    onClick={handleBackPress}
+                                    className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
+                                >
+                                    <ChevronLeft size={24} />
+                                    <span className="font-bold text-xl text-gray-900">
+                                        Saved Jobs List
+                                    </span>
+                                </button>
+
+                                {/* Debug/Refresh Button */}
+                                <RefreshingButton
+                                    handleRefresh={handleRetry}
+                                    isRefreshing={isLoading}
+                                    isLoading={isLoading}
+                                />
+                            </div>
                         </div>
 
                         {/* Content */}
@@ -214,36 +90,80 @@ export default function SavedJobs() {
                                         <JobCardLoader key={item} />
                                     ))}
                                 </div>
+                            ) : error ? (
+                                // ✅ Error state
+                                <div className="bg-white rounded-xl p-8 text-center shadow-sm">
+                                    <div className="text-4xl mb-4">⚠️</div>
+                                    <h3 className="text-lg font-bold text-gray-900 mb-2">
+                                        Failed to Load Saved Jobs
+                                    </h3>
+                                    <p className="text-gray-600 mb-6">
+                                        {error}
+                                    </p>
+                                    <button
+                                        onClick={handleRetry}
+                                        className="bg-primary text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors"
+                                    >
+                                        Try Again
+                                    </button>
+                                </div>
+                            ) : savedJobsCount === 0 ? (
+                                // ✅ Empty state
+                                <div className="bg-white rounded-xl p-8 text-center shadow-sm">
+                                    <div className="text-4xl mb-4 flex items-center justify-center">
+                                        <LucideEqualApproximately size={48} color='red' />
+                                    </div>
+                                    <h3 className="text-lg font-bold text-gray-900 mb-2">
+                                        No Saved Jobs Yet
+                                    </h3>
+                                    <p className="text-gray-600 mb-6">
+                                        Start saving jobs you're interested in to see them here.
+                                        You can save jobs by clicking the bookmark icon on any job card.
+                                    </p>
+                                    <button
+                                        onClick={() => router.push('/dashboard/job-seeker/explore')}
+                                        className="bg-primary text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors"
+                                    >
+                                        Explore Jobs
+                                    </button>
+                                </div>
+                            ) : savedJobsCount > 0 && savedJobs.length === 0 ? (
+                                // ⚠️ Mismatch state - count > 0 but no jobs loaded
+                                <div className="bg-white rounded-xl p-8 text-center shadow-sm border-2 border-yellow-200">
+                                    <div className="text-4xl mb-4">⚠️</div>
+                                    <h3 className="text-lg font-bold text-gray-900 mb-2">
+                                        Loading Saved Jobs...
+                                    </h3>
+                                    <p className="text-gray-600 mb-6">
+                                        You have {savedJobsCount} saved job{savedJobsCount > 1 ? 's' : ''}, but they're still loading.
+                                        If this persists, try refreshing.
+                                    </p>
+                                    <div className="flex gap-3 justify-center">
+                                        <button
+                                            onClick={handleRetry}
+                                            className="bg-primary text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors"
+                                        >
+                                            Retry Loading
+                                        </button>
+                                        <button
+                                            onClick={() => window.location.reload()}
+                                            className="bg-gray-100 text-gray-700 px-6 py-3 rounded-lg font-semibold hover:bg-gray-200 transition-colors"
+                                        >
+                                            Refresh Page
+                                        </button>
+                                    </div>
+                                </div>
                             ) : (
-                                <>
-                                    {savedJobs.length === 0 ? (
-                                        <div className="bg-white rounded-xl p-8 text-center shadow-sm">
-                                            <div className="text-4xl mb-4">📋</div>
-                                            <h3 className="text-lg font-bold text-gray-900 mb-2">
-                                                No Saved Jobs
-                                            </h3>
-                                            <p className="text-red-500 font-medium mb-4">
-                                                No Saved jobs available
-                                            </p>
-                                            <button
-                                                onClick={() => router.push('/dashboard/job-seeker/explore')}
-                                                className="bg-primary text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors"
-                                            >
-                                                Browse Jobs
-                                            </button>
-                                        </div>
-                                    ) : (
-                                        <div className="space-y-4">
-                                            {savedJobs.map((job) => (
-                                                <JobCard
-                                                    key={job._id}
-                                                    data={job}
-                                                    onSelect={handleJobSelect}
-                                                />
-                                            ))}
-                                        </div>
-                                    )}
-                                </>
+                                // ✅ Success state with jobs
+                                <div className="space-y-4">
+                                    {savedJobs.map((job: JobI) => (
+                                       <JobCardSeeker
+                                            key={job._id}
+                                            data={job}
+                                            onSelect={handleJobSelect}
+                                        />
+                                    ))}
+                                </div>
                             )}
                         </div>
                     </div>
@@ -257,12 +177,12 @@ export default function SavedJobs() {
                                 <div className="space-y-3">
                                     <div className="flex justify-between">
                                         <span className="text-gray-600">Total Saved</span>
-                                        <span className="font-semibold text-primary">{savedJobs.length}</span>
+                                        <span className="font-semibold text-primary">{savedJobsCount}</span>
                                     </div>
                                     <div className="flex justify-between">
                                         <span className="text-gray-600">High Priority</span>
                                         <span className="font-semibold text-red-600">
-                                            {savedJobs.filter(job => job.urgency === 'high').length}
+                                            {savedJobs.filter((job: JobI) => job.priority === 'High').length}
                                         </span>
                                     </div>
                                 </div>

@@ -21,10 +21,6 @@ export const useSavedJobs = () => {
     removeJobOptimistic
   } = useSavedJobsStore();
 
-  useEffect(() => {
-      fetchSavedJobs();
-  }, []);
-
   /**
    * Toggle save/unsave a job with optimistic updates
    */

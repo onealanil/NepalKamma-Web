@@ -1,15 +1,14 @@
 import { JobI } from "@/types/job";
 import SafeHTML from "../global/SafeHTML";
-import { Calendar, Eye, Trash2 } from "lucide-react";
+import { Calendar, Eye, Trash2, DollarSign } from "lucide-react";
 
 
 type JobCardProps = {
     job: JobI;
-    onDelete: (job: JobI) => void;
-    onView: (job: JobI) => void;
+    onPayClick: (job: JobI) => void;
 };
 
-export default function JobCard({ job, onDelete, onView }: JobCardProps) {
+export default function JobCardCompletedProvider({ job, onPayClick }: JobCardProps) {
     const getUrgencyColor = (urgency?: string) => {
         switch (urgency) {
             case 'Urgent': return 'bg-red-100 text-red-600';
@@ -92,29 +91,26 @@ export default function JobCard({ job, onDelete, onView }: JobCardProps) {
                     </div>
 
                     <div className="flex items-center gap-2">
-                        {
-                            (job.job_status === "Paid" || job.job_status==="Completed" || job.job_status === "Cancelled") ? (
-                                <span className={`px-2 py-1 rounded-full text-xs font-medium ${job.job_status === "Paid" || job.job_status === "Completed"? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
-                                    {job.job_status}
-                                </span>
-                            ) : (
-                                <button
-                                    onClick={() => onView(job)}
-                                    className="p-2 rounded-lg transition-colors"
-                                >
-                                    <Eye className="w-4 h-4 text-gray-600" />
-                                </button>
+                        {/* Pay Button or Status */}
+                        {job.job_status === "Paid" ? (
+                            <div className="flex items-center gap-2 px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">
+                                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                                Paid
+                            </div>
+                        ) : job.job_status === "Cancelled" ? (
+                            <span className="px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700">
+                                Cancelled
+                            </span>
+                        ) : job.job_status === "Completed" ? (
+                            <button
+                                onClick={() => onPayClick(job)}
+                                className="bg-primary text-white px-4 py-2 rounded-lg font-semibold hover:bg-primary/90 transition-colors flex items-center gap-2 text-sm"
+                            >
+                                <DollarSign size={16} />
+                                Pay
+                            </button>
+                        ) : null}
 
-                            )
-                        }
-                        <button
-                            onClick={() => {
-                                if (job._id) onDelete(job);
-                            }}
-                            className="p-2 hover:bg-red-100 rounded-lg transition-colors"
-                        >
-                            <Trash2 className="w-4 h-4 text-red-600" />
-                        </button>
                     </div>
                 </div>
             </div>

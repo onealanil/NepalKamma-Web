@@ -9,6 +9,7 @@ interface SavedJobsState {
   savedJobs: JobI[];
   isLoading: boolean;
   error: string | null;
+  isFetching: boolean;
 
   // Actions
   saveJobAction: (jobId: string) => Promise<boolean>;
@@ -31,6 +32,7 @@ export const useSavedJobsStore = create<SavedJobsState>()(
       savedJobs: [],
       isLoading: false,
       error: null,
+      isFetching: false,
 
       // Check if a job is saved
       isSaved: (jobId: string) => {
@@ -119,31 +121,51 @@ export const useSavedJobsStore = create<SavedJobsState>()(
 
       // Fetch all saved jobs
       fetchSavedJobs: async () => {
-        set({ isLoading: true, error: null });
+        const { isFetching } = get();
+        
+        if (isFetching) {
+          return;
+        }
+
+        set({ isLoading: true, error: null, isFetching: true });
 
         try {
           const response = await getSavedJobs();
 
           if (response.success && response.data) {
-            const jobs = response.data.savedPosts;
-            const jobIds = jobs.map((job: JobI) => job._id);
+            const jobs = response.data.savedPosts || [];
 
-            set({
-              savedJobs: jobs,
-              savedJobIds: jobIds,
-              isLoading: false,
-              error: null
-            });
+            if (Array.isArray(jobs)) {
+              const jobIds = jobs.map((job: JobI) => job._id).filter(Boolean);
+
+              set({
+                savedJobs: jobs,
+                savedJobIds: jobIds,
+                isLoading: false,
+                error: null,
+                isFetching: false
+              });
+            } else {
+              set({
+                savedJobs: [],
+                savedJobIds: [],
+                isLoading: false,
+                error: 'Invalid response format: expected array of jobs',
+                isFetching: false
+              });
+            }
           } else {
             set({
               error: response.message || 'Failed to fetch saved jobs',
-              isLoading: false
+              isLoading: false,
+              isFetching: false
             });
           }
         } catch (error) {
           set({
             error: 'Failed to fetch saved jobs. Please try again.',
-            isLoading: false
+            isLoading: false,
+            isFetching: false
           });
         }
       },

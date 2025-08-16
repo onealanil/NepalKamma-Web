@@ -44,7 +44,7 @@ export default function JobCardSeeker({ data: job, onSelect }: JobCardProps) {
                         </div>
                     </div>
                     <div className="text-right">
-                        <div className="text-xl font-bold text-primary">₹{job.price}</div>
+                        <div className="text-xl font-bold text-primary">Rs. {job.price}</div>
                         {/* {job.distance && (
                                                                 <div className="text-xs text-gray-500">{job.distance}</div>
                                                             )} */}

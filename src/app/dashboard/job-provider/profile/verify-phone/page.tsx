@@ -140,7 +140,7 @@ export default function VerifyPhone(){
                             {/* Header with Back Button */}
                             <div className="flex items-center gap-4 mb-6">
                                 <button
-                                    onClick={() => router.push('/dashboard/job-seeker/profile')}
+                                    onClick={() => router.push('/dashboard/job-provider/profile')}
                                     className="p-2 rounded-lg transition-colors"
                                 >
                                     <ArrowLeft className="w-6 h-6 text-gray-600" />

@@ -2,7 +2,7 @@
 "use client";
 
 import LeftSideProvider from "@/components/ui/LeftSideProvider";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, RefreshCw } from "lucide-react";
 import { useRouter } from 'next/navigation';
 import { useUserJobs } from "@/hooks/jobs/useJobs";
 import { useAuthStore } from "@/store/authStore";
@@ -28,10 +28,29 @@ export default function MyJobsPage() {
     const [activeTab, setActiveTab] = useState<string>("pending");
     const [showJobModal, setShowJobModal] = useState<boolean>(false);
     const [selectedJob, setSelectedJob] = useState<JobI | null>(null);
+    const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
+
 
     const handleViewJob = (job: JobI) => {
         setSelectedJob(job);
         setShowJobModal(true);
+    };
+
+  
+    /**
+     * @function handleRefresh
+     * @description Function to refresh the jobs list
+     */
+    const handleRefresh = async () => {
+        setIsRefreshing(true);
+        try {
+            await mutate();
+        } catch (error) {
+            console.error('Failed to refresh jobs:', error);
+            ErrorToast('Failed to refresh jobs');
+        } finally {
+            setIsRefreshing(false);
+        }
     };
 
     /**
@@ -79,7 +98,7 @@ export default function MyJobsPage() {
     /**
      * if user is not authenticated
      **/
-    if (!user) {
+    if (!user ) {
         return <Loader />
     }
 
@@ -93,17 +112,31 @@ export default function MyJobsPage() {
                     {/* Main Content */}
                     <div className="lg:col-span-6 py-6">
                         {/* Header */}
-                        <div className="flex items-center gap-4 mb-6">
-                            <button
-                                onClick={() => router.back()}
-                                className="lg:hidden p-2 rounded-full transition-colors"
-                            >
-                                <ChevronLeft className="w-6 h-6 text-gray-600" />
-                            </button>
-                            <div>
-                                <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">My Jobs</h1>
-                                <p className="text-gray-600">Manage your posted Jobs</p>
+                        <div className="flex items-center justify-between mb-6">
+                            <div className="flex items-center gap-4">
+                                <button
+                                    onClick={() => router.back()}
+                                    className="lg:hidden p-2 rounded-full transition-colors"
+                                >
+                                    <ChevronLeft className="w-6 h-6 text-gray-600" />
+                                </button>
+                                <div>
+                                    <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">My Jobs</h1>
+                                    <p className="text-gray-600">Manage your posted Jobs</p>
+                                </div>
                             </div>
+
+                            {/* Refresh Button */}
+                            <button
+                                onClick={handleRefresh}
+                                disabled={isRefreshing}
+                                className="p-2 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                title="Refresh jobs"
+                            >
+                                <RefreshCw
+                                    className={`w-5 h-5 text-gray-600 ${isRefreshing ? 'animate-spin' : ''}`}
+                                />
+                            </button>
                         </div>
 
                         {/* stats  */}
@@ -121,7 +154,8 @@ export default function MyJobsPage() {
       `}
                                     onClick={() => setActiveTab(status.toLowerCase())}
                                 >
-                                    {status} ({jobs.filter((job: JobI) => job.job_status === status).length})
+                                    {status === "In_Progress" ? "In Progress" : status}
+                                     ({jobs.filter((job: JobI) => job.job_status === status).length})
                                 </button>
                             ))}
                         </div>
@@ -154,11 +188,11 @@ export default function MyJobsPage() {
                                 jobs
                                     .filter((job: JobI) => {
                                         if (activeTab === "pending") return job.job_status === "Pending";
-                                        if (activeTab === "in progress") return job.job_status === "In_Progress";
+                                        if (activeTab === "in_progress") return job.job_status === "In_Progress";
                                         if (activeTab === "completed") return job.job_status === "Completed";
                                         if (activeTab === "cancelled") return job.job_status === "Cancelled";
                                         if (activeTab === "paid") return job.job_status === "Paid";
-                                        return true;
+                                        return false; // Don't show any jobs if no tab matches
                                     })
                                     .map((job: JobI) => (
                                         <JobCard key={job._id} onView={handleViewJob} job={job} onDelete={handleDeleteJob} />

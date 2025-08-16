@@ -13,7 +13,7 @@ import { ApiResponse } from "@/types/job-provider/job-api";
  * @param defaultMessage - Default error message to show
  * @returns Formatted error response
  */
-function handleApiError(error: unknown, defaultMessage: string): ApiResponse {
+export function handleApiError(error: unknown, defaultMessage: string): ApiResponse {
     if (error instanceof AxiosError) {
         const message = error.response?.data?.message || error.message || defaultMessage;
         ErrorToast(message);
@@ -112,7 +112,7 @@ export async function deleteJob(jobId: string): Promise<ApiResponse> {
  */
 export async function updateJob(
     jobId: string,
-    jobData: { job_status: string, assignedTo: string }
+    jobData: { job_status: string, assignedTo?: string }
 ): Promise<ApiResponse> {
     try {
         if (!jobId) {
@@ -123,8 +123,10 @@ export async function updateJob(
             throw new Error("Job status is required");
         }
 
-        if (!jobData.assignedTo) {
-            throw new Error("Assigned user is required");
+        // Only validate assignedTo if status is not "Cancelled"
+        // Note: "Cancelled" is a special case that resets the job to "Pending" on the backend
+        if (jobData.job_status !== "Cancelled" && !jobData.assignedTo) {
+            throw new Error("Assigned user is required for this status");
         }
 
         const response = await axiosInstance.put(`/job/updateJobStatus/${jobId}`, jobData);
@@ -184,6 +186,51 @@ export async function fetchAllJobs(page: number = 1, limit: number = 5): Promise
     }
     catch (error: unknown) {
         return handleApiError(error, "Failed to fetch jobs. Please try again.");
+    }
+}
+
+/**
+ * @function searchJobs
+ * @description Searches for jobs based on your backend API structure
+ * @param page - Page number (default: 1)
+ * @param limit - Number of jobs per page (default: 5)
+ * @param filters - Filter parameters matching backend structure
+ * @returns Promise<ApiResponse> - Response from the server
+ * @route GET /job/search
+ */
+export async function searchJobs(
+    searchText: string = '',
+    category: string = '',
+    selectedDistance: number | null = null,
+    lowToHigh: boolean = false,
+    highToLow: boolean = false,
+    sortByRating: boolean = false,
+    page: number = 1,
+    limit: number = 5,
+    lat: number | null = null,
+    lng: number | null = null
+): Promise<ApiResponse> {
+    try {
+        const response = await axiosInstance.get(
+            `/job/searchjob?text=${searchText}&category=${category}&sortByRating=${sortByRating}&sortByPriceHighToLow=${highToLow}&sortByPriceLowToHigh=${lowToHigh}&lng=${lng}&lat=${lat}&distance=${selectedDistance}&page=${page}&limit=${limit}`
+        );
+
+        if (response.status === 200) {
+            return {
+                success: true,
+                data: response.data,
+                message: "Jobs searched successfully"
+            };
+        }
+
+        return {
+            success: false,
+            data: [],
+            error: "Failed to fetch jobs"
+        };
+    }
+    catch (error: unknown) {
+        return handleApiError(error, "Failed to search jobs. Please try again.");
     }
 }
 
@@ -298,7 +345,16 @@ export async function unsaveJob(jobId: string): Promise<ApiResponse> {
 export async function getSavedJobs(): Promise<ApiResponse> {
     try {
         const response = await axiosInstance.get(`/user/saved-jobs`);
-        console.log("this is fectch saved jobs return functiuon", response.data);
+
+        // Validate response structure
+        if (!response.data) {
+            throw new Error('No data received from server');
+        }
+
+        if (!response.data.savedPosts) {
+            console.warn('⚠️ No savedPosts property in response, but API call succeeded');
+        }
+
         return {
             success: true,
             data: response.data,
@@ -306,6 +362,7 @@ export async function getSavedJobs(): Promise<ApiResponse> {
         };
     }
     catch (error: unknown) {
+        console.error('❌ Error fetching saved jobs:', error);
         return handleApiError(error, "Failed to fetch saved jobs. Please try again.");
     }
 }
@@ -384,3 +441,24 @@ export async function fetchRecentJobs(): Promise<ApiResponse> {
 }
 
 
+
+// ---------------------------- for job provider (who posted the job) -------------------------------------------
+/**
+ * @function fetchCompletedJobsProvider
+ * @description Fetches completed jobs for provider
+ * @returns Promise<ApiResponse> - Response from the server
+ * @route GET /job/getRecentJob
+ */
+export async function fetchCompletedJobsProvider(): Promise<ApiResponse> {
+    try {
+        const response = await axiosInstance.get(`/job/completedJobs`);
+        return {
+            success: true,
+            data: response.data.job || [],
+            message: response.data.message || "Recent jobs fetched successfully"
+        };
+    }
+    catch (error: unknown) {
+        return handleApiError(error, "Failed to fetch recent jobs. Please try again.");
+    }
+}

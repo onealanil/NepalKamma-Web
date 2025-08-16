@@ -131,7 +131,7 @@ export default function VerifyDocument() {
                         <p className="text-primary font-medium">{user?.phoneNumber || 'Not added'}</p>
                     </div>
                     <button
-                        onClick={() => router.push('/dashboard/job-seeker/profile/verify-phone')}
+                        onClick={() => router.push('/dashboard/job-provider/profile/verify-phone')}
                         className="flex items-center gap-2 text-primary hover:text-primary/80 font-medium"
                     >
                         <Phone className="w-4 h-4" />

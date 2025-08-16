@@ -83,6 +83,16 @@ export const EditJobModal = ({ isOpen, onClose, job, onSave }: Props) => {
                         </select>
                     </div>
 
+                    {/* Show description for Cancelled status */}
+                    {selectedStatus === 'Cancelled' && (
+                        <div className="bg-red-50 border border-red-200 rounded-lg p-4 mt-4">
+                            <p className="text-red-700 text-sm">
+                                <strong>Note:</strong> Selecting "Cancelled" will reset this job back to "Pending" status
+                                and remove any assigned worker. The job will be available for new applications.
+                            </p>
+                        </div>
+                    )}
+
                     {selectedStatus !== 'Pending' && selectedStatus !== 'Cancelled' && (
                         <>
                             <div className="flex gap-2 mt-4">
@@ -121,22 +131,26 @@ export const EditJobModal = ({ isOpen, onClose, job, onSave }: Props) => {
                     <div className="mt-6 flex justify-center">
                         <button
                             onClick={handleSave}
-                            className="bg-primary text-white px-6 py-2 rounded-md"
+                            className={`px-6 py-2 rounded-md text-white ${
+                                selectedStatus === 'Cancelled'
+                                    ? 'bg-red-600 hover:bg-red-700'
+                                    : 'bg-primary hover:bg-primary/90'
+                            }`}
                         >
-                            OK
+                            {selectedStatus === 'Cancelled' ? 'Reset Job' : 'Update Status'}
                         </button>
                     </div>
-                ) : selectedStatus !== 'Pending' && 
-                   selectedStatus !== 'Cancelled' && 
-                   selectedUsers && 
-                   Array.isArray(selectedUsers) && 
+                ) : selectedStatus !== 'Pending' &&
+                   selectedStatus !== 'Cancelled' &&
+                   selectedUsers &&
+                   Array.isArray(selectedUsers) &&
                    selectedUsers.length > 0 ? (
                     <div className="mt-6 flex justify-center">
                         <button
                             onClick={handleSave}
-                            className="bg-primary text-white px-6 py-2 rounded-md"
+                            className="bg-primary text-white px-6 py-2 rounded-md hover:bg-primary/90"
                         >
-                            OK
+                            Update Status
                         </button>
                     </div>
                 ) : null}

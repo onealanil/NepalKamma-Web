@@ -49,7 +49,7 @@ export default function SignUp() {
       }));
     }
   }, [locationName, geometry]);
-
+1
 
 
   const validateForm = (): boolean => {

@@ -57,7 +57,7 @@ export default function SignIn() {
                 } else if (user?.role === "job_provider") {
                     router.push('/dashboard/job-provider');
                 } else {
-                    router.push('/auth/signin');
+                    router.push('/unauthorized');
                 }
                 return;
             }

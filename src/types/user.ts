@@ -38,4 +38,5 @@ export interface User {
   totalCompletedJobs: number;
   totalIncome: number;
   userAccountStatus: 'Active' | 'Inactive' | string;
+  averageRating?: number;
 }

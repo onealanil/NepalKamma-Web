@@ -20,7 +20,7 @@ export const JobDetailsModal = ({
   job: JobI | null;
 }) => {
   const [isEditOpen, setIsEditOpen] = useState<boolean>(false);
-  const {mutate} = useUserJobs(job?.postedBy?._id);
+  const { mutate } = useUserJobs(job?.postedBy?._id);
 
 
 
@@ -32,8 +32,8 @@ export const JobDetailsModal = ({
       ErrorToast("Job ID is missing");
       return;
     }
-    
-    if (!users.length || !users[0]?._id) {
+
+    if (status !== "Cancelled" && (!users.length || !users[0]?._id)) {
       ErrorToast("Please select a user to assign");
       return;
     }
@@ -45,14 +45,21 @@ export const JobDetailsModal = ({
       return;
     }
 
-    const jobData = {
+    const jobData: { job_status: string; assignedTo?: string } = {
       job_status: status,
-      assignedTo: users[0]._id, 
     };
+
+    if (status !== "Cancelled" && users.length > 0 && users[0]?._id) {
+      jobData.assignedTo = users[0]._id;
+    }
 
     const response = await updateJob(job._id, jobData);
     if (response.success) {
-      SuccessToast("Job updated successfully!");
+      if (status === "Cancelled") {
+        SuccessToast("Job has been reset to Pending status!");
+      } else {
+        SuccessToast("Job updated successfully!");
+      }
       mutate();
       setIsEditOpen(false);
       onClose();
@@ -104,11 +111,10 @@ export const JobDetailsModal = ({
                   </div>
                 </div>
                 <div className="flex-shrink-0">
-                  <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${
-                    job.job_status === "Completed" 
-                      ? "bg-green-100 text-green-700" 
-                      : "bg-blue-100 text-blue-700"
-                  }`}>
+                  <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${job.job_status === "Completed"
+                    ? "bg-green-100 text-green-700"
+                    : "bg-blue-100 text-blue-700"
+                    }`}>
                     {job.job_status === "In_Progress" ? "In Progress" : job.job_status}
                   </span>
                 </div>
@@ -158,13 +164,12 @@ export const JobDetailsModal = ({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="bg-gray-50 p-4 rounded-lg">
                   <h5 className="font-semibold text-gray-900 mb-1">Status</h5>
-                  <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${
-                    job.job_status === "Pending" ? "bg-yellow-100 text-yellow-700" :
+                  <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${job.job_status === "Pending" ? "bg-yellow-100 text-yellow-700" :
                     job.job_status === "In_Progress" ? "bg-blue-100 text-blue-700" :
-                    job.job_status === "Completed" ? "bg-green-100 text-green-700" :
-                    job.job_status === "Cancelled" ? "bg-red-100 text-red-700" :
-                    "bg-gray-100 text-gray-700"
-                  }`}>
+                      job.job_status === "Completed" ? "bg-green-100 text-green-700" :
+                        job.job_status === "Cancelled" ? "bg-red-100 text-red-700" :
+                          "bg-gray-100 text-gray-700"
+                    }`}>
                     {job.job_status === "In_Progress" ? "In Progress" : job.job_status}
                   </span>
                 </div>

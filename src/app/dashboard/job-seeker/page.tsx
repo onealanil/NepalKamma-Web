@@ -133,8 +133,8 @@ function JobSeekerDashboard() {
               {/* Header */}
               <div className="p-6 border-b border-gray-100">
                 <div className="flex justify-between gap-2 items-center-center mb-4">
-                  <div className="flex gap-2 items-center ">
-                    <h1 className="text-xl md:text-2xl font-bold text-gray-900">
+                  <div className="flex flex-col md:flex-row md:gap-2 items-center ">
+                    <h1 className="text-lg md:text-2xl font-bold text-gray-900">
                       Discover Jobs,
                     </h1>
                     <span className="floating-animation text-lg md:text-xl font-bold text-primary">

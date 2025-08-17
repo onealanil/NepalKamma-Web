@@ -1,133 +1,40 @@
 
 "use client";
 
-import { useState, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { ChevronLeft, Home, ChevronRight, X, MapPin, Star, Bookmark, BookmarkCheck, Send, Eye } from 'lucide-react';
+import { useState } from 'react';
+import { useRouter, useParams } from 'next/navigation';
+import { ChevronLeft, ChevronRight, X, MapPin, Star, Send } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
-import LeftSideSeeker from '@/components/ui/LeftSideSeeker';
+import LeftSideProvider from '@/components/ui/LeftSideProvider';
 import SafeHTML from '@/components/global/SafeHTML';
 import Image from 'next/image';
-
-interface GigData {
-    _id: string;
-    title: string;
-    gig_description: string;
-    category: string;
-    price: number;
-    images?: { url: string; public_id: string }[];
-    visibility: 'public' | 'private';
-    createdAt: string;
-    postedBy: {
-        _id: string;
-        username: string;
-        profilePic?: { url: string };
-        onlineStatus: boolean;
-        skills?: string[];
-        address?: {
-            coordinates: number[];
-            type: string;
-        };
-        location?: string;
-    };
-    reviews?: {
-        _id: string;
-        rating: number;
-        review: string;
-        reviewedBy: {
-            _id: string;
-            username: string;
-            profilePic?: { url: string };
-        };
-        createdAt: string;
-    }[];
-}
+import { useSingleGig } from '@/hooks/gigs/useSingleGig';
 
 const GigDetailPage = () => {
     // State management for all interactive features
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
-    const [isBookmarked, setIsBookmarked] = useState(false);
     const [showLocationModal, setShowLocationModal] = useState(false);
     const [isRating, setIsRating] = useState(false);
     const [rating, setRating] = useState(0);
     const [review, setReview] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [averageRating, setAverageRating] = useState(0);
 
     // Navigation using Next.js router
     const router = useRouter();
-    const searchParams = useSearchParams();
-    const gigId = searchParams.get('id');
+    const params = useParams();
+    const gigId = params.gig as string;
 
-    const [gigData, setGigData] = useState<GigData | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
+    // Fetch gig data using the hook
+    const { gig: gigData, isLoading, isError } = useSingleGig(gigId);
 
-    useEffect(() => {
-        if (!gigId) {
-            router.push('/dashboard/job-seeker/explore');
-            return;
-        }
-
-        // Simulate loading - replace with actual API call
-        setIsLoading(true);
-        setTimeout(() => {
-            const mockGigData: GigData = {
-                _id: gigId,
-                title: 'Professional Web Development Services',
-                gig_description: `<p>I will create a modern, responsive website for your business using the latest technologies. My services include:</p>
-                <ul>
-                    <li>Custom website design and development</li>
-                    <li>Responsive design for all devices</li>
-                    <li>SEO optimization</li>
-                    <li>Fast loading times</li>
-                    <li>Modern UI/UX design</li>
-                </ul>
-                <p>With over 5 years of experience in web development, I guarantee high-quality work that meets your requirements.</p>`,
-                category: 'Web Development',
-                price: 25000,
-                visibility: 'public',
-                createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-                images: [
-                    { url: 'https://picsum.photos/800/400?random=1', public_id: 'img1' },
-                    { url: 'https://picsum.photos/800/400?random=2', public_id: 'img2' },
-                    { url: 'https://picsum.photos/800/400?random=3', public_id: 'img3' }
-                ],
-                postedBy: {
-                    _id: 'user123',
-                    username: 'John Developer',
-                    profilePic: { url: 'https://picsum.photos/100/100?random=4' },
-                    onlineStatus: true,
-                    skills: ['React', 'Node.js', 'TypeScript', 'MongoDB', 'Tailwind CSS'],
-                    location: 'Kathmandu, Nepal',
-                    address: {
-                        coordinates: [85.3240, 27.7172],
-                        type: 'Point'
-                    }
-                },
-                reviews: [
-                    {
-                        _id: 'review1',
-                        rating: 5,
-                        review: 'Excellent work! Very professional and delivered on time.',
-                        reviewedBy: {
-                            _id: 'reviewer1',
-                            username: 'Sarah Client',
-                            profilePic: { url: 'https://picsum.photos/100/100?random=5' }
-                        },
-                        createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString()
-                    }
-                ]
-            };
-
-            setGigData(mockGigData);
-            setAverageRating(4.8);
-            setIsLoading(false);
-        }, 1000);
-    }, [gigId, router]);
+    // Calculate average rating from reviews (if available)
+    const averageRating = gigData?.reviews && gigData.reviews.length > 0
+        ? gigData.reviews.reduce((sum: number, review: any) => sum + review.rating, 0) / gigData.reviews.length
+        : 0;
 
     const handleContactProvider = () => {
         if (gigData?.postedBy?._id) {
-            router.push(`/dashboard/job-seeker/profile/user/${gigData.postedBy._id}`);
+            router.push(`/dashboard/job-provider/profile/user/${gigData.postedBy._id}`);
         }
     };
 
@@ -161,13 +68,21 @@ const GigDetailPage = () => {
         );
     }
 
-    if (!gigData) {
+    if (isError || (!isLoading && !gigData)) {``
         return (
             <div className="min-h-screen bg-gray-50 flex items-center justify-center">
                 <div className="text-center">
-                    <h2 className="text-2xl font-bold text-gray-900 mb-4">Gig Not Found</h2>
-                    <button 
-                        onClick={() => router.push('/dashboard/job-seeker/explore')}
+                    <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                        {isError ? 'Error Loading Gig' : 'Gig Not Found'}
+                    </h2>
+                    <p className="text-gray-600 mb-4">
+                        {isError
+                            ? 'There was an error loading the gig details. Please try again.'
+                            : 'The gig you are looking for does not exist or has been removed.'
+                        }
+                    </p>
+                    <button
+                        onClick={() => router.push('/dashboard/job-provider/explore')}
                         className="bg-primary text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors"
                     >
                         Back to Explore
@@ -183,27 +98,11 @@ const GigDetailPage = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                     {/* Left Sidebar */}
                     <div className="hidden lg:block lg:col-span-3">
-                        <LeftSideSeeker />
+                        <LeftSideProvider />
                     </div>
 
                     {/* Main Content */}
                     <div className="lg:col-span-6 py-6">
-                        {/* Header Breadcrumb */}
-                        <div className="bg-white rounded-xl p-4 mb-6 shadow-sm">
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-2 text-sm text-gray-600">
-                                    <Home size={16} className="text-color2" />
-                                    <ChevronRight size={16} />
-                                    <span>{gigData.category}</span>
-                                </div>
-                                <button 
-                                    onClick={() => router.push('/dashboard/job-seeker/explore')}
-                                    className="p-2 rounded-full hover:bg-gray-100 transition-colors"
-                                >
-                                    <X size={20} className="text-red-500" />
-                                </button>
-                            </div>
-                        </div>
 
                         <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
                             <div className="p-6 space-y-6">
@@ -307,7 +206,7 @@ const GigDetailPage = () => {
                                     <h3 className="text-lg font-bold text-gray-900">Skills</h3>
                                     {gigData.postedBy?.skills && gigData.postedBy.skills.length > 0 ? (
                                         <div className="flex flex-wrap gap-2">
-                                            {gigData.postedBy.skills.map((skill, index) => (
+                                            {gigData.postedBy.skills.map((skill: string, index: number) => (
                                                 <span
                                                     key={index}
                                                     className="bg-gray-200 text-gray-800 px-3 py-1 rounded-md text-sm font-medium"
@@ -326,7 +225,7 @@ const GigDetailPage = () => {
                                     <h2 className="text-xl font-bold text-gray-900">Pricing</h2>
                                     <p className="text-gray-700">
                                         I will start from Rs.{' '}
-                                        <span className="font-bold text-gray-900">₹{gigData.price.toLocaleString()}</span>{' '}
+                                        <span className="font-bold text-gray-900">₹{gigData.price}</span>{' '}
                                         for this gig.
                                     </p>
                                     <p className="text-red-500 text-sm font-semibold leading-relaxed">
@@ -335,6 +234,10 @@ const GigDetailPage = () => {
                                         ensuring that you receive the best value for your investment.
                                     </p>
 
+                                    <h1 className='text-xl font-bold text-gray-900'>Category</h1>
+                                    <p>
+                                        {gigData?.category}
+                                    </p>
                                     <h3 className="text-xl font-bold text-gray-900 pt-4">For more Details</h3>
                                     <div className="flex flex-col sm:flex-row gap-4 pt-2">
                                         <button
@@ -429,7 +332,7 @@ const GigDetailPage = () => {
 
                                         {gigData.reviews && gigData.reviews.length > 0 ? (
                                             <div className="space-y-6">
-                                                {gigData.reviews.map((reviewItem) => (
+                                                {gigData.reviews.map((reviewItem: any) => (
                                                     <div key={reviewItem._id} className="flex gap-4">
                                                         <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
                                                             {reviewItem.reviewedBy.profilePic?.url ? (
@@ -493,7 +396,7 @@ const GigDetailPage = () => {
                                 </div>
                                 <div className="flex justify-between">
                                     <span className="text-gray-600">Starting Price:</span>
-                                    <span className="font-medium">₹{gigData.price.toLocaleString()}</span>
+                                    <span className="font-medium">₹{gigData.price}</span>
                                 </div>
                                 <div className="flex justify-between">
                                     <span className="text-gray-600">Provider:</span>
@@ -516,22 +419,11 @@ const GigDetailPage = () => {
 
                             <div className="mt-6 space-y-3">
                                 <button
-                                    onClick={() => setIsBookmarked(!isBookmarked)}
-                                    className={`w-full flex items-center justify-center gap-2 py-3 rounded-lg font-semibold transition-colors ${
-                                        isBookmarked
-                                            ? 'bg-color2 text-white hover:bg-color2/90'
-                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                    }`}
-                                >
-                                    {isBookmarked ? <BookmarkCheck size={20} /> : <Bookmark size={20} />}
-                                    {isBookmarked ? 'Bookmarked' : 'Bookmark'}
-                                </button>
-                                <button
                                     onClick={handleContactProvider}
                                     className="w-full bg-primary text-white py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
                                 >
                                     <Send size={20} />
-                                    Contact Provider
+                                    Contact Seller
                                 </button>
                             </div>
                         </div>

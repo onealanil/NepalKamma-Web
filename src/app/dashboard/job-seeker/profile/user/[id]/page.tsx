@@ -44,9 +44,6 @@ export default function UserProfilePage() {
     mutate: mutateReviews,
   } = usePaginatedReviews(userId);
 
-  console.log("this is avearage rating", averageRating);
-  console.log("this is reivew", reviewData);
-
   // Use the hook to fetch user data and jobs
   const { user, userJobs, isLoading, isError } = useSingleUserProvider(userId);
 
@@ -136,7 +133,7 @@ export default function UserProfilePage() {
                       Verification Required
                     </h4>
                     <p className="text-yellow-700 text-xs sm:text-sm mt-1">
-                      Verify your account to access messaging, calling, and
+                      Verify your document to access messaging, calling, and
                       location features.
                     </p>
                   </div>
@@ -164,7 +161,19 @@ export default function UserProfilePage() {
                       {user.username}
                     </h1>
                     {user.isDocumentVerified === "verified" && (
-                      <Verified className="w-5 h-5 text-primary" />
+                      <div className="w-5 h-5 bg-primary rounded-full flex items-center justify-center">
+                        <svg
+                          className="w-3 h-3 text-white"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      </div>
                     )}
                   </div>
 
@@ -202,7 +211,7 @@ export default function UserProfilePage() {
             </div>
 
             {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row lg:flex-row items-stretch sm:items-center lg:justify-between gap-3 sm:gap-2 lg:gap-2 mb-4 sm:mb-6">
+            <div className="flex sm:flex-row lg:flex-row items-stretch sm:items-center lg:justify-between gap-3 sm:gap-2 lg:gap-2 mb-4 sm:mb-6">
               <button
                 onClick={handleMessagePress}
                 className={`flex items-center justify-center gap-2 text-white px-4 sm:px-6 lg:px-10 py-3 sm:py-2 rounded-md font-semibold transition-colors ${
@@ -231,7 +240,8 @@ export default function UserProfilePage() {
 
               <button
                 onClick={() => setMoreModalVisible(true)}
-                className="flex items-center justify-center gap-2 bg-primary text-white px-4 sm:px-6 lg:px-10 py-3 sm:py-2 rounded-md font-semibold hover:bg-primary/90 transition-colors"
+                className="flex items-center justify-center gap-2 disabled:opacity-50 bg-primary text-white px-4 sm:px-6 lg:px-10 py-3 sm:py-2 rounded-md font-semibold hover:bg-primary/90 transition-colors"
+                disabled={!isCurrentUserVerified}
               >
                 <MoreHorizontal size={17} />
                 <span className="text-sm sm:text-base">More</span>
@@ -266,7 +276,8 @@ export default function UserProfilePage() {
                   {userJobs.length > 1 && (
                     <button
                       onClick={handleNextJob}
-                      className="w-full bg-primary text-white py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors flex items-center justify-center gap-2 text-sm sm:text-base"
+                      disabled={!isCurrentUserVerified}
+                      className="w-full bg-primary disabled:opacity-50 text-white py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors flex items-center justify-center gap-2 text-sm sm:text-base"
                     >
                       <span>
                         Next Job ({currentJobIndex + 1} of {userJobs.length})
@@ -403,7 +414,7 @@ export default function UserProfilePage() {
                     Average Rating
                   </span>
                   <span className="font-bold text-yellow-500">
-                    {user.averageRating?.toFixed(1) || "0.0"}
+                    {averageRating?.toFixed(1) || "0.0"}
                   </span>
                 </div>
                 <div className="text-center">

@@ -1,7 +1,11 @@
+"use client";
+
 import { JobI } from "@/types/job";
 import SafeHTML from "../global/SafeHTML";
 import { useRouter } from "next/navigation";
 import SaveJobButton from "./SaveJobButton";
+import { useAuthStore } from "@/store/authStore";
+import { Bookmark, Save } from "lucide-react";
 
 type JobCardProps = {
     data: JobI;
@@ -10,6 +14,9 @@ type JobCardProps = {
 
 export default function JobCardSeeker({ data: job, onSelect }: JobCardProps) {
     const router = useRouter();
+    const {user} = useAuthStore();
+
+    const isCurrentUserVerified = user?.isDocumentVerified === "verified";
 
     const getUrgencyColor = (urgency?: string) => {
         switch (urgency) {
@@ -61,11 +68,20 @@ export default function JobCardSeeker({ data: job, onSelect }: JobCardProps) {
                         <span className="text-sm">{job.location}</span>
                     </div>
                     <div className="flex justify-end items-center gap-2">
-                        <SaveJobButton
-                            job={job}
-                            variant="icon"
-                            size="md"
-                        />
+                        {
+                            isCurrentUserVerified ? (
+                                <SaveJobButton
+                                    job={job}
+                                    variant="icon"
+                                    size="md"
+                                />
+                            ) : (
+                                <Bookmark
+                                    size={20}
+                                    className="text-gray-400 cursor-not-allowed"
+                                />
+                            )
+                        }
                         <button
                             className="bg-primary text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-primary/90 transition-colors"
                             onClick={() => router.push(`/dashboard/job-seeker/job/${job._id}`)}

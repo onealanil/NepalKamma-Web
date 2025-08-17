@@ -51,7 +51,7 @@ export default function ReviewPagination({
     };
 
     return (
-        <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-200">
+        <div className="flex flex-col gap-4 items-center justify-between mt-6 pt-4 border-t border-gray-200">
             <div className="text-sm text-gray-600">
                 Showing page {currentPage} of {totalPages} ({totalReviews} total reviews)
             </div>
@@ -61,7 +61,7 @@ export default function ReviewPagination({
                 <button
                     onClick={handlePrevious}
                     disabled={!hasPrevPage || isLoading}
-                    className="flex items-center px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex items-center px-3 py-2 text-sm font-medium text-gray-500  border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     <ChevronLeft size={16} className="mr-1" />
                     Previous
@@ -77,7 +77,7 @@ export default function ReviewPagination({
                             className={`px-3 py-2 text-sm font-medium rounded-md ${
                                 page === currentPage
                                     ? 'bg-primary text-white'
-                                    : 'text-gray-700 bg-white border border-gray-300 hover:bg-gray-50'
+                                    : 'text-gray-700  border border-gray-300 hover:bg-gray-50'
                             } disabled:opacity-50 disabled:cursor-not-allowed`}
                         >
                             {page}
@@ -89,7 +89,7 @@ export default function ReviewPagination({
                 <button
                     onClick={handleNext}
                     disabled={!hasNextPage || isLoading}
-                    className="flex items-center px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex items-center px-3 py-2 text-sm font-medium text-gray-500 border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     Next
                     <ChevronRight size={16} className="ml-1" />

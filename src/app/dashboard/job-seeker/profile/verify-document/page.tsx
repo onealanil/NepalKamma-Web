@@ -221,7 +221,7 @@ export default function VerifyDocument() {
             <div className="bg-white rounded-xl p-6 shadow-sm">
                 <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
                     <p className="text-red-700 text-sm">
-                        Note: You can upload your citizenship card or passport or driving license.
+                        Note: You can upload anything that prove you are Nepali citizen.
                         Please make sure the document is clear and visible.
                     </p>
                 </div>

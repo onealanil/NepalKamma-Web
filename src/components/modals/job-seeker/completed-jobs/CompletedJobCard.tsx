@@ -60,7 +60,7 @@ const CompletedJobCard = ({
 
                 <div className="flex-1">
                     <div className="flex items-start justify-between mb-2">
-                        <h3 className="font-bold text-gray-900 text-lg leading-tight">
+                        <h3 className="font-bold text-gray-900 text-lg leading-tight lineclamp-2">
                             {data.job.title}
                         </h3>
                         <CheckCircle className="w-5 h-5 text-green-500" />
@@ -70,7 +70,7 @@ const CompletedJobCard = ({
                         Payment from: <span className="font-medium">{data.PaymentBy.username}</span>
                     </p>
 
-                    <div className="flex items-center gap-4 text-sm text-gray-500 mb-3">
+                    <div className="flex flex-col md:flex-row items-start md:items-center gap-4 text-sm text-gray-500 mb-3">
                         <div className="flex items-center gap-1">
                             <MapPin size={14} />
                             <span>{data.job.location}</span>

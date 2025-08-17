@@ -36,7 +36,7 @@ const ReviewCard = ({ data }: { data: ReviewI }) => (
                     </div>
                 </div>
                 <p className="text-sm text-gray-600 mb-1">{data.reviewedBy.location}</p>
-                <p className="text-gray-700 text-sm">{data.review}</p>
+                <p className="text-gray-700 text-sm line-clamp-3">{data.review}</p>
                 <p className="text-xs text-gray-500 mt-2">
                     {formatDistanceToNow(new Date(data.createdAt), { addSuffix: true })}
                 </p>

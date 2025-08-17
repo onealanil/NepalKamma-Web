@@ -1,14 +1,14 @@
-'use client'
+"use client";
 
-import Image from 'next/image';
-import Link from 'next/link';
-import { useAuthStore } from '@/store/authStore';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
-import { Menu, X } from 'lucide-react';
-import { logOut } from '@/lib/auth';
-import { ErrorToast } from '../ui/Toast';
-import { useSavedJobsStore } from '@/store/savedJobsStore';
+import Image from "next/image";
+import Link from "next/link";
+import { useAuthStore } from "@/store/authStore";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { Menu, X } from "lucide-react";
+import { logOut } from "@/lib/auth";
+import { ErrorToast } from "../ui/Toast";
+import { useSavedJobsStore } from "@/store/savedJobsStore";
 
 export default function Header() {
   const { logout, user } = useAuthStore();
@@ -19,12 +19,11 @@ export default function Header() {
     try {
       await logOut();
     } catch (error: unknown) {
-      ErrorToast('Logout API error');
+      ErrorToast("Logout API error");
     } finally {
       logout();
       useSavedJobsStore.getState().clearSavedJobs();
-      router.push('/auth/signin');
-
+      router.push("/auth/signin");
     }
   };
 
@@ -48,19 +47,23 @@ export default function Header() {
             <Image
               src="/images/NepalKamma.png"
               alt="NepalKamma Logo"
-              width={250}
-              height={100}
+              width={160}
+              height={160}
+              className="w-40 md:w-40 lg:w-48 xl:w-52"
             />
           </Link>
+          
 
           {/* Desktop Navigation for job-seeker */}
-          {
-            user?.role === "job_provider" && (
-              <nav className="hidden md:flex items-center space-x-8 font-medium">
-                <Link href="/dashboard/job-provider" className="text-black hover:text-gray-500 transition-colors">
-                  Dashboard
-                </Link>
-                {/* <Link href="/dashboard/job-provider/explore" className="text-black hover:text-gray-500 transition-colors">
+          {user?.role === "job_provider" && (
+            <nav className="hidden md:flex items-center space-x-8 font-medium">
+              <Link
+                href="/dashboard/job-provider"
+                className="text-black hover:text-gray-500 transition-colors"
+              >
+                Dashboard
+              </Link>
+              <Link href="/dashboard/job-provider/explore" className="text-black hover:text-gray-500 transition-colors">
                   Explore
                 </Link>
                 <Link href="/dashboard/job-provider/chat" className="text-black hover:text-gray-500 transition-colors">
@@ -68,49 +71,63 @@ export default function Header() {
                 </Link>
                 <Link href="/dashboard/job-provider/top-buyer" className="text-black hover:text-gray-500 transition-colors">
                   Top Buyer
-                </Link> */}
-                <Link href="/dashboard/job-provider/profile" className="text-black hover:text-gray-500 transition-colors">
-                  Profile
                 </Link>
-                <button
-                  onClick={handleLogout}
-                  className="bg-primary text-white hover:bg-primary-foreground transition-colors px-4 py-2 rounded-md"
-                >
-                  Log out
-                </button>
-              </nav>
-            )
-          }
+              <Link
+                href="/dashboard/job-provider/profile"
+                className="text-black hover:text-gray-500 transition-colors"
+              >
+                Profile
+              </Link>
+              <button
+                onClick={handleLogout}
+                className="bg-primary text-white hover:bg-primary-foreground transition-colors px-4 py-2 rounded-md"
+              >
+                Log out
+              </button>
+            </nav>
+          )}
 
           {/* Desktop Navigation for job-seeker */}
-          {
-            user?.role === "job_seeker" && (
-              <nav className="hidden md:flex items-center space-x-8 font-medium">
-                <Link href="/dashboard/job-seeker" className="text-black hover:text-gray-500 transition-colors">
-                  Dashboard
-                </Link>
-                <Link href="/dashboard/job-seeker/explore" className="text-black hover:text-gray-500 transition-colors">
-                  Explore
-                </Link>
-                <Link href="/dashboard/job-seeker/chat" className="text-black hover:text-gray-500 transition-colors">
-                  Message
-                </Link>
-                <Link href="/dashboard/job-seeker/top-buyer" className="text-black hover:text-gray-500 transition-colors">
-                  Top Buyer
-                </Link>
-                <Link href="/dashboard/job-seeker/profile" className="text-black hover:text-gray-500 transition-colors">
-                  Profile
-                </Link>
-                <button
-                  onClick={handleLogout}
-                  className="bg-primary text-white hover:bg-primary-foreground transition-colors px-4 py-2 rounded-md"
-                >
-                  Log out
-                </button>
-              </nav>
-            )
-          }
-
+          {user?.role === "job_seeker" && (
+            <nav className="hidden md:flex items-center space-x-8 font-medium">
+              <Link
+                href="/dashboard/job-seeker"
+                className="text-black hover:text-gray-500 transition-colors"
+              >
+                Dashboard
+              </Link>
+              <Link
+                href="/dashboard/job-seeker/explore"
+                className="text-black hover:text-gray-500 transition-colors"
+              >
+                Explore
+              </Link>
+              <Link
+                href="/dashboard/job-seeker/chat"
+                className="text-black hover:text-gray-500 transition-colors"
+              >
+                Message
+              </Link>
+              <Link
+                href="/dashboard/job-seeker/top-buyer"
+                className="text-black hover:text-gray-500 transition-colors"
+              >
+                Top Buyer
+              </Link>
+              <Link
+                href="/dashboard/job-seeker/profile"
+                className="text-black hover:text-gray-500 transition-colors"
+              >
+                Profile
+              </Link>
+              <button
+                onClick={handleLogout}
+                className="bg-primary text-white hover:bg-primary-foreground transition-colors px-4 py-2 rounded-md"
+              >
+                Log out
+              </button>
+            </nav>
+          )}
 
           {/* Mobile Hamburger Button */}
           <button
@@ -234,11 +251,33 @@ export default function Header() {
                   Explore
                 </Link>
                 <Link
+                  href="/dashboard/job-seeker/my-gigs"
+                  className="block text-lg font-medium text-gray-900 hover:text-primary transition-colors"
+                  onClick={closeMobileMenu}
+                >
+                  My Gigs
+                </Link>
+                <Link
                   href="/dashboard/job-seeker/chat"
                   className="block text-lg font-medium text-gray-900 hover:text-primary transition-colors"
                   onClick={closeMobileMenu}
                 >
                   Message
+                </Link>
+                <Link 
+
+                  href="/dashboard/job-seeker/notification"
+                  className="block text-lg font-medium text-gray-900 hover:text-primary transition-colors"
+                  onClick={closeMobileMenu}
+                >
+                  Notification
+                </Link>
+                <Link
+                  href="/dashboard/job-seeker/my-review"
+                  className="block text-lg font-medium text-gray-900 hover:text-primary transition-colors"
+                  onClick={closeMobileMenu}
+                >
+                  My Review
                 </Link>
                 <Link
                   href="/dashboard/job-seeker/top-buyer"
@@ -253,6 +292,20 @@ export default function Header() {
                   onClick={closeMobileMenu}
                 >
                   Profile
+                </Link>
+                <Link
+                  href="/dashboard/job-seeker/completed-jobs"
+                  className="block text-lg font-medium text-gray-900 hover:text-primary transition-colors"
+                  onClick={closeMobileMenu}
+                >
+                  Completed Jobs
+                </Link>
+                <Link
+                  href="/dashboard/job-seeker/saved-jobs"
+                  className="block text-lg font-medium text-gray-900 hover:text-primary transition-colors"
+                  onClick={closeMobileMenu}
+                >
+                  Saved Jobs
                 </Link>
 
                 {/* Logout Button */}

@@ -71,29 +71,6 @@ function LeftSideProvider() {
                             </button>
                         </div>
                     </div>
-
-                    {/* Stats */}
-                    <div className="bg-white rounded-xl p-6 shadow-sm">
-                        <h3 className="font-bold text-gray-900 mb-4">Your Stats</h3>
-                        <div className="space-y-3">
-                            <div className="flex justify-between">
-                                <span className="text-gray-600">Active Gigs</span>
-                                <span className="font-bold text-primary">2</span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span className="text-gray-600">Total Applicants</span>
-                                <span className="font-bold text-green-600">13</span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span className="text-gray-600">Completed Jobs</span>
-                                <span className="font-bold text-blue-600">8</span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span className="text-gray-600">Success Rate</span>
-                                <span className="font-bold text-yellow-600">85%</span>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </>

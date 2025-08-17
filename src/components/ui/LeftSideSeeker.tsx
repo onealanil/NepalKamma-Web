@@ -90,14 +90,14 @@ function LeftSideSeeker() {
                                 </div>
                                 <span className="text-gray-700">Saved Jobs</span>
                             </Link>
-                            <Link href="/dashboard/job-seeker/my-earning" className="w-full flex items-center gap-3 p-3 text-left hover:bg-gray-50 rounded-lg transition-colors">
+                            {/* <Link href="/dashboard/job-seeker/my-earning" className="w-full flex items-center gap-3 p-3 text-left hover:bg-gray-50 rounded-lg transition-colors">
                                 <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
                                     <svg className="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
                                     </svg>
                                 </div>
                                 <span className="text-gray-700">Earnings</span>
-                            </Link>
+                            </Link> */}
                             <Link href="/dashboard/job-seeker/my-review" className="w-full flex items-center gap-3 p-3 text-left hover:bg-gray-50 rounded-lg transition-colors">
                                 <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
                                     <svg className="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">

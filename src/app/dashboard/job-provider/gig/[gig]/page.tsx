@@ -9,9 +9,17 @@ import LeftSideProvider from '@/components/ui/LeftSideProvider';
 import SafeHTML from '@/components/global/SafeHTML';
 import Image from 'next/image';
 import { useSingleGig } from '@/hooks/gigs/useSingleGig';
+import { useAuthStore } from '@/store/authStore';
+import ReviewPagination from '@/components/review/ReviewPagination';
+import { usePaginatedReviews } from '@/hooks/review/useReviews';
+import ReviewCard from '@/components/review/ReviewCard';
+import { ErrorToast, SuccessToast } from '@/components/ui/Toast';
+import { createReview } from '@/lib/review/review-api';
+import Link from 'next/link';
+import logger from '@/utils/logger';
 
 const GigDetailPage = () => {
-    // State management for all interactive features
+    // State management for all features
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [showLocationModal, setShowLocationModal] = useState(false);
     const [isRating, setIsRating] = useState(false);
@@ -24,31 +32,85 @@ const GigDetailPage = () => {
     const params = useParams();
     const gigId = params.gig as string;
 
+
+    const { user: loggedInUser } = useAuthStore();
     // Fetch gig data using the hook
-    const { gig: gigData, isLoading, isError } = useSingleGig(gigId);
+    const { gig: gigData, mutate, isLoading, isError } = useSingleGig(gigId);
 
-    // Calculate average rating from reviews (if available)
-    const averageRating = gigData?.reviews && gigData.reviews.length > 0
-        ? gigData.reviews.reduce((sum: number, review: any) => sum + review.rating, 0) / gigData.reviews.length
-        : 0;
+    // Fetch paginated reviews for the job provider
+    const {
+        reviews: reviewData,
+        pagination,
+        averageRating,
+        isLoading: isLoadingReviews,
+        currentPage,
+        setCurrentPage,
+        mutate: mutateReviews,
+    } = usePaginatedReviews(gigData?.postedBy?._id);
 
-    const handleContactProvider = () => {
-        if (gigData?.postedBy?._id) {
-            router.push(`/dashboard/job-provider/profile/user/${gigData.postedBy._id}`);
-        }
-    };
+
+    // Check if current user can review this job provider
+    const canReviewProvider =
+        (loggedInUser?.can_review &&
+            gigData?.postedBy?._id &&
+            loggedInUser._id !== gigData.postedBy._id && // Prevent self-review
+            loggedInUser.can_review?.some(
+                (reviewItem) =>
+                    (reviewItem as { user: string; _id: string }).user ===
+                    gigData.postedBy._id
+            )) ||
+        false;
+
+    // Check if current user is verified
+    const isCurrentUserVerified = loggedInUser?.isDocumentVerified === "verified";
 
     const handleReviewSubmit = async () => {
-        if (!rating || !review.trim()) return;
-        
+        // Validate rating
+        if (!rating || rating < 1 || rating > 5) {
+            ErrorToast("Please select a rating (1-5 stars)");
+            return;
+        }
+
+        // Validate review text
+        if (!review.trim()) {
+            ErrorToast("Please write a review comment");
+            return;
+        }
+
+        // Validate user data
+        if (!loggedInUser?._id || !gigData?.postedBy?._id) {
+            ErrorToast("Unable to submit review. Please try again.");
+            return;
+        }
+
         setIsSubmitting(true);
-        // Simulate API call
-        setTimeout(() => {
+        try {
+            const reviewData = {
+                reviewedBy: loggedInUser._id,
+                reviewedTo: gigData.postedBy._id,
+                review: review.trim(),
+                rating: rating,
+            };
+
+            const response = await createReview(reviewData);
+
+            if (response.success) {
+                SuccessToast("Review submitted successfully!");
+                setIsRating(false);
+                setRating(0);
+                setReview("");
+                // Refresh reviews to show the new review
+                mutateReviews();
+                mutate();
+            } else {
+                ErrorToast(response.error || "Failed to submit review");
+            }
+        } catch (error) {
+            ErrorToast("Failed to submit review. Please try again.");
+            logger.error(`Failed to submit review. ${error}`)
+        } finally {
             setIsSubmitting(false);
-            setIsRating(false);
-            setRating(0);
-            setReview('');
-        }, 2000);
+        }
     };
 
     if (isLoading) {
@@ -68,7 +130,7 @@ const GigDetailPage = () => {
         );
     }
 
-    if (isError || (!isLoading && !gigData)) {``
+    if (isError || (!isLoading && !gigData)) {
         return (
             <div className="min-h-screen bg-gray-50 flex items-center justify-center">
                 <div className="text-center">
@@ -92,6 +154,25 @@ const GigDetailPage = () => {
         );
     }
 
+    if (gigData?.visibility === "private") {
+        return (
+            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+                <div className="text-center">
+                    <h2 className="text-2xl font-bold text-gray-900 mb-4">Private Job</h2>
+                    <p className="text-gray-600 mb-6">
+                        This job is private and can only be viewed by the job seeker.
+                    </p>
+                    <button
+                        onClick={() => router.push("/dashboard/job-provider/explore")}
+                        className="bg-primary text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors"
+                    >
+                        Back to Explore
+                    </button>
+                </div>
+            </div>
+        )
+    }
+
     return (
         <div className="min-h-screen bg-gray-50">
             <div className="container mx-auto px-4 lg:px-8">
@@ -103,7 +184,23 @@ const GigDetailPage = () => {
 
                     {/* Main Content */}
                     <div className="lg:col-span-6 py-6">
-
+                        {/* Verification Notice for unverified users */}
+                        {!isCurrentUserVerified && (
+                            <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-3 sm:p-4 mb-4 sm:mb-6">
+                                <div className="flex items-start gap-2">
+                                    <div className="w-5 h-5 text-yellow-600 mt-0.5">⚠️</div>
+                                    <div>
+                                        <h4 className="font-semibold text-yellow-800 text-sm sm:text-base">
+                                            Verification Required
+                                        </h4>
+                                        <p className="text-yellow-700 text-xs sm:text-sm mt-1">
+                                            Verify your document to access messaging, calling, saving, reporting and
+                                            location features.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                         <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
                             <div className="p-6 space-y-6">
                                 {/* Gig Title */}
@@ -113,42 +210,55 @@ const GigDetailPage = () => {
 
                                 {/* Provider Profile */}
                                 <div className="flex items-center gap-4">
-                                    <button
-                                        onClick={handleContactProvider}
-                                        className="relative"
-                                    >
-                                        <div className="relative">
-                                            {gigData.postedBy?.profilePic?.url ? (
-                                                <Image
-                                                    src={gigData.postedBy.profilePic.url}
-                                                    alt={gigData.postedBy.username}
-                                                    width={40}
-                                                    height={40}
-                                                    className="rounded-full object-cover"
-                                                />
-                                            ) : (
-                                                <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center">
-                                                    <span className="text-gray-600 text-sm">N/A</span>
+                                    {
+                                        gigData?.postedBy._id && (
+                                            <Link
+                                                href={`/dashboard/job-provider/profile/user/${gigData.postedBy._id}`}
+                                                className='relative'
+                                            >
+                                                <div className="relative">
+                                                    {gigData.postedBy?.profilePic?.url ? (
+                                                        <Image
+                                                            src={gigData.postedBy.profilePic.url}
+                                                            alt={gigData.postedBy.username}
+                                                            width={40}
+                                                            height={40}
+                                                            className="w-12 h-12 rounded-full object-cover"
+                                                        />
+                                                    ) : (
+                                                        <div className="w-10 h-10 rounded-full flex items-center justify-center">
+                                                            <span className="text-gray-600 text-sm">N/A</span>
+                                                        </div>
+                                                    )}
+                                                    <div
+                                                        className={`absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-white ${gigData.postedBy?.onlineStatus ? 'bg-green-500' : 'bg-red-500'
+                                                            }`}
+                                                    />
                                                 </div>
-                                            )}
-                                            <div
-                                                className={`absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-white ${
-                                                    gigData.postedBy?.onlineStatus ? 'bg-green-500' : 'bg-red-500'
-                                                }`}
-                                            />
-                                        </div>
-                                    </button>
+                                            </Link>
+                                        )
+                                    }
+
                                     <div className="flex-1">
                                         <div className="flex items-center justify-between">
                                             <h3 className="font-bold text-gray-900">{gigData.postedBy?.username}</h3>
+                                            {canReviewProvider && (
+                                                <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-medium">
+                                                    Can Review
+                                                </span>
+                                            )}
                                         </div>
                                         <div className="flex items-center gap-1">
-                                            <Star 
-                                                size={15} 
-                                                className={`${averageRating > 0 ? 'text-yellow-500 fill-current' : 'text-gray-400'}`} 
+                                            <Star
+                                                size={15}
+                                                className={`${averageRating > 0 ? 'text-yellow-500 fill-current' : 'text-gray-400'}`}
                                             />
                                             <span className="font-bold text-gray-900">
-                                                {averageRating > 0 ? averageRating.toFixed(1) : '0.0'}
+                                                {isLoadingReviews ? (
+                                                    <span className="text-primary">Loading...</span>
+                                                ) : (
+                                                    averageRating?.toFixed(1) || "0.0"
+                                                )}
                                             </span>
                                         </div>
                                     </div>
@@ -178,7 +288,7 @@ const GigDetailPage = () => {
                                                         onClick={() => setCurrentImageIndex(prev =>
                                                             prev === gigData.images!.length - 1 ? 0 : prev + 1
                                                         )}
-                                                        className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
+                                                        className="absolute left-[-2] top-1/2 transform -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
                                                     >
                                                         <ChevronRight size={20} />
                                                     </button>
@@ -240,15 +350,31 @@ const GigDetailPage = () => {
                                     </p>
                                     <h3 className="text-xl font-bold text-gray-900 pt-4">For more Details</h3>
                                     <div className="flex flex-col sm:flex-row gap-4 pt-2">
-                                        <button
-                                            onClick={handleContactProvider}
-                                            className="bg-color2 text-white px-6 py-3 rounded-lg font-semibold hover:bg-color2/90 transition-colors"
-                                        >
-                                            Contact Me
-                                        </button>
+                                        {
+                                            gigData?.postedBy?._id ? (
+                                                <Link
+                                                    href={`/dashboard/job-provider/profile/user/${gigData.postedBy._id}
+                                                    
+                                                    `}
+                                                    className="bg-primary items-center justify-center flex disabled:opacity-50 text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors"
+                                                    aria-disabled={!isCurrentUserVerified}
+                                                >
+                                                    Contact Me
+                                                </Link>
+                                            ) : (
+                                                <button
+                                                    disabled={!isCurrentUserVerified}
+                                                    className="bg-primary disabled:opacity-50 text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors"
+                                                >
+                                                    Contact Me
+                                                </button>
+                                            )
+                                        }
+
                                         <button
                                             onClick={() => setShowLocationModal(true)}
-                                            className="bg-color2 text-white px-6 py-3 rounded-lg font-semibold hover:bg-color2/90 transition-colors"
+                                            disabled={!isCurrentUserVerified}
+                                            className="bg-primary disabled:opacity-50 text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors"
                                         >
                                             Get My Location
                                         </button>
@@ -260,13 +386,18 @@ const GigDetailPage = () => {
                                     <h2 className="text-xl font-bold text-gray-900">Reviews</h2>
                                     <hr className="border-gray-200" />
 
+
+
                                     {/* Rating Input */}
-                                    {isRating && (
+                                    {isRating && canReviewProvider && (
                                         <div className="bg-gray-50 p-6 rounded-lg space-y-4">
                                             <div className="flex gap-4">
                                                 <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
                                                     <Image
-                                                        src="https://picsum.photos/100/100?random=6"
+                                                        src={
+                                                            loggedInUser?.profilePic?.url ||
+                                                            "https://picsum.photos/100/100?random=6"
+                                                        }
                                                         alt="Your profile"
                                                         width={48}
                                                         height={48}
@@ -274,39 +405,61 @@ const GigDetailPage = () => {
                                                     />
                                                 </div>
                                                 <div className="flex-1 space-y-3">
-                                                    <h4 className="font-bold text-gray-900">Your Name</h4>
-                                                    <p className="text-gray-600">Your Location</p>
+                                                    <h4 className="font-bold text-gray-900">
+                                                        {loggedInUser?.username || "Your Name"}
+                                                    </h4>
+                                                    <p className="text-gray-600">
+                                                        {loggedInUser?.location || "Your Location"}
+                                                    </p>
 
                                                     {/* Star Rating */}
-                                                    <div className="flex gap-1">
-                                                        {[1, 2, 3, 4, 5].map((star) => (
-                                                            <button
-                                                                key={star}
-                                                                onClick={() => setRating(star)}
-                                                                className={`${
-                                                                    star <= rating
-                                                                        ? 'text-yellow-500 fill-current'
-                                                                        : 'text-gray-300'
-                                                                } hover:text-yellow-500 transition-colors`}
-                                                            >
-                                                                <Star size={20} />
-                                                            </button>
-                                                        ))}
+                                                    <div className="space-y-2">
+                                                        <div className="flex gap-1">
+                                                            {[1, 2, 3, 4, 5].map((star) => (
+                                                                <button
+                                                                    key={star}
+                                                                    onClick={() => setRating(star)}
+                                                                    className={`${star <= rating
+                                                                        ? "text-yellow-500"
+                                                                        : "text-primary"
+                                                                        } hover:text-yellow-500 transition-colors`}
+                                                                >
+                                                                    <Star
+                                                                        size={20}
+                                                                        fill={
+                                                                            star <= rating ? "currentColor" : "none"
+                                                                        }
+                                                                    />
+                                                                </button>
+                                                            ))}
+                                                        </div>
+                                                        {rating > 0 && (
+                                                            <p className="text-sm text-gray-600">
+                                                                {rating} star{rating !== 1 ? "s" : ""} selected
+                                                            </p>
+                                                        )}
                                                     </div>
 
                                                     <textarea
                                                         placeholder="Write your review..."
                                                         value={review}
                                                         onChange={(e) => setReview(e.target.value)}
-                                                        className="w-full p-3 border border-color2 rounded-lg resize-none h-24 focus:outline-none focus:ring-2 focus:ring-color2/50"
+                                                        className="w-full p-3 border border-primary rounded-lg resize-none h-24 focus:outline-none focus:ring-2 focus:ring-primary/50"
                                                     />
 
                                                     <button
                                                         onClick={handleReviewSubmit}
                                                         disabled={isSubmitting || !rating || !review.trim()}
-                                                        className="w-full bg-color2 text-white py-3 rounded-lg font-semibold hover:bg-color2/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                                        className="w-full bg-primary text-white py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                                        title={
+                                                            !rating
+                                                                ? "Please select a rating"
+                                                                : !review.trim()
+                                                                    ? "Please write a review"
+                                                                    : ""
+                                                        }
                                                     >
-                                                        {isSubmitting ? 'Submitting...' : 'Submit Review'}
+                                                        {isSubmitting ? "Submitting..." : "Submit Review"}
                                                     </button>
                                                 </div>
                                             </div>
@@ -314,70 +467,71 @@ const GigDetailPage = () => {
                                     )}
 
                                     {!isRating && (
-                                        <button
-                                            onClick={() => setIsRating(true)}
-                                            className="bg-color2 text-white px-6 py-3 rounded-lg font-semibold hover:bg-color2/90 transition-colors"
-                                        >
-                                            Write a Review
-                                        </button>
-                                    )}
-
-                                    <hr className="border-gray-200" />
-
-                                    {/* Reviews List */}
-                                    <div className="space-y-4">
-                                        <p className="text-gray-700">
-                                            Total {gigData.reviews?.length || 0} Reviews
-                                        </p>
-
-                                        {gigData.reviews && gigData.reviews.length > 0 ? (
-                                            <div className="space-y-6">
-                                                {gigData.reviews.map((reviewItem: any) => (
-                                                    <div key={reviewItem._id} className="flex gap-4">
-                                                        <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
-                                                            {reviewItem.reviewedBy.profilePic?.url ? (
-                                                                <Image
-                                                                    src={reviewItem.reviewedBy.profilePic.url}
-                                                                    alt={reviewItem.reviewedBy.username}
-                                                                    width={48}
-                                                                    height={48}
-                                                                    className="object-cover"
-                                                                />
-                                                            ) : (
-                                                                <div className="w-full h-full bg-gray-300 flex items-center justify-center">
-                                                                    <span className="text-gray-600 text-xs">N/A</span>
-                                                                </div>
-                                                            )}
+                                        <div className="space-y-3">
+                                            {canReviewProvider ? (
+                                                <button
+                                                    onClick={() => setIsRating(true)}
+                                                    className="bg-primary text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors"
+                                                >
+                                                    Write a Review
+                                                </button>
+                                            ) : (
+                                                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                                                    <div className="flex items-start gap-3">
+                                                        <div className="w-5 h-5 text-yellow-600 mt-0.5">
+                                                            ⚠️
                                                         </div>
-                                                        <div className="flex-1">
-                                                            <div className="flex items-center gap-2 mb-1">
-                                                                <h4 className="font-bold text-gray-900">
-                                                                    {reviewItem.reviewedBy.username}
-                                                                </h4>
-                                                                <div className="flex gap-1">
-                                                                    {[1, 2, 3, 4, 5].map((star) => (
-                                                                        <Star
-                                                                            key={star}
-                                                                            size={14}
-                                                                            className={`${
-                                                                                star <= reviewItem.rating
-                                                                                    ? 'text-yellow-500 fill-current'
-                                                                                    : 'text-gray-300'
-                                                                            }`}
-                                                                        />
-                                                                    ))}
-                                                                </div>
-                                                            </div>
-                                                            <p className="text-gray-700 mb-2">{reviewItem.review}</p>
-                                                            <p className="text-sm text-gray-500">
-                                                                {formatDistanceToNow(new Date(reviewItem.createdAt), { addSuffix: true })}
+                                                        <div>
+                                                            <h4 className="font-semibold text-yellow-800 mb-1">
+                                                                Review Not Available
+                                                            </h4>
+                                                            <p className="text-yellow-700 text-sm">
+                                                                You can only review job seekers you have
+                                                                worked with before. Complete a job with this
+                                                                seeker to unlock the review feature.
                                                             </p>
                                                         </div>
                                                     </div>
-                                                ))}
-                                            </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+                                    <hr className="border-gray-200" />
+
+                                    {/* Reviews List */}
+                                    {/* Reviews List */}
+                                    <div className="space-y-4">
+                                        {isLoadingReviews ? (
+                                            <p className="text-primary">Loading...</p>
                                         ) : (
-                                            <p className="text-red-500 font-bold">No reviews found</p>
+                                            <p className="text-gray-700">
+                                                Total {pagination?.totalReviews || 0} Reviews
+                                            </p>
+                                        )}
+
+                                        {!isLoadingReviews && reviewData.length > 0 && (
+                                            <>
+                                                <div className="space-y-4">
+                                                    {reviewData.map((reviewItem) => (
+                                                        <ReviewCard
+                                                            key={reviewItem._id}
+                                                            data={reviewItem}
+                                                        />
+                                                    ))}
+                                                </div>
+
+                                                {/* Pagination */}
+                                                <ReviewPagination
+                                                    pagination={pagination}
+                                                    currentPage={currentPage}
+                                                    onPageChange={setCurrentPage}
+                                                    isLoading={isLoadingReviews}
+                                                />
+                                            </>
+                                        )}
+
+                                        {!isLoadingReviews && reviewData.length === 0 && (
+                                            <p className="text-red-500 font-bold">No review found</p>
                                         )}
                                     </div>
                                 </div>
@@ -418,13 +572,28 @@ const GigDetailPage = () => {
                             </div>
 
                             <div className="mt-6 space-y-3">
-                                <button
-                                    onClick={handleContactProvider}
-                                    className="w-full bg-primary text-white py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
-                                >
-                                    <Send size={20} />
-                                    Contact Seller
-                                </button>
+                                {
+                                    gigData?.postedBy?._id ? (
+                                        <Link href={`/dashboard/job-provider/profile/user/${gigData.postedBy._id}`}
+                                            className="w-full disabled:opacity-50 bg-primary text-white py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
+                                            aria-disabled={!isCurrentUserVerified}
+                                        >
+                                            <Send size={20} />
+
+                                            Contanct Seller
+                                        </Link>
+                                    ) : (
+                                        <button
+
+                                            disabled={!isCurrentUserVerified}
+                                            className="w-full disabled:opacity-50 bg-primary text-white py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
+                                        >
+                                            <Send size={20} />
+                                            Contact Seller Not available
+                                        </button>
+
+                                    )
+                                }
                             </div>
                         </div>
                     </div>
@@ -454,7 +623,7 @@ const GigDetailPage = () => {
                             </p>
                             <button
                                 onClick={() => setShowLocationModal(false)}
-                                className="w-full bg-color2 text-white py-3 rounded-lg font-semibold hover:bg-color2/90 transition-colors"
+                                className="w-full bg-primary text-white py-3 rounded-lg font-semibold hover:bg-color2/90 transition-colors"
                             >
                                 Close
                             </button>

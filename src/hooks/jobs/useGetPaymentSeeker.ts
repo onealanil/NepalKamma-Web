@@ -12,7 +12,6 @@ export const useGetPaymentSeeker = () => {
         '/payment/getPaymentByProvider',
         async () => {
             const response = await getPaymentByProvider();
-            console.log("this is response from useGetpaymentseeker", response);
             return response.success ? response.data : [];
         },
         {

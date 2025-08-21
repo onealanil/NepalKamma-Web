@@ -8,10 +8,7 @@ import {
   MessageCircle,
   Phone,
   MoreHorizontal,
-  Verified,
   ChevronRight,
-  Navigation,
-  X,
 } from "lucide-react";
 import LeftSideSeeker from "@/components/ui/LeftSideSeeker";
 import { useSingleUserProvider } from "@/hooks/useSingleUserProvider";
@@ -24,6 +21,7 @@ import JobCard from "@/components/other-profile/JobCard";
 import { usePaginatedReviews } from "@/hooks/review/useReviews";
 import ReviewCard from "@/components/review/ReviewCard";
 import ReviewPagination from "@/components/review/ReviewPagination";
+import Image from "next/image";
 
 export default function UserProfilePage() {
   const router = useRouter();
@@ -41,7 +39,6 @@ export default function UserProfilePage() {
     isLoading: isLoadingReviews,
     currentPage,
     setCurrentPage,
-    mutate: mutateReviews,
   } = usePaginatedReviews(userId);
 
   // Use the hook to fetch user data and jobs
@@ -145,7 +142,7 @@ export default function UserProfilePage() {
               <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-5 lg:flex-row lg:items-start">
                 {/* Profile Picture */}
                 <div className="relative flex-shrink-0">
-                  <img
+                  <Image
                     src={
                       user.profilePic?.url || "https://picsum.photos/200/200"
                     }
@@ -200,6 +197,11 @@ export default function UserProfilePage() {
                       )}
                     </span>
                   </div>
+                  <div className="my-4">
+                    <span className='text-red-500 text-xs'>
+                      This may not be the exact location. It could be the nearest place to where the user is located.
+                    </span>
+                  </div>
 
                   <div className="inline-block border border-primary rounded-lg px-3 sm:px-4 py-2">
                     <span className="text-gray-700 font-medium text-sm sm:text-base">
@@ -211,14 +213,13 @@ export default function UserProfilePage() {
             </div>
 
             {/* Action Buttons */}
-            <div className="flex sm:flex-row lg:flex-row items-stretch sm:items-center lg:justify-between gap-3 sm:gap-2 lg:gap-2 mb-4 sm:mb-6">
+            <div className="flex sm:flex-row lg:flex-row items-stretch sm:items-center justify-between px-4 lg:px-0 lg:justify-between gap-3 sm:gap-2 lg:gap-2 mb-4 sm:mb-6">
               <button
                 onClick={handleMessagePress}
-                className={`flex items-center justify-center gap-2 text-white px-4 sm:px-6 lg:px-10 py-3 sm:py-2 rounded-md font-semibold transition-colors ${
-                  isCurrentUserVerified
-                    ? "bg-primary hover:bg-primary/90"
-                    : "bg-gray-400 cursor-not-allowed"
-                }`}
+                className={`flex items-center justify-center gap-2 text-white px-4 sm:px-6 lg:px-10 py-3 sm:py-2 rounded-md font-semibold transition-colors ${isCurrentUserVerified
+                  ? "bg-primary hover:bg-primary/90"
+                  : "bg-gray-400 cursor-not-allowed"
+                  }`}
                 disabled={!isCurrentUserVerified}
               >
                 <MessageCircle size={17} />
@@ -227,11 +228,10 @@ export default function UserProfilePage() {
 
               <button
                 onClick={handleCallPress}
-                className={`flex items-center justify-center gap-2 text-white px-4 sm:px-8 lg:px-20 py-3 sm:py-2 rounded-md font-semibold transition-colors ${
-                  isCurrentUserVerified
-                    ? "bg-primary hover:bg-primary/90"
-                    : "bg-gray-400 cursor-not-allowed"
-                }`}
+                className={`flex items-center justify-center gap-2 text-white px-4 sm:px-8 lg:px-20 py-3 sm:py-2 rounded-md font-semibold transition-colors ${isCurrentUserVerified
+                  ? "bg-primary hover:bg-primary/90"
+                  : "bg-gray-400 cursor-not-allowed"
+                  }`}
                 disabled={!isCurrentUserVerified}
               >
                 <Phone size={17} />
@@ -324,11 +324,10 @@ export default function UserProfilePage() {
                   <div className="flex justify-between">
                     <span className="text-gray-600">Verified</span>
                     <span
-                      className={`font-bold ${
-                        user.isDocumentVerified === "verified"
-                          ? "text-green-600"
-                          : "text-red-600"
-                      }`}
+                      className={`font-bold ${user.isDocumentVerified === "verified"
+                        ? "text-green-600"
+                        : "text-red-600"
+                        }`}
                     >
                       {user.isDocumentVerified === "verified" ? "Yes" : "No"}
                     </span>
@@ -426,11 +425,10 @@ export default function UserProfilePage() {
                 <div className="text-center">
                   <span className="block text-xs text-gray-600">Verified</span>
                   <span
-                    className={`font-bold ${
-                      user.isDocumentVerified === "verified"
-                        ? "text-green-600"
-                        : "text-red-600"
-                    }`}
+                    className={`font-bold ${user.isDocumentVerified === "verified"
+                      ? "text-green-600"
+                      : "text-red-600"
+                      }`}
                   >
                     {user.isDocumentVerified === "verified" ? "Yes" : "No"}
                   </span>

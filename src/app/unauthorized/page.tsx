@@ -37,7 +37,7 @@ export default function Unauthorized() {
 
                 {/* Description */}
                 <p className="text-gray-600 mb-8 text-lg">
-                    You don't have permission to access this page. Please log in with the appropriate credentials.
+                    You don&apos;t have permission to access this page. Please log in with the appropriate credentials.
                 </p>
 
                 {/* Login Button */}

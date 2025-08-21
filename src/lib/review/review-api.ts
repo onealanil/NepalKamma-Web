@@ -23,6 +23,7 @@ export interface PaginationInfo {
 export interface ReviewsResponse {
     reviews: ReviewI[];
     pagination: PaginationInfo;
+    
 }
 
 /**

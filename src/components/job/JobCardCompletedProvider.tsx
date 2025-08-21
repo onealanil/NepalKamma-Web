@@ -1,6 +1,6 @@
 import { JobI } from "@/types/job";
 import SafeHTML from "../global/SafeHTML";
-import { Calendar, Eye, Trash2, DollarSign } from "lucide-react";
+import { Calendar, DollarSign } from "lucide-react";
 
 
 type JobCardProps = {

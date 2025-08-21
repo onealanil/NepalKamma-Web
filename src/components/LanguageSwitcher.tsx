@@ -10,7 +10,7 @@ export default function LanguageSwitcher() {
   const [isChanging, setIsChanging] = useState<boolean>(false);
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
-  const currentLocale = pathname.split('/')[1] || 'en';
+  const currentLocale = pathname.split('/')[1] || 'ne';
 
   const languages = [
     { code: 'en', name: 'English', flag: '🇺🇸' },

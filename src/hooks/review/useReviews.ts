@@ -3,7 +3,6 @@ import {
     fetchReviewsByProvider,
     fetchAllReviewsByProvider,
     calculateAverageRating,
-    ReviewsResponse,
     PaginationInfo
 } from "@/lib/review/review-api";
 import { ReviewI } from "@/types/review";

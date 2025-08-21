@@ -1,9 +1,8 @@
 
 "use client";
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { Search, Filter, MapPin, Star, Clock } from 'lucide-react';
+import { useState } from 'react';
+import { Search, Filter, Star } from 'lucide-react';
 import LeftSideProvider from '@/components/ui/LeftSideProvider';
 import { GigCardProvider } from '@/components/gig/GigCardProvider';
 import { useSearchGigs, GigSearchParams } from '@/hooks/gigs/useSearchGigs';
@@ -12,9 +11,9 @@ import { GigI } from '@/types/gig';
 import { CATEGORY_OPTIONS } from '@/types/filters';
 import RefreshingButton from '@/components/ui/RefreshingButton';
 import Loader from '@/components/global/Loader';
+import Link from 'next/link';
 
 function JobProviderExplorePage() {
-    const router = useRouter();
     const { latitude, longitude } = useUserLocation();
 
     // Search state
@@ -123,8 +122,8 @@ function JobProviderExplorePage() {
                                     <button
                                         onClick={() => setSortBy(sortBy === 'rating' ? '' : 'rating')}
                                         className={`px-3 py-1 border border-black rounded-full text-sm font-medium transition-colors ${sortBy === 'rating'
-                                                ? 'bg-primary text-white'
-                                                : 'text-gray-700 '
+                                            ? 'bg-primary text-white'
+                                            : 'text-gray-700 '
                                             }`}
                                     >
                                         <Star className="w-4 h-4 inline mr-1" />
@@ -133,8 +132,8 @@ function JobProviderExplorePage() {
                                     <button
                                         onClick={() => setSortBy(sortBy === 'priceLow' ? '' : 'priceLow')}
                                         className={`px-3 py-1 border border-black rounded-full text-sm font-medium transition-colors ${sortBy === 'priceLow'
-                                                ? 'bg-primary text-white'
-                                                : 'text-gray-700 '
+                                            ? 'bg-primary text-white'
+                                            : 'text-gray-700 '
                                             }`}
                                     >
                                         Price: Low to High
@@ -142,8 +141,8 @@ function JobProviderExplorePage() {
                                     <button
                                         onClick={() => setSortBy(sortBy === 'priceHigh' ? '' : 'priceHigh')}
                                         className={`px-3 py-1 border border-black rounded-full text-sm font-medium transition-colors ${sortBy === 'priceHigh'
-                                                ? 'bg-primary text-white'
-                                                : 'text-gray-700 '
+                                            ? 'bg-primary text-white'
+                                            : 'text-gray-700 '
                                             }`}
                                     >
                                         Price: High to Low
@@ -229,15 +228,15 @@ function JobProviderExplorePage() {
                                         </div>
 
                                         {/* Gigs List */}
-                                        <div className="space-y-4">
+                                        <div className="grid grid-cols-1 space-y-4">
                                             {gigs.map((gig: GigI) => (
-                                                <div
+                                                <Link href={`/dashboard/job-provider/gig/${gig._id}`}
                                                     key={gig._id}
-                                                    onClick={() => router.push(`/dashboard/job-provider/gig/${gig._id}`)}
+                                                    // onClick={() => router.push(`/dashboard/job-provider/gig/${gig._id}`)}
                                                     className="cursor-pointer hover:shadow-md transition-shadow"
                                                 >
                                                     <GigCardProvider gig={gig} />
-                                                </div>
+                                                </Link>
                                             ))}
                                         </div>
 
@@ -262,8 +261,8 @@ function JobProviderExplorePage() {
                                                             key={pageNum}
                                                             onClick={() => setCurrentPage(pageNum)}
                                                             className={`px-4 py-2 rounded-lg font-medium ${pageNum === currentPage
-                                                                    ? 'bg-primary text-white'
-                                                                    : 'border border-gray-300 text-gray-700 hover:bg-gray-50'
+                                                                ? 'bg-primary text-white'
+                                                                : 'border border-gray-300 text-gray-700 hover:bg-gray-50'
                                                                 }`}
                                                         >
                                                             {pageNum}

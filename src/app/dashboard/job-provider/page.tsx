@@ -1,8 +1,7 @@
 
 "use client";
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState} from 'react';
 import LeftSideProvider from '@/components/ui/LeftSideProvider';
 import { GigCardProvider } from '@/components/gig/GigCardProvider';
 import { useAllGigs } from '@/hooks/gigs/useAllGigs';
@@ -10,20 +9,19 @@ import { useNearbyGigs } from '@/hooks/gigs/useNearbyGigs';
 import { useUserLocation } from '@/hooks/useUserLocation';
 import { GigI } from '@/types/gig';
 import RefreshingButton from '@/components/ui/RefreshingButton';
+import Link from 'next/link';
 
 function JobProviderDashboard() {
-    const router = useRouter();
-
     const [isPopular, setIsPopular] = useState(true);
 
     // Get user location for nearby gigs
     const { latitude, longitude } = useUserLocation();
 
     // Fetch all gigs for browse tab
-    const { gigs: allGigs, isLoading: isLoadingAllGigs, mutate: allGigsMutate } = useAllGigs(1, 10);
+    const { gigs: allGigs, totalGigs, isLoading: isLoadingAllGigs, mutate: allGigsMutate } = useAllGigs(1, 10);
 
     // Fetch nearby gigs for nearby tab
-    const { gigs: nearbyGigsData, isLoading: isLoadingNearbyGigs , mutate: nearbyGigsMutate } = useNearbyGigs(
+    const { gigs: nearbyGigsData, isLoading: isLoadingNearbyGigs, mutate: nearbyGigsMutate } = useNearbyGigs(
         latitude || undefined,
         longitude || undefined
     );
@@ -51,7 +49,7 @@ function JobProviderDashboard() {
             setIsRefreshing(false);
         }
     };
- 
+
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
             <div className="w-full max-w-md lg:max-w-7xl mx-auto px-4 pb-20">
@@ -93,7 +91,7 @@ function JobProviderDashboard() {
                             </div>
                         </div>
 
-                        <div className='mb-3 flex items-center justify-end'>
+                        <div className='mb-4 flex items-center justify-end'>
                             <RefreshingButton
                                 handleRefresh={handleRefresh}
                                 isRefreshing={isRefreshing}
@@ -129,23 +127,25 @@ function JobProviderDashboard() {
                                             <p className="text-gray-600 mb-6">
                                                 {isPopular ? 'Post your first gig to get started' : 'Enable location to find gigs in your area'}
                                             </p>
-                                            <button
-                                                onClick={() => router.push('/dashboard/job-provider/post-gig')}
+                                            <Link
+                                                href={'/dashboard/job-provider/explore'}
                                                 className="bg-primary text-white px-6 py-3 rounded-xl font-semibold hover:bg-primary/90 transition-colors"
                                             >
-                                                Post a Gig
-                                            </button>
+                                                Go To Explore
+                                            </Link>
                                         </div>
                                     ) : (
                                         <div className="space-y-4">
                                             {currentGigs.map((gig: GigI) => (
-                                                <GigCardProvider
+                                                <Link
                                                     key={gig._id}
-                                                    gig={gig}
-                                                    onViewDetails={(selectedGig) =>
-                                                        router.push(`/dashboard/job-provider/gig/${selectedGig._id}`)
-                                                    }
-                                                />
+                                                    href={`/dashboard/job-provider/gig/${gig._id}`}
+                                                >
+                                                    <GigCardProvider
+                                                        gig={gig}
+
+                                                    />
+                                                </Link>
                                             ))}
                                         </div>
                                     )}
@@ -161,19 +161,15 @@ function JobProviderDashboard() {
 
                             {/* Stats */}
                             <div className="bg-white rounded-xl p-6 shadow-sm">
-                                <h3 className="font-bold text-gray-900 mb-4">Your Stats</h3>
+                                <h3 className="font-bold text-gray-900 mb-4">Gigs Stats</h3>
                                 <div className="space-y-3">
                                     <div className="flex justify-between">
-                                        <span className="text-gray-600">Active Gigs</span>
-                                        <span className="font-bold text-primary">2</span>
+                                        <span className="text-gray-600">Total Gigs</span>
+                                        <span className="font-bold text-primary">{totalGigs}</span>
                                     </div>
                                     <div className="flex justify-between">
-                                        <span className="text-gray-600">Total Applicants</span>
-                                        <span className="font-bold text-green-600">13</span>
-                                    </div>
-                                    <div className="flex justify-between">
-                                        <span className="text-gray-600">Completed Jobs</span>
-                                        <span className="font-bold text-blue-600">8</span>
+                                        <span className="text-gray-600">Near You</span>
+                                        <span className="font-bold text-green-600">{nearbyGigsData?.length || 0}</span>
                                     </div>
                                 </div>
                             </div>

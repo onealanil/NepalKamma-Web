@@ -11,6 +11,7 @@ import SkillsGuide from '@/components/ui/SkillsGuide';
 import { X, Upload, Phone, CheckCircle, Clock, AlertCircle } from 'lucide-react';
 import { verifyDocument } from '@/lib/profile/profile-api';
 import { useEnsureAuth } from '@/hooks/useEnsureAuth';
+import Image from 'next/image';
 
 /**
  * @function VerifyDocument
@@ -96,7 +97,7 @@ export default function VerifyDocument() {
         } finally {
             setIsSubmitting(false);
         }
-    }, [images, router]);
+    }, [images, router, isReady, setUser, user]);
 
     if (!user) {
         return <Loader />
@@ -145,7 +146,7 @@ export default function VerifyDocument() {
                 <h4 className="text-lg font-semibold text-gray-900 mb-4">Verified Documents</h4>
                 <div className="grid grid-cols-2 gap-4">
                     {user?.documents?.map((doc: { url: string }, index: number) => (
-                        <img
+                        <Image
                             key={index}
                             src={doc?.url || ''}
                             alt={`Document ${index + 1}`}
@@ -196,7 +197,7 @@ export default function VerifyDocument() {
                     <h3 className="text-lg font-semibold text-red-800">Document Verification Required</h3>
                 </div>
                 <p className="text-red-700">
-                    Note: You can't create a gig or access important features without verifying your document. This is to ensure that you are a real person and not a bot.
+                    Note: You can&appos;t create a gig or access important features without verifying your document. This is to ensure that you are a real person and not a bot.
                 </p>
             </div>
 
@@ -254,7 +255,7 @@ export default function VerifyDocument() {
                             <div className="grid grid-cols-2 gap-4">
                                 {images.slice(0, 2).map((image, index) => (
                                     <div key={index} className="relative">
-                                        <img
+                                        <Image
                                             src={URL.createObjectURL(image)}
                                             alt={`Document ${index + 1}`}
                                             className="w-full h-32 object-cover rounded-lg border border-gray-200"

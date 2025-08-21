@@ -1,18 +1,9 @@
-// import GeoLocation from "@/components/geolocation/Geolocation";
-
-
-// export default function SettingsPage() {
-//     return (
-//         <>
-//             {/* <GeoLocation/> */}
-//         </>
-//     )
-// }
-
 "use client";
 
 import { useState } from 'react';
 import debounce from 'lodash.debounce';
+import clientLogger from '@/utils/logger';
+import { ErrorToast } from '@/components/ui/Toast';
 
 interface Geometry {
   coordinates: number[];
@@ -33,12 +24,7 @@ interface GeoapifyResponse {
   features: Place[];
 }
 
-interface GeoLocationProps {
-  setGeometry?: (geometry: Geometry) => void;
-  setLocationName?: (name: string) => void;
-}
-
-const GeoLocation = ({ setGeometry, setLocationName }: GeoLocationProps) => {
+const GeoLocation = () => {
   const [suggestions, setSuggestions] = useState<Place[]>([]);
   const [inputValue, setInputValue] = useState('');
 
@@ -56,13 +42,15 @@ const GeoLocation = ({ setGeometry, setLocationName }: GeoLocationProps) => {
     try {
       const response = await fetch(url);
       if (!response.ok) {
-        console.error('Network response was not ok');
+        ErrorToast("Network response was not ok");
+        clientLogger.error('Network response was not ok');
         throw new Error('Network response was not ok');
       }
       const data: GeoapifyResponse = await response.json();
       setSuggestions(data.features);
     } catch (error) {
-      console.error('Error fetching suggestions:', error);
+      ErrorToast("Something went wrong while fetching suggestions");
+      clientLogger.error('Error fetching suggestions:', error);
     }
   }, 300);
 
@@ -76,12 +64,6 @@ const GeoLocation = ({ setGeometry, setLocationName }: GeoLocationProps) => {
     const locationName = place.properties.formatted || place.properties.city;
     setInputValue(locationName);
     setSuggestions([]);
-
-    if (setGeometry) setGeometry(place.geometry);
-    if (setLocationName) setLocationName(locationName);
-
-    console.log('Selected place:', locationName);
-    console.log('Coordinates:', place.geometry.coordinates);
   };
 
   return (
@@ -117,8 +99,6 @@ const GeoLocation = ({ setGeometry, setLocationName }: GeoLocationProps) => {
 };
 
 export default function SettingsPage() {
-  const [geometry, setGeometry] = useState<Geometry | null>(null);
-  const [locationName, setLocationName] = useState<string>('');
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4">
@@ -126,9 +106,7 @@ export default function SettingsPage() {
         <h1 className="text-2xl font-bold text-gray-900 mb-6">Settings</h1>
         <div className="bg-white rounded-xl p-6 shadow-sm">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Location Settings</h2>
-          <GeoLocation 
-            setGeometry={setGeometry}
-            setLocationName={setLocationName}
+          <GeoLocation
           />
         </div>
       </div>

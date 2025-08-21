@@ -16,6 +16,8 @@ import ReviewPagination from "@/components/review/ReviewPagination";
 import { useAuthStore } from "@/store/authStore";
 import { usePaginatedReviews } from "@/hooks/review/useReviews";
 import { createReview } from "@/lib/review/review-api";
+import Link from "next/link";
+import clientLogger from "@/utils/logger";
 
 export default function SingleJobPage() {
   const router = useRouter();
@@ -66,13 +68,6 @@ export default function SingleJobPage() {
   // Check if current user is verified
   const isCurrentUserVerified = loggedInUser?.isDocumentVerified === "verified";
 
-
-  const handleContactProvider = () => {
-    if (jobData?.postedBy?._id) {
-      router.push(`/dashboard/job-seeker/profile/user/${jobData.postedBy._id}`);
-    }
-  };
-
   // Use saved jobs store for save/unsave functionality
   const { toggleSaveJob } = useSavedJobs();
 
@@ -108,6 +103,7 @@ export default function SingleJobPage() {
       }
     } catch (error) {
       ErrorToast("Failed to apply to job. Please try again.");
+      clientLogger.error("Failed to apply to job ", error);
     } finally {
       setIsApplying(false);
     }
@@ -155,6 +151,7 @@ export default function SingleJobPage() {
       }
     } catch (error) {
       ErrorToast("Failed to submit review. Please try again.");
+      clientLogger.error("Failed to submit review. ", error);
     } finally {
       setIsSubmitting(false);
     }
@@ -266,30 +263,36 @@ export default function SingleJobPage() {
 
                 {/* Provider Profile */}
                 <div className="flex items-center gap-4">
-                  <button onClick={handleContactProvider} className="relative">
-                    <div className="relative">
-                      {jobData.postedBy?.profilePic?.url ? (
-                        <Image
-                          src={jobData.postedBy.profilePic.url}
-                          alt={jobData.postedBy.username}
-                          width={40}
-                          height={40}
-                          className="w-12 h-12 rounded-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center">
-                          <span className="text-gray-600 text-sm">N/A</span>
+                  {
+                    jobData?.postedBy._id && (
+                      <Link
+                        href={`/dashboard/job-seeker/profile/user/${jobData.postedBy._id}`}
+                        className="relative">
+                        <div className="relative">
+                          {jobData.postedBy?.profilePic?.url ? (
+                            <Image
+                              src={jobData.postedBy.profilePic.url}
+                              alt={jobData.postedBy.username}
+                              width={40}
+                              height={40}
+                              className="w-12 h-12 rounded-full object-cover"
+                            />
+                          ) : (
+                            <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center">
+                              <span className="text-gray-600 text-sm">N/A</span>
+                            </div>
+                          )}
+                          <div
+                            className={`absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-white ${jobData.postedBy?.onlineStatus
+                              ? "bg-green-500"
+                              : "bg-red-500"
+                              }`}
+                          />
                         </div>
-                      )}
-                      <div
-                        className={`absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-white ${
-                          jobData.postedBy?.onlineStatus
-                            ? "bg-green-500"
-                            : "bg-red-500"
-                        }`}
-                      />
-                    </div>
-                  </button>
+                      </Link>
+                    )
+                  }
+
                   <div className="flex-1">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2 w-[70%]">
@@ -323,11 +326,10 @@ export default function SingleJobPage() {
                     <div className="flex items-center gap-1">
                       <Star
                         size={15}
-                        className={`${
-                          averageRating > 0
-                            ? "text-yellow-500 fill-current"
-                            : "text-gray-400"
-                        }`}
+                        className={`${averageRating > 0
+                          ? "text-yellow-500 fill-current"
+                          : "text-gray-400"
+                          }`}
                       />
                       <span className="font-bold text-gray-900">
                         {isLoadingReviews ? (
@@ -416,6 +418,12 @@ export default function SingleJobPage() {
                 <div className="space-y-4">
                   <h3 className="text-lg font-bold text-gray-900">Location</h3>
                   <span className="font-medium">{jobData.location}</span>
+                  <div>
+                    <span className='text-red-500 text-xs'>
+                      This may not be the exact location. If you are near it, you can contact the job provider.
+                    </span>
+
+                  </div>
                 </div>
                 {/* location end */}
 
@@ -423,13 +431,12 @@ export default function SingleJobPage() {
                 <div className="lg:hidden flex gap-x-3">
                   <span className="font-bold text-black">Priority:</span>
                   <span
-                    className={`font-medium ${
-                      jobData.priority === "Urgent"
-                        ? "text-red-600"
-                        : jobData.priority === "Medium"
+                    className={`font-medium ${jobData.priority === "Urgent"
+                      ? "text-red-600"
+                      : jobData.priority === "Medium"
                         ? "text-yellow-600"
                         : "text-green-600"
-                    }`}
+                      }`}
                   >
                     {jobData.priority}
                   </span>
@@ -448,23 +455,24 @@ export default function SingleJobPage() {
                     >
                       {isApplying ? "Applying..." : "Apply Now"}
                     </button>
-                    <button
-                      onClick={() => {
-                        const lat = jobData?.address?.coordinates?.[1];
-                        const lng = jobData?.address?.coordinates?.[0];
-                        if (lat && lng) {
-                          router.push(
-                            `/dashboard/job-seeker/map?lat=${lat}&lng=${lng}`
-                          );
-                        } else {
-                          alert("Job location not available");
-                        }
-                      }}
-                      className="bg-primary text-white px-6 py-3 rounded-lg font-semibold transition-colors disabled:opacity-50"
-                      disabled={!isCurrentUserVerified}
-                    >
-                      View on Map
-                    </button>
+                    {jobData?.address?.coordinates?.[1] && jobData?.address?.coordinates?.[0] ? (
+                      <Link
+                        href={`/dashboard/job-seeker/map?lat=${jobData.address.coordinates[1]}&lng=${jobData.address.coordinates[0]}`}
+                        className={`bg-primary text-white px-6 py-3 rounded-lg flex items-center justify-center font-semibold transition-colors ${!isCurrentUserVerified ? "pointer-events-none opacity-50" : "hover:bg-primary/90"
+                          }`}
+                        aria-disabled={!isCurrentUserVerified}
+                      >
+                        View on Map
+                      </Link>
+                    ) : (
+                      <button
+                        className="bg-primary text-white px-6 py-3 rounded-lg font-semibold transition-colors opacity-50 cursor-not-allowed"
+                        disabled
+                      >
+                        Job location not available
+                      </button>
+                    )}
+
                   </div>
                 </div>
 
@@ -516,11 +524,10 @@ export default function SingleJobPage() {
                                 <button
                                   key={star}
                                   onClick={() => setRating(star)}
-                                  className={`${
-                                    star <= rating
-                                      ? "text-yellow-500"
-                                      : "text-primary"
-                                  } hover:text-yellow-500 transition-colors`}
+                                  className={`${star <= rating
+                                    ? "text-yellow-500"
+                                    : "text-primary"
+                                    } hover:text-yellow-500 transition-colors`}
                                 >
                                   <Star
                                     size={20}
@@ -553,8 +560,8 @@ export default function SingleJobPage() {
                               !rating
                                 ? "Please select a rating"
                                 : !review.trim()
-                                ? "Please write a review"
-                                : ""
+                                  ? "Please write a review"
+                                  : ""
                             }
                           >
                             {isSubmitting ? "Submitting..." : "Submit Review"}
@@ -667,15 +674,14 @@ export default function SingleJobPage() {
                 <div className="flex justify-between">
                   <span className="text-gray-600">Status:</span>
                   <span
-                    className={`font-medium ${
-                      jobData.job_status === "Pending"
-                        ? "text-yellow-600"
-                        : jobData.job_status === "In_Progress"
+                    className={`font-medium ${jobData.job_status === "Pending"
+                      ? "text-yellow-600"
+                      : jobData.job_status === "In_Progress"
                         ? "text-blue-600"
                         : jobData.job_status === "Completed"
-                        ? "text-green-600"
-                        : "text-gray-600"
-                    }`}
+                          ? "text-green-600"
+                          : "text-gray-600"
+                      }`}
                   >
                     {jobData.job_status}
                   </span>
@@ -683,13 +689,12 @@ export default function SingleJobPage() {
                 <div className="flex justify-between">
                   <span className="text-gray-600">Priority:</span>
                   <span
-                    className={`font-medium ${
-                      jobData.priority === "Urgent"
-                        ? "text-red-600"
-                        : jobData.priority === "Medium"
+                    className={`font-medium ${jobData.priority === "Urgent"
+                      ? "text-red-600"
+                      : jobData.priority === "Medium"
                         ? "text-yellow-600"
                         : "text-green-600"
-                    }`}
+                      }`}
                   >
                     {jobData.priority}
                   </span>
@@ -708,11 +713,10 @@ export default function SingleJobPage() {
               <div className="mt-6 space-y-3">
                 <button
                   onClick={saveJobHandler}
-                  className={`w-full flex items-center justify-center gap-2 py-3 rounded-lg disabled:opacity-50 font-semibold transition-colors ${
-                    isPostSaved
-                      ? "bg-primary text-white hover:bg-primary/90"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                  }`}
+                  className={`w-full flex items-center justify-center gap-2 py-3 rounded-lg disabled:opacity-50 font-semibold transition-colors ${isPostSaved
+                    ? "bg-primary text-white hover:bg-primary/90"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    }`}
                   disabled={!isCurrentUserVerified}
                 >
                   {isPostSaved ? (
@@ -722,14 +726,25 @@ export default function SingleJobPage() {
                   )}
                   {isPostSaved ? "Saved" : "Save Job"}
                 </button>
-                <button
-                  onClick={handleContactProvider}
-                  disabled={!isCurrentUserVerified}
-                  className="w-full bg-primary text-white py-3 rounded-lg font-semibold hover:bg-primary/90 disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
-                >
-                  <User size={20} />
-                  Contact Provider
-                </button>
+                {
+                  jobData?.postedBy?._id ? (
+                    <Link href={`/dashboard/job-seeker/profile/user/${jobData.postedBy._id}`}
+                      className="w-full bg-primary text-white py-3 rounded-lg font-semibold hover:bg-primary/90 disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
+                    >
+                      <User size={20} />
+                      Contact Provider
+                    </Link>
+                  ) : (
+                    <button
+                      disabled={!isCurrentUserVerified}
+                      className="w-full bg-primary text-white py-3 rounded-lg font-semibold hover:bg-primary/90 disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
+                    >
+                      <User size={20} />
+                      Contact Provider Not available
+                    </button>
+                  )
+                }
+
               </div>
             </div>
           </div>

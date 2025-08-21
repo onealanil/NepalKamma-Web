@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect, useRef } from 'react';
-import { ChevronLeft, Send, Paperclip, Smile, Phone, Video, MoreVertical } from 'lucide-react';
+import { ChevronLeft, Send, Phone, MoreVertical } from 'lucide-react';
 import { useRouter, useParams } from 'next/navigation';
+import Image from 'next/image';
 
 interface User {
     _id: string;
@@ -147,9 +148,9 @@ export default function ConversationPage() {
                         
                         <div className="flex items-center gap-3">
                             <div className="relative">
-                                <img
+                                <Image
                                     src={otherUser?.profilePic?.url || 'https://picsum.photos/100/100'}
-                                    alt={otherUser?.username}
+                                    alt={otherUser?.username || "message-image"}
                                     className="w-10 h-10 rounded-full object-cover"
                                 />
                                 {isOnline && (

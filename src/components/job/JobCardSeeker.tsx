@@ -2,10 +2,10 @@
 
 import { JobI } from "@/types/job";
 import SafeHTML from "../global/SafeHTML";
-import { useRouter } from "next/navigation";
 import SaveJobButton from "./SaveJobButton";
 import { useAuthStore } from "@/store/authStore";
-import { Bookmark, Save } from "lucide-react";
+import { Bookmark } from "lucide-react";
+import Link from "next/link";
 
 type JobCardProps = {
     data: JobI;
@@ -13,7 +13,6 @@ type JobCardProps = {
 };
 
 export default function JobCardSeeker({ data: job, onSelect }: JobCardProps) {
-    const router = useRouter();
     const {user} = useAuthStore();
 
     const isCurrentUserVerified = user?.isDocumentVerified === "verified";
@@ -82,12 +81,12 @@ export default function JobCardSeeker({ data: job, onSelect }: JobCardProps) {
                                 />
                             )
                         }
-                        <button
+                        <Link
                             className="bg-primary text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-primary/90 transition-colors"
-                            onClick={() => router.push(`/dashboard/job-seeker/job/${job._id}`)}
+                            href={`/dashboard/job-seeker/job/${job._id}`}
                         >
                             View Details
-                        </button>
+                        </Link>
                     </div>
                 </div>
             </div>

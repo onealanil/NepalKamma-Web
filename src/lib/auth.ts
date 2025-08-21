@@ -2,6 +2,7 @@ import axios from "axios";
 import axiosInstance, { baseURL } from "./axios";
 import { loginI, ResendOtpData, SignupI, VerifyOtpData } from "@/types/auth";
 import { useAuthStore } from "@/store/authStore";
+import clientLogger from "@/utils/logger";
 
 
 //signup user
@@ -81,6 +82,7 @@ export const refreshAccessToken = async () => {
         useAuthStore.getState().setAccessToken(data.accessToken);
     } catch (error) {
         useAuthStore.getState().logout();
+        clientLogger.error("Something went wrong while refreshing token")
     }
 };
 

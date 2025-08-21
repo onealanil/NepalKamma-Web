@@ -14,7 +14,7 @@ const DesktopFilterSidebar = ({
     onApplyFilters
 }: DesktopFilterSidebarProps) => {
 
-    const handleFilterChange = (key: keyof JobFilters, value: any) => {
+    const handleFilterChange = <k extends keyof JobFilters>(key: k, value: JobFilters[k]) => {
         const newFilters = {
             ...filters,
             [key]: value
@@ -30,6 +30,13 @@ const DesktopFilterSidebar = ({
         onFiltersChange(DEFAULT_FILTERS);
     };
 
+    const handleSortChange = (value: string) => {
+        if (SORT_OPTIONS.some(option => option.value === value)) {
+            handleFilterChange('sortBy', value as JobFilters['sortBy']);
+        }
+    };
+
+
     return (
         <div className="hidden lg:block lg:col-span-3 py-6">
             <div className="sticky top-6 space-y-6">
@@ -37,7 +44,7 @@ const DesktopFilterSidebar = ({
                 <div className="bg-white rounded-xl p-6 shadow-sm">
                     <div className="flex items-center justify-between mb-4">
                         <h3 className="font-bold text-gray-900">Filters</h3>
-                        <button 
+                        <button
                             onClick={handleReset}
                             className="text-primary text-sm font-medium hover:text-primary/80"
                         >
@@ -52,14 +59,12 @@ const DesktopFilterSidebar = ({
                         <h4 className="font-semibold text-gray-900">Distance Search</h4>
                         <button
                             onClick={() => handleFilterChange('useDistanceFilter', !filters.useDistanceFilter)}
-                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors${
-                                filters.useDistanceFilter ? 'bg-primary' : 'bg-gray-200'
-                            }`}
+                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors${filters.useDistanceFilter ? 'bg-primary' : 'bg-gray-200'
+                                }`}
                         >
                             <span
-                                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                                    filters.useDistanceFilter ? 'translate-x-6' : 'translate-x-1'
-                                }`}
+                                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${filters.useDistanceFilter ? 'translate-x-6' : 'translate-x-1'
+                                    }`}
                             />
                         </button>
                     </div>
@@ -128,7 +133,7 @@ const DesktopFilterSidebar = ({
                                     name="sortBy"
                                     value={option.value}
                                     checked={filters.sortBy === option.value}
-                                    onChange={(e) => handleFilterChange('sortBy', e.target.value)}
+                                    onChange={(e) => handleSortChange(e.target.value)}
                                     className="w-4 h-4 text-primary bg-gray-100 border-gray-300 focus:ring-primary focus:ring-2"
                                 />
                                 <span className="ml-3 text-sm text-gray-700">{option.label}</span>
@@ -141,7 +146,7 @@ const DesktopFilterSidebar = ({
 
                 {/* Apply Filters Button */}
                 <div className="bg-white rounded-xl p-6 shadow-sm">
-                    <button 
+                    <button
                         onClick={onApplyFilters}
                         className="w-full bg-primary text-white py-3 rounded-xl font-semibold hover:bg-primary/90 transition-colors"
                     >

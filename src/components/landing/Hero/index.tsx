@@ -2,9 +2,11 @@
 
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import Link from "next/link";
+import { Dictionary } from '@/types/dictionary/dictionary';
 
 interface HeroProps {
-  dict: any;
+  dict: Dictionary;
 }
 
 /**
@@ -22,7 +24,7 @@ export default function Hero({ dict }: HeroProps) {
         if (word === 'Skill,') {
           return <span key={index} className="text-primary">{word} </span>;
         }
-         if (word === 'Unique') {
+        if (word === 'Unique') {
           return <span key={index} className="text-primary">{word} </span>;
         }
         if (word === 'Story,') {
@@ -34,7 +36,7 @@ export default function Hero({ dict }: HeroProps) {
         return <span key={index}>{word} </span>;
       });
     }
-    
+
     // For Nepali - highlight key words
     if (title.includes('सीपमा') && title.includes('उद्देश्य')) {
       return title.split(' ').map((word, index) => {
@@ -70,12 +72,12 @@ export default function Hero({ dict }: HeroProps) {
                 {dict.landing.hero.description}
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                <button 
-                  onClick={() => router.push('/auth/signin')} 
+                <Link
+                  href={'/auth/signin'}
                   className="bg-primary cursor-pointer hover:bg-primary text-white px-8 py-4 rounded-lg font-semibold text-lg shadow-lg"
                 >
                   {dict.landing.hero.getStarted}
-                </button>
+                </Link>
                 <button className="border-2 cursor-pointer border-primary text-primary hover:text-black px-8 py-4 rounded-lg font-semibold text-lg transition-all duration-300">
                   {dict.landing.hero.learnMore}
                 </button>

@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import { ErrorToast, SuccessToast } from "@/components/ui/Toast";
 import axiosInstance from "@/lib/axios";
 import { AxiosError } from "axios";
+import Image from "next/image";
 
 // Request Payment Modal Component
 const RequestPaymentModal = ({
@@ -332,7 +333,7 @@ const RequestPaymentModal = ({
                                 <div className="flex gap-3 overflow-x-auto">
                                     {previewImages.slice(0, 2).map((preview: string, index: number) => (
                                         <div key={index} className="relative flex-shrink-0">
-                                            <img
+                                            <Image
                                                 src={preview}
                                                 alt={`Preview ${index + 1}`}
                                                 className="w-24 h-32 object-cover rounded-lg border border-gray-200"

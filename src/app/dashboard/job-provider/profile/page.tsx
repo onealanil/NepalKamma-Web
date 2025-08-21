@@ -12,6 +12,9 @@ import { updateProfilePicture } from '@/lib/profile/profile-api';
 import { useEnsureAuth } from '@/hooks/useEnsureAuth';
 import LeftSideProvider from '@/components/ui/LeftSideProvider';
 import { useUserJobs } from '@/hooks/jobs/useJobs';
+import Link from 'next/link';
+import logger from '@/utils/logger';
+import Image from 'next/image';
 
 /**
  * @function ProfilePageProvider
@@ -84,6 +87,7 @@ export default function ProfilePageProvider() {
 
         } catch (error) {
             ErrorToast('Failed to update profile picture');
+            logger.error(`Failed to update profile picture, ${error}`)
         } finally {
             setIsUploadingImage(false);
         }
@@ -141,7 +145,7 @@ export default function ProfilePageProvider() {
                                             <div className="w-24 h-24 bg-gray-200 rounded-full animate-pulse border-2 border-primary"></div>
                                         ) : (
                                             <div className="relative">
-                                                <img
+                                                <Image
                                                     src={userData.profilePic?.url || "https://picsum.photos/600/400?random=6"}
                                                     alt="Profile"
                                                     width={96}
@@ -194,22 +198,22 @@ export default function ProfilePageProvider() {
 
                                 {/* Action Buttons */}
                                 <div className="flex flex-wrap gap-3 mt-6">
-                                    <button onClick={() => router.push("/dashboard/job-provider/profile/edit-profile")} className="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-lg font-semibold hover:bg-primary/90 transition-colors">
+                                    <Link href={"/dashboard/job-provider/profile/edit-profile"} className="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-lg font-semibold hover:bg-primary/90 transition-colors">
                                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                                         </svg>
                                         Edit Profile
-                                    </button>
+                                    </Link>
                                     <button className="hidden md:flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-lg font-semibold hover:bg-primary/90 transition-colors">
                                         Share Profile
                                     </button>
-                                    <button onClick={() => router.push("/dashboard/job-provider/profile/verify-document")} className="flex font-semibold items-center gap-2 bg-primary text-white px-3 md:px-8 py-2 rounded-lg hover:bg-primary/90 transition-colors">
+                                    <Link href={"/dashboard/job-provider/profile/verify-document"} className="flex font-semibold items-center gap-2 bg-primary text-white px-3 md:px-8 py-2 rounded-lg hover:bg-primary/90 transition-colors">
                                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                         </svg>
                                         Settings
-                                    </button>
+                                    </Link>
                                 </div>
                             </div>
 
@@ -284,7 +288,7 @@ export default function ProfilePageProvider() {
                         </h3>
 
                         <div className="flex justify-center mb-6">
-                            <img
+                            <Image
                                 src={imagePreview}
                                 alt="Preview"
                                 className="w-24 h-24 rounded-full object-cover border-4 border-primary"

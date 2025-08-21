@@ -468,3 +468,63 @@ select.language-selector:focus {
 .floating-animation {
   animation: floating 3s ease-in-out infinite;
 }
+
+/* Add this to your globals.css file */
+
+/* Add this to the END of your globals.css file */
+
+/* NProgress overrides - IMPORTANT: Add at the end of globals.css */
+/* @import 'nprogress/nprogress.css'; */
+
+/* Force the progress bar to be visible above everything */
+/* #nprogress {
+  pointer-events: none !important;
+  z-index: 999999 !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+}
+
+#nprogress .bar {
+  background: #32b327 !important; /* Your green color */
+  /* position: fixed !important;
+  z-index: 999999 !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 6px !important; /* Thicker bar */
+  /* box-shadow: 0 0 10px #32b327 !important; Glow effect */
+
+/* Override any potential conflicts from your body pseudo-elements */
+/* body::before,
+body::after {
+  z-index: 1 !important; /* Ensure these are below the progress bar */
+ 
+
+/* Make sure the progress bar isn't affected by your grain animation */
+/* #nprogress * {
+  animation: none !important;
+} */
+
+/* Peg (the moving part) */
+/* #nprogress .peg {
+  display: block;
+  position: absolute;
+  right: 0px;
+  width: 100px;
+  height: 100%;
+  box-shadow: 0 0 10px #32b327, 0 0 5px #32b327;
+  opacity: 1.0;
+  transform: rotate(3deg) translate(0px, -4px);
+} */
+
+/* Hide spinner completely */
+/* #nprogress .spinner {
+  display: none !important;
+} */
+
+/* Make sure it stays visible longer */
+/* #nprogress .bar {
+  transition: width 0.4s ease !important;
+} */ 

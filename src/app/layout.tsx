@@ -1,10 +1,10 @@
-import Footer from '@/components/layout/Footer';
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import "./globals.css";
 import SWRProvider from '@/components/providers/SWRProvider';
+import NextTopLoader from 'nextjs-toploader';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -21,11 +21,6 @@ export const metadata: Metadata = {
   description: "Nepal's first local gig marketplace connecting skilled neighbors with quick jobs and linking talented professionals with those who need them.",
 };
 
-/**
- * @function RootLayout
- * @param param0 
- * @returns The main layout of the application.
- */
 export default function RootLayout({
   children,
 }: {
@@ -34,9 +29,15 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <NextTopLoader
+          color="#32b327" 
+          height={6} 
+          showSpinner={false} 
+          easing="ease-in-out" 
+          shadow="0 0 10px #FF0000,0 0 5px #FF0000" 
+        />
         <SWRProvider>
           {children}
-          {/* <Footer/> */}
           <ToastContainer />
         </SWRProvider>
       </body>

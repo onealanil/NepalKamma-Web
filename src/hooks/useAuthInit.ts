@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useAuthStore } from '@/store/authStore';
 import axiosInstance from '@/lib/axios';
 import axios from 'axios';
+import clientLogger from '@/utils/logger';
 
 /**
  * @function useAuthInit
@@ -40,8 +41,8 @@ export const useAuthInit = (skipAuthCheck = false) => {
           setUser(userResponse.data.user);
           
         } catch (error) {
-          console.log('Token refresh failed during init');
           useAuthStore.getState().logout();
+          clientLogger.error("Something went wrong");
         }
       }
       

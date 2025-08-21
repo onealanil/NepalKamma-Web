@@ -1,7 +1,9 @@
 "use client";
 
+import { Dictionary } from "@/types/dictionary/dictionary";
+
 interface ValuePropsProps {
-  dict: any;
+  dict: Dictionary;
 }
 
 export default function ValueProps({ dict }: ValuePropsProps) {

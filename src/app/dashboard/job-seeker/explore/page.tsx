@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Filter, Search, WholeWord } from "lucide-react";
+import { Filter, Search } from "lucide-react";
 import LeftSideSeeker from "@/components/ui/LeftSideSeeker";
 import { JobI } from "@/types/job";
 import JobCardSeeker from "@/components/job/JobCardSeeker";
@@ -197,7 +197,7 @@ function ExplorePage() {
                     <div className="flex flex-wrap gap-2">
                       {filters.text && (
                         <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm">
-                          Search: "{filters.text}"
+                          Search: &quot;{filters.text}&quot;
                         </span>
                       )}
                       {filters.category &&

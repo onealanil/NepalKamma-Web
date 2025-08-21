@@ -2,8 +2,6 @@
 
 import { useAuthStore } from '@/store/authStore';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-
 /**3
  * @function LeftSideSeeker
  * @returns The left side of the dashboard for job seekers. It includes the profile card and quick actions.
@@ -11,7 +9,6 @@ import { useRouter } from 'next/navigation';
  */
 function LeftSideSeeker() {
     const { user, hasHydrated } = useAuthStore();
-    const router = useRouter();
 
     if (!hasHydrated || !user) {
         return (
@@ -56,9 +53,9 @@ function LeftSideSeeker() {
                             </div>
                             <h3 className="font-bold text-lg text-gray-900">{user?.username}</h3>
                             <p className="text-gray-500 text-sm mb-4">{user?.email}</p>
-                            <button onClick={() => router.push("/dashboard/job-seeker/profile/edit-profile")} className="w-full bg-primary/10 text-primary py-2 rounded-lg font-semibold hover:bg-primary/20 transition-colors">
+                            <Link href={"/dashboard/job-seeker/profile/edit-profile"} className="w-full bg-primary/10 text-primary py-2 px-4 rounded-lg font-semibold hover:bg-primary/20 transition-colors">
                                 Edit Profile
-                            </button>
+                            </Link>
                         </div>
                     </div>
 

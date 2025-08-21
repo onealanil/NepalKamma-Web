@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from 'react';
-import { Lightbulb, ClipboardList, Briefcase, FileText, TrendingUp, Users, DollarSign } from 'lucide-react';
+import { Lightbulb, ClipboardList, Briefcase, TrendingUp, Users, DollarSign } from 'lucide-react';
 
 const CreateJobTips = () => {
     const [activeTab, setActiveTab] = useState('tips');

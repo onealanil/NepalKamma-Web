@@ -1,176 +1,56 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ChevronLeft, Star, User } from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
+import { ChevronLeft, Star } from 'lucide-react';
 import LeftSideSeeker from '@/components/ui/LeftSideSeeker';
+import { usePaginatedReviews } from '@/hooks/review/useReviews';
+import { useAuthStore } from '@/store/authStore';
+import ReviewCard from '@/components/review/ReviewCard';
+import Loader from '@/components/global/Loader';
+import ReviewPagination from '@/components/review/ReviewPagination';
+import RefreshingButton from '@/components/ui/RefreshingButton';
 
-interface Review {
-    _id: string;
-    rating: number;
-    review: string;
-    reviewedBy: {
-        _id: string;
-        username: string;
-        profilePic?: { url: string };
-        location: string;
-    };
-    jobTitle: string;
-    createdAt: string;
-}
-
-const ReviewLoader = () => (
-    <div className="bg-white rounded-xl p-4 mb-4 shadow-sm animate-pulse">
-        <div className="flex items-start gap-3">
-            <div className="w-12 h-12 bg-gray-200 rounded-full"></div>
-            <div className="flex-1">
-                <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                <div className="h-3 bg-gray-200 rounded w-1/2 mb-2"></div>
-                <div className="h-3 bg-gray-200 rounded w-full mb-2"></div>
-                <div className="h-3 bg-gray-200 rounded w-2/3"></div>
-            </div>
-        </div>
-    </div>
-);
-
-const ReviewCard = ({ data }: { data: Review }) => (
-    <div className="bg-white rounded-xl p-4 border border-gray-100 mb-4 shadow-sm hover:shadow-md transition-shadow">
-        <div className="flex items-start gap-3">
-            <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
-                {data.reviewedBy.profilePic?.url ? (
-                    <img
-                        src={data.reviewedBy.profilePic.url}
-                        alt={data.reviewedBy.username}
-                        className="w-full h-full rounded-full object-cover"
-                    />
-                ) : (
-                    <User className="w-6 h-6 text-primary" />
-                )}
-            </div>
-
-            <div className="flex-1">
-                <div className="flex items-center justify-between mb-2">
-                    <div>
-                        <h4 className="font-bold text-gray-900">{data.reviewedBy.username}</h4>
-                        <p className="text-sm text-gray-500">{data.reviewedBy.location}</p>
-                    </div>
-                    <div className="flex items-center gap-1">
-                        {[...Array(5)].map((_, i) => (
-                            <Star
-                                key={i}
-                                size={16}
-                                className={`${i < data.rating ? 'text-yellow-400 fill-current' : 'text-gray-300'}`}
-                            />
-                        ))}
-                        <span className="ml-1 text-sm font-medium text-gray-700">{data.rating}</span>
-                    </div>
-                </div>
-
-                <div className="mb-2">
-                    <p className="text-sm font-medium text-primary">{data.jobTitle}</p>
-                </div>
-
-                <p className="text-gray-700 text-sm mb-2 leading-relaxed">{data.review}</p>
-
-                <p className="text-xs text-gray-500">
-                    {formatDistanceToNow(new Date(data.createdAt))} ago
-                </p>
-            </div>
-        </div>
-    </div>
-);
 
 export default function MyReviewPage() {
     const router = useRouter();
-    const [isLoadingReview, setIsLoadingReview] = useState(true);
-    const [reviewData, setReviewData] = useState<Review[]>([]);
-    const [totalRating, setTotalRating] = useState(0);
-    const [averageRating, setAverageRating] = useState(0);
 
-    useEffect(() => {
-        // Simulate loading reviews
-        setTimeout(() => {
-            const mockReviews: Review[] = [
-                {
-                    _id: '1',
-                    rating: 5,
-                    review: 'Excellent work quality and delivered on time. Very professional and communicative throughout the project. Highly recommended!',
-                    reviewedBy: {
-                        _id: '2',
-                        username: 'Alice Johnson',
-                        profilePic: { url: 'https://picsum.photos/100/100?random=1' },
-                        location: 'Pokhara, Nepal'
-                    },
-                    jobTitle: 'Website Development Project',
-                    createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString()
-                },
-                {
-                    _id: '2',
-                    rating: 4,
-                    review: 'Good communication and professional approach. The design was exactly what we needed. Will work again in the future.',
-                    reviewedBy: {
-                        _id: '3',
-                        username: 'Ram Sharma',
-                        profilePic: { url: 'https://picsum.photos/100/100?random=2' },
-                        location: 'Lalitpur, Nepal'
-                    },
-                    jobTitle: 'Mobile App UI Design',
-                    createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString()
-                },
-                {
-                    _id: '3',
-                    rating: 5,
-                    review: 'Outstanding content writing skills. The articles were well-researched and SEO optimized. Great attention to detail.',
-                    reviewedBy: {
-                        _id: '4',
-                        username: 'Sita Patel',
-                        profilePic: { url: 'https://picsum.photos/100/100?random=3' },
-                        location: 'Kathmandu, Nepal'
-                    },
-                    jobTitle: 'Content Writing Project',
-                    createdAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString()
-                },
-                {
-                    _id: '4',
-                    rating: 4,
-                    review: 'Very satisfied with the logo design. Creative and professional work. Minor revisions were handled quickly.',
-                    reviewedBy: {
-                        _id: '5',
-                        username: 'John Doe',
-                        profilePic: { url: 'https://picsum.photos/100/100?random=4' },
-                        location: 'Bhaktapur, Nepal'
-                    },
-                    jobTitle: 'Logo Design Project',
-                    createdAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString()
-                },
-                {
-                    _id: '5',
-                    rating: 5,
-                    review: 'Fantastic developer! Built our e-commerce platform with all the features we requested. Highly technical and reliable.',
-                    reviewedBy: {
-                        _id: '6',
-                        username: 'Tech Solutions Ltd',
-                        profilePic: { url: 'https://picsum.photos/100/100?random=5' },
-                        location: 'Kathmandu, Nepal'
-                    },
-                    jobTitle: 'E-commerce Platform Development',
-                    createdAt: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000).toISOString()
-                }
-            ];
+    // Get current logged-in user for verification checks
+    const { user: currentUser } = useAuthStore();
 
-            const totalReviews = mockReviews.length;
-            const avgRating = mockReviews.reduce((sum, review) => sum + review.rating, 0) / totalReviews;
+    // Fetch paginated reviews for the job provider
+    const {
+        reviews: reviewData,
+        pagination,
+        averageRating,
+        isLoading: isLoadingReviews,
+        currentPage,
+        setCurrentPage,
+        mutate: mutateReviews,
+    } = usePaginatedReviews(currentUser?._id);
 
-            setReviewData(mockReviews);
-            setTotalRating(totalReviews);
-            setAverageRating(avgRating);
-            setIsLoadingReview(false);
-        }, 1500);
-    }, []);
+
+    const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
+
+
 
     const handleBackPress = () => {
         router.push('/dashboard/job-seeker');
+    };
+
+    if (isLoadingReviews || !currentUser || !currentUser._id) {
+        return <Loader />
+    }
+
+    const handleRefresh = async () => {
+        setIsRefreshing(true);
+        try {
+            await mutateReviews();
+        } catch (error) {
+            console.error("Failed to refresh jobs:", error);
+        } finally {
+            setIsRefreshing(false);
+        }
     };
 
     return (
@@ -193,24 +73,31 @@ export default function MyReviewPage() {
                                     My Reviews
                                 </span>
                             </button>
+                            <div className="flex items-center justify-end">
+                                <RefreshingButton
+                                    handleRefresh={handleRefresh}
+                                    isRefreshing={isRefreshing}
+                                    isLoading={isLoadingReviews}
+                                />
+                            </div>
                         </div>
 
                         {/* Loading State */}
-                        {isLoadingReview && (
+                        {isLoadingReviews && (
                             <div className="flex items-center justify-center py-20">
                                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
                             </div>
                         )}
 
                         {/* Content */}
-                        {!isLoadingReview && (
+                        {!isLoadingReviews && (
                             <div className="space-y-6">
                                 {/* Stats */}
                                 <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
                                     <div className="grid grid-cols-2 gap-4">
                                         <div>
                                             <p className="text-gray-600 font-medium text-sm">Total Reviews:</p>
-                                            <p className="text-primary font-bold text-2xl">{totalRating || 0}</p>
+                                            <p className="text-primary font-bold text-2xl">{reviewData?.length || 0}</p>
                                         </div>
                                         <div>
                                             <p className="text-gray-600 font-medium text-sm">Average Rating:</p>
@@ -252,11 +139,20 @@ export default function MyReviewPage() {
                                             </button>
                                         </div>
                                     ) : (
-                                        <div className="space-y-4">
-                                            {reviewData.map((review) => (
-                                                <ReviewCard key={review._id} data={review} />
-                                            ))}
-                                        </div>
+                                        <>
+                                            <div className="space-y-4">
+                                                {reviewData.map((review) => (
+                                                    <ReviewCard key={review._id} data={review} />
+                                                ))}
+                                                {/* Pagination */}
+                                                <ReviewPagination
+                                                    pagination={pagination}
+                                                    currentPage={currentPage}
+                                                    onPageChange={setCurrentPage}
+                                                    isLoading={isLoadingReviews}
+                                                />
+                                            </div>
+                                        </>
                                     )}
                                 </div>
                             </div>

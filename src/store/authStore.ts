@@ -3,7 +3,6 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 
-
 /**
  * @function useAuthStore
  * @description This hook is used to manage the auth state. It returns the user, access token, and functions to set them.

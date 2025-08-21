@@ -3,8 +3,6 @@ import {
   MoreHorizontal,
   Calendar,
   Eye,
-  Trash2,
-  Edit,
   MapPin,
   User,
 } from "lucide-react";
@@ -23,17 +21,17 @@ export const GigCardProvider = ({
   onViewDetails,
   showActions = false,
 }: GigCardProviderProps) => (
-  <div className="bg-white rounded-xl p-4 md:p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+  <div className="rounded-xl p-4 md:p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
     <div className="flex items-start gap-4">
       {/* Profile Picture */}
-      <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-primary/20 to-green-100 rounded-xl flex items-center justify-center overflow-hidden flex-shrink-0">
+      <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl flex items-center justify-center overflow-hidden flex-shrink-0">
         {gig.postedBy?.profilePic?.url ? (
           <Image
             src={gig.postedBy.profilePic.url}
             alt={gig.postedBy.username || gig.title}
             width={64}
             height={64}
-            className="w-full h-full object-cover"
+            className="w-12 h-12 rounded-full object-cover"
           />
         ) : (
           <User className="w-6 h-6 md:w-8 md:h-8 text-gray-400" />
@@ -56,11 +54,10 @@ export const GigCardProvider = ({
           </div>
           <div className="flex items-center gap-2 ml-2">
             <span
-              className={`px-2 py-1 rounded-full text-xs font-medium ${
-                gig.visibility === "public"
-                  ? "bg-green-100 text-green-700"
-                  : "bg-gray-100 text-gray-700"
-              }`}
+              className={`px-2 py-1 border border-black items-center justify-center rounded-full text-xs font-medium ${gig.visibility === "public"
+                  ? "text-green-700"
+                  : "text-gray-700"
+                }`}
             >
               {gig.visibility}
             </span>
@@ -95,8 +92,8 @@ export const GigCardProvider = ({
                 </span>
               </div>
               {gig.category && (
-                <div className="hidden md:flex items-center gap-1">
-                  <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs">
+                <div className="hidden md:flex items-center ml-3 gap-1">
+                  <span className="px-2 py-1 border border-black text-gray-600 rounded-full text-xs">
                     {gig.category}
                   </span>
                 </div>
@@ -117,7 +114,7 @@ export const GigCardProvider = ({
                 View Details
               </button>
             </div>
-          </div>
+          </div>1
         </div>
       </div>
     </div>

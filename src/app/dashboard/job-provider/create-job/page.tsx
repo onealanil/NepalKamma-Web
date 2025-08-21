@@ -2,7 +2,7 @@
 
 import { useCallback, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ChevronLeft, X, Image as ImageIcon } from 'lucide-react';
+import { ChevronLeft} from 'lucide-react';
 import { Formik } from 'formik';
 import { MotivationalQuotes } from '@/components/ui/MotivationalQuotes';
 import { SuccessToast, ErrorToast } from '@/components/ui/Toast';
@@ -96,7 +96,7 @@ const CreateJobPage = () => {
         } finally {
             setIsSubmitting(false);
         }
-    }, [isReady, selectedSkills, geometry, locationName, router]);
+    }, [isReady, selectedSkills, geometry, locationName, router, createJob, user?.phoneNumber]);
 
     const toggleSkill = (skillId: number) => {
         setSelectedSkills(prev =>
@@ -305,7 +305,7 @@ const CreateJobPage = () => {
                                         {/* ----payment method start --- */}
                                         <div>
                                             <label className="block text-sm font-medium text-gray-900 mb-2">
-                                                Set Payment method * ("Default Cash: Online payment is not available yet")
+                                                Set Payment method * (Default Cash: Online payment is not available yet)
                                             </label>
                                             <select
                                                 className="w-full px-4 py-3 border border-green-100 rounded-lg"

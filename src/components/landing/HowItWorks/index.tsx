@@ -1,9 +1,11 @@
 "use client";
 
 import LandingAnimation from "@/components/animation/LandingAnimation";
+import { Dictionary } from "@/types/dictionary/dictionary";
+import Link from "next/link";
 
 interface HowItWorksProps {
-  dict: any;
+  dict: Dictionary;
 }
 
 export default function HowItWorks({ dict }: HowItWorksProps) {
@@ -99,11 +101,13 @@ export default function HowItWorks({ dict }: HowItWorksProps) {
         </div>
 
         <div className="text-center mt-20 md:mt-24">
-          <button className="bg-gradient-to-r from-[var(--primary)] to-[var(--accent)] hover:from-[var(--accent)] hover:to-[var(--primary)] text-white px-12 py-4 rounded-2xl font-bold text-xl
+          <Link
+            href="/auth/signin"
+            className="bg-gradient-to-r from-[var(--primary)] to-[var(--accent)] hover:from-[var(--accent)] hover:to-[var(--primary)] text-white px-12 py-4 rounded-2xl font-bold text-xl
                              transition-all duration-300 transform hover:scale-105 shadow-2xl border border-[var(--primary)]/30 hover:border-[var(--accent)]/50
                              focus:outline-none focus:ring-4 focus:ring-[var(--primary)]/50 active:scale-95">
-            Start Your Journey
-          </button>
+            {dict.landing.howItWorks.start}
+          </Link>
         </div>
       </div>
     </section>

@@ -2,7 +2,6 @@
 "use client";
 
 import { useCallback, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import Loader from '@/components/global/Loader';
 import LeftSideSeeker from '@/components/ui/LeftSideSeeker';
@@ -12,6 +11,8 @@ import { SuccessToast, ErrorToast } from '@/components/ui/Toast';
 import { updateProfilePicture } from '@/lib/profile/profile-api';
 import { useEnsureAuth } from '@/hooks/useEnsureAuth';
 import { useUserGigs } from '@/hooks/gigs/useGigs';
+import Link from 'next/link';
+import Image from 'next/image';
 
 /**
  * @function ProfilePageSeeker
@@ -19,7 +20,6 @@ import { useUserGigs } from '@/hooks/gigs/useGigs';
  * @returns {JSX.Element}
  */
 export default function ProfilePageSeeker() {
-    const router = useRouter();
     const { isLoading } = useAuth();
     const { isReady } = useEnsureAuth();
     const { user: userData, setUser } = useAuthStore();
@@ -29,6 +29,7 @@ export default function ProfilePageSeeker() {
     const [image, setImage] = useState<File | null>(null);
     const [showImageModal, setShowImageModal] = useState<boolean>(false);
     const [imagePreview, setImagePreview] = useState<string>('');
+
 
     /**
      * @function handleImagePicker
@@ -75,7 +76,6 @@ export default function ProfilePageSeeker() {
 
             const response = await updateProfilePicture(formData);
             if (response.status === 200) {
-                console.log(response.data)
                 setUser({ ...userData, profilePic: { public_id: response.data.public_id, url: response.data.url } });
                 SuccessToast('Profile picture updated successfully!');
                 setShowImageModal(false);
@@ -124,14 +124,14 @@ export default function ProfilePageSeeker() {
                         {/* Main Content */}
                         <div className="lg:col-span-6 py-6">
                             {/* Back Button */}
-                            <button
-                                onClick={() => router.push('/dashboard/job-seeker')}
+                            <Link
+                                href={'/dashboard/job-seeker'}
                                 className="mb-4 flex items-center gap-2 text-gray-600 hover:text-gray-800 transition-colors lg:hidden"
                             >
                                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                                 </svg>
-                            </button>
+                            </Link>
 
                             {/* Profile Header */}
                             <div className="bg-white rounded-xl p-6 shadow-sm mb-6">
@@ -142,7 +142,7 @@ export default function ProfilePageSeeker() {
                                             <div className="w-24 h-24 bg-gray-200 rounded-full animate-pulse border-2 border-primary"></div>
                                         ) : (
                                             <div className="relative">
-                                                <img
+                                                <Image
                                                     src={userData.profilePic?.url || "https://picsum.photos/600/400?random=6"}
                                                     alt="Profile"
                                                     width={96}
@@ -195,22 +195,22 @@ export default function ProfilePageSeeker() {
 
                                 {/* Action Buttons */}
                                 <div className="flex flex-wrap gap-3 mt-6">
-                                    <button onClick={() => router.push("/dashboard/job-seeker/profile/edit-profile")} className="flex items-center gap-2 bg-primary text-sm md:text-md text-white px-4 py-2 rounded-lg font-semibold hover:bg-primary/90 transition-colors">
+                                    <Link href={"/dashboard/job-seeker/profile/edit-profile"} className="flex items-center gap-2 bg-primary text-sm md:text-md text-white px-4 py-2 rounded-lg font-semibold hover:bg-primary/90 transition-colors">
                                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                                         </svg>
                                         Edit Profile
-                                    </button>
+                                    </Link>
                                     <button className="hidden md:flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-lg text-md font-semibold hover:bg-primary/90 transition-colors">
                                         Share Profile
                                     </button>
-                                    <button onClick={() => router.push("/dashboard/job-seeker/profile/verify-document")} className="flex text-sm md:text-md font-semibold items-center gap-2 bg-primary text-white px-5 md:px-8 py-2 rounded-lg hover:bg-primary/90 transition-colors">
+                                    <Link href={"/dashboard/job-seeker/profile/verify-document"} className="flex text-sm md:text-md font-semibold items-center gap-2 bg-primary text-white px-5 md:px-8 py-2 rounded-lg hover:bg-primary/90 transition-colors">
                                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                         </svg>
                                         Settings
-                                    </button>
+                                    </Link>
                                 </div>
                             </div>
 
@@ -306,7 +306,7 @@ export default function ProfilePageSeeker() {
                         </h3>
 
                         <div className="flex justify-center mb-6">
-                            <img
+                            <Image
                                 src={imagePreview}
                                 alt="Preview"
                                 className="w-24 h-24 rounded-full object-cover border-4 border-primary"

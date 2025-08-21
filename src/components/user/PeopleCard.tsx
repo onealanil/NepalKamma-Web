@@ -1,16 +1,16 @@
 "use client";
 
 import { User as JobProviderI } from "@/types/user";
+import Image from "next/image";
 
 // People card component
-const PeopleCard = ({ data, onClick }: { data: JobProviderI; onClick: () => void }) => (
+const PeopleCard = ({ data }: { data: JobProviderI }) => (
     <div 
-        onClick={onClick}
-        className="bg-white rounded-xl p-4 mb-4 shadow-sm border border-gray-100 hover:shadow-md transition-shadow cursor-pointer"
+        className="rounded-xl p-4 mb-4 shadow-sm border border-gray-100 hover:shadow-md transition-shadow cursor-pointer"
     >
         <div className="flex items-center gap-4">
             <div className="relative">
-                <img
+                <Image
                     src={data.profilePic?.url || 'https://picsum.photos/100/100'}
                     alt={data.username}
                     className="w-16 h-16 rounded-full object-cover"
@@ -51,7 +51,7 @@ const PeopleCard = ({ data, onClick }: { data: JobProviderI; onClick: () => void
                 <div className="flex items-center gap-4 text-xs text-gray-500">
                     {/* <span>{data.completedJobs} jobs completed</span> */}
                     {data.skills.length > 0 && (
-                        <span className="bg-gray-100 px-2 py-1 rounded">
+                        <span className="boder border-black px-2 py-1 rounded">
                             {data.skills[0]}
                             {data.skills.length > 1 && ` +${data.skills.length - 1}`}
                         </span>

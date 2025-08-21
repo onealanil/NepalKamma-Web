@@ -16,6 +16,7 @@ import { useState } from "react";
 import { ErrorToast, SuccessToast } from "@/components/ui/Toast";
 import { deleteJob } from "@/lib/job/job-api";
 import { JobDetailsModal } from "@/components/ui/modals/JobDetailsModal";
+import Link from "next/link";
 
 export default function MyJobsPage() {
     const router = useRouter();
@@ -165,7 +166,7 @@ export default function MyJobsPage() {
 
 
                         <div className='flex items-center justify-center'>
-                            <button onClick={() => router.push("/dashboard/job-provider/create-job")} className="w-full my-3 bg-primary text-white py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors flex items-center justify-center gap-2">
+                            <Link href={"/dashboard/job-provider/create-job"} className="w-full my-3 bg-primary text-white py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors flex items-center justify-center gap-2">
                                 <span>Create New Job</span>
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-copy-plus">
                                     <line x1="15" x2="15" y1="12" y2="18" />
@@ -173,7 +174,7 @@ export default function MyJobsPage() {
                                     <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
                                     <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
                                 </svg>
-                            </button>
+                            </Link>
                         </div>
 
                         {/* Gigs List */}
@@ -200,8 +201,8 @@ export default function MyJobsPage() {
                             ) : (
                                 <div className="bg-white rounded-xl p-8 text-center shadow-sm">
                                     <div className="text-4xl mb-4">📝</div>
-                                    <h3 className="text-lg font-bold text-gray-900 mb-2">No Gigs Yet</h3>
-                                    <p className="text-gray-600 mb-6">Start by creating your first gig to showcase your skills</p>
+                                    <h3 className="text-lg font-bold text-gray-900 mb-2">No Jobs Yet</h3>
+                                    <p className="text-gray-600 mb-6">Start posting a job, connect with local talent</p>
                                     <button className="bg-primary text-white px-6 py-3 rounded-xl font-semibold hover:bg-primary/90 transition-colors">
                                         Create Your First Job
                                     </button>

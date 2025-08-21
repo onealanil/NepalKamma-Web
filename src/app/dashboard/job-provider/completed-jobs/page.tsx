@@ -123,7 +123,7 @@ export default function CompletedJobPage() {
                                         No Completed Jobs
                                     </h3>
                                     <p className="text-gray-600 mb-6">
-                                        You don't have any completed jobs yet. Once jobs are completed, they'll appear here for payment processing.
+                                        You don&apos;t have any completed jobs yet. Once jobs are completed, they&apos;ll appear here for payment processing.
                                     </p>
                                     <button
                                         onClick={() => router.push('/dashboard/job-provider')}

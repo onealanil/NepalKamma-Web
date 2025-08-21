@@ -67,7 +67,6 @@ export default function SignIn() {
                 const errorMessage = error.response?.data?.message || 'Invalid credentials';
                 ErrorToast(errorMessage);
             } else if (error instanceof Error) {
-                console.log(error)
                 ErrorToast('An error occurred during verification');
             } else {
                 ErrorToast('An unknown error occurred');

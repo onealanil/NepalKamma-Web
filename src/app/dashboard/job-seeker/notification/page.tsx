@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { ChevronLeft, Bell, MessageCircle, CheckCircle, AlertCircle, Clock } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import LeftSideSeeker from '@/components/ui/LeftSideSeeker';
+import Image from 'next/image';
 
 interface Notification {
     id: string;
@@ -47,7 +48,7 @@ const NotificationCard = ({ item }: { item: Notification }) => {
         <div className={`flex items-start gap-3 p-4 mb-2 rounded-lg transition-colors hover:bg-gray-50 ${!item.isRead ? 'bg-primary/5 border-l-4 border-primary' : 'bg-white'}`}>
             {/* Profile Image */}
             <div className="relative">
-                <img
+                <Image
                     src={item.image}
                     alt="Notification"
                     className="w-16 h-16 rounded-full object-cover"

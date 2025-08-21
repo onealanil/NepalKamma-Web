@@ -5,9 +5,12 @@ import Link from "next/link";
 import LanguageSwitcher from "../LanguageSwitcher";
 import { useState } from 'react';
 import { Menu, X } from 'lucide-react';
+import { useAuthStore } from "@/store/authStore";
+import Loader from "../global/Loader";
 
 export default function HeaderLanding() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const { user, hasHydrated } = useAuthStore();
 
     const toggleMobileMenu = () => {
         setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -16,6 +19,10 @@ export default function HeaderLanding() {
     const closeMobileMenu = () => {
         setIsMobileMenuOpen(false);
     };
+
+    if (!hasHydrated) {
+        return <Loader />
+    }
 
     return (
         <>
@@ -29,7 +36,7 @@ export default function HeaderLanding() {
                             height={100}
                         />
                     </Link>
-                    
+
                     {/* Desktop Navigation */}
                     <nav className="hidden md:flex items-center space-x-8 font-medium">
                         <LanguageSwitcher />
@@ -42,9 +49,13 @@ export default function HeaderLanding() {
                         <Link href="/auth/signin" className="text-black hover:text-gray-500 transition-colors">
                             Sign In
                         </Link>
-                        <Link href="/auth/signup" className="bg-primary text-white hover:bg-primary-foreground transition-colors px-4 py-2 rounded-md">
-                            Sign Up
-                        </Link>
+                        {
+                            !user && (
+                                <Link href="/auth/signup" className="bg-primary text-white hover:bg-primary-foreground transition-colors px-4 py-2 rounded-md">
+                                    Sign Up
+                                </Link>
+                            )
+                        }
                     </nav>
 
                     {/* Mobile Hamburger Button */}
@@ -61,11 +72,11 @@ export default function HeaderLanding() {
             {isMobileMenuOpen && (
                 <>
                     {/* Backdrop */}
-                    <div 
+                    <div
                         className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 md:hidden"
                         onClick={closeMobileMenu}
                     />
-                    
+
                     {/* Sidebar */}
                     <div className="fixed top-0 right-0 h-full w-80 bg-white shadow-2xl z-50 md:hidden transform transition-transform duration-300">
                         <div className="p-6">
@@ -78,44 +89,48 @@ export default function HeaderLanding() {
                                     <X size={24} />
                                 </button>
                             </div>
-                            
+
                             {/* Language Switcher */}
                             <div className="mb-8">
                                 <LanguageSwitcher />
                             </div>
-                            
+
                             {/* Navigation Links */}
                             <nav className="space-y-6">
-                                <Link 
-                                    href="#features" 
+                                <Link
+                                    href="#features"
                                     className="block text-lg font-medium text-gray-900 hover:text-primary transition-colors"
                                     onClick={closeMobileMenu}
                                 >
                                     Features
                                 </Link>
-                                <Link 
-                                    href="#testimonials" 
+                                <Link
+                                    href="#testimonials"
                                     className="block text-lg font-medium text-gray-900 hover:text-primary transition-colors"
                                     onClick={closeMobileMenu}
                                 >
                                     Testimonials
                                 </Link>
-                                <Link 
-                                    href="/auth/signin" 
+                                <Link
+                                    href="/auth/signin"
                                     className="block text-lg font-medium text-gray-900 hover:text-primary transition-colors"
                                     onClick={closeMobileMenu}
                                 >
                                     Sign In
                                 </Link>
-                                
+
                                 {/* Sign Up Button */}
-                                <Link
-                                    href="/auth/signup"
-                                    onClick={closeMobileMenu}
-                                    className="block w-full bg-primary text-white hover:bg-primary-foreground transition-colors px-4 py-3 rounded-md font-medium text-lg text-center mt-8"
-                                >
-                                    Sign Up
-                                </Link>
+                                {
+                                    !user && (
+                                        <Link
+                                            href="/auth/signup"
+                                            onClick={closeMobileMenu}
+                                            className="block w-full bg-primary text-white hover:bg-primary-foreground transition-colors px-4 py-3 rounded-md font-medium text-lg text-center mt-8"
+                                        >
+                                            Sign Up
+                                        </Link>
+                                    )
+                                }
                             </nav>
                         </div>
                     </div>

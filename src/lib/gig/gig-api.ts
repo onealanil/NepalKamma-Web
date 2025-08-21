@@ -151,7 +151,6 @@ export async function searchGigs(searchParams: GigSearchParams): Promise<ApiResp
                 queryParams.append(key, value.toString());
             }
         });
-        console.log("this is query params", queryParams.toString());
         const response = await axiosInstance.get(`/gig/searchgig?${queryParams.toString()}`);
         return {
             success: true,

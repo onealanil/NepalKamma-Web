@@ -28,7 +28,7 @@ export default function DashboardLayout({
         } else if (userData) {
             setUser(userData);
         }
-    }, [user, hasHydrated, userData, router]);
+    }, [user, hasHydrated, userData, router, setUser]);
 
     // Show loader until everything is ready
     if (!hasHydrated || isLoading || !user || (user && !userData)) {

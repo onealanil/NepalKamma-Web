@@ -26,7 +26,6 @@ export const useSearchGigs = (searchParams: GigSearchParams) => {
         searchKey,
         async () => {
             if (!searchKey) return null;
-            console.log("this is from useSearchGigs", searchParams);
             const response = await searchGigs(searchParams);
             return response.success ? response.data : null;
         },

@@ -9,6 +9,7 @@ import { Menu, X } from "lucide-react";
 import { logOut } from "@/lib/auth";
 import { ErrorToast } from "../ui/Toast";
 import { useSavedJobsStore } from "@/store/savedJobsStore";
+import clientLogger from "@/utils/logger";
 
 export default function Header() {
   const { logout, user } = useAuthStore();
@@ -20,6 +21,7 @@ export default function Header() {
       await logOut();
     } catch (error: unknown) {
       ErrorToast("Logout API error");
+      clientLogger.error("Logout APi error")
     } finally {
       logout();
       useSavedJobsStore.getState().clearSavedJobs();
@@ -52,7 +54,7 @@ export default function Header() {
               className="w-40 md:w-40 lg:w-48 xl:w-52"
             />
           </Link>
-          
+
 
           {/* Desktop Navigation for job-seeker */}
           {user?.role === "job_provider" && (
@@ -64,14 +66,14 @@ export default function Header() {
                 Dashboard
               </Link>
               <Link href="/dashboard/job-provider/explore" className="text-black hover:text-gray-500 transition-colors">
-                  Explore
-                </Link>
-                <Link href="/dashboard/job-provider/chat" className="text-black hover:text-gray-500 transition-colors">
-                  Message
-                </Link>
-                <Link href="/dashboard/job-provider/top-buyer" className="text-black hover:text-gray-500 transition-colors">
-                  Top Buyer
-                </Link>
+                Explore
+              </Link>
+              <Link href="/dashboard/job-provider/chat" className="text-black hover:text-gray-500 transition-colors">
+                Message
+              </Link>
+              <Link href="/dashboard/job-provider/top-seller" className="text-black hover:text-gray-500 transition-colors">
+                Top Seller
+              </Link>
               <Link
                 href="/dashboard/job-provider/profile"
                 className="text-black hover:text-gray-500 transition-colors"
@@ -170,7 +172,7 @@ export default function Header() {
                 >
                   Dashboard
                 </Link>
-                {/* <Link
+                <Link
                   href="/dashboard/job-provider/explore"
                   className="block text-lg font-medium text-gray-900 hover:text-primary transition-colors"
                   onClick={closeMobileMenu}
@@ -185,12 +187,33 @@ export default function Header() {
                   Message
                 </Link>
                 <Link
-                  href="/dashboard/job-provider/top-buyer"
+                  href="/dashboard/job-provider/my-jobs"
                   className="block text-lg font-medium text-gray-900 hover:text-primary transition-colors"
                   onClick={closeMobileMenu}
                 >
-                  Top Buyer
-                </Link> */}
+                  My Jobs
+                </Link>
+                <Link
+                  href="/dashboard/job-provider/completed-jobs"
+                  className="block text-lg font-medium text-gray-900 hover:text-primary transition-colors"
+                  onClick={closeMobileMenu}
+                >
+                  Completed Jobs
+                </Link>
+                <Link
+                  href="/dashboard/job-provider/my-review"
+                  className="block text-lg font-medium text-gray-900 hover:text-primary transition-colors"
+                  onClick={closeMobileMenu}
+                >
+                  My Reviews
+                </Link>
+                <Link
+                  href="/dashboard/job-provider/top-seller"
+                  className="block text-lg font-medium text-gray-900 hover:text-primary transition-colors"
+                  onClick={closeMobileMenu}
+                >
+                  Top Seller
+                </Link>
                 <Link
                   href="/dashboard/job-provider/profile"
                   className="block text-lg font-medium text-gray-900 hover:text-primary transition-colors"
@@ -264,7 +287,7 @@ export default function Header() {
                 >
                   Message
                 </Link>
-                <Link 
+                <Link
 
                   href="/dashboard/job-seeker/notification"
                   className="block text-lg font-medium text-gray-900 hover:text-primary transition-colors"

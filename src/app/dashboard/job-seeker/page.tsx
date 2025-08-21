@@ -384,7 +384,7 @@ function JobSeekerDashboard() {
                               Recent Jobs Coming Soon
                             </h3>
                             <p className="text-gray-600 mb-6">
-                              We're working on showing the most recently posted
+                              We&apos;re working on showing the most recently posted
                               jobs in your area.
                             </p>
                             <button

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ChevronLeft, Trash2 } from 'lucide-react';
+import { ChevronLeft } from 'lucide-react';
 import LeftSideSeeker from '@/components/ui/LeftSideSeeker';
 import { MotivationalQuotes } from '@/components/ui/MotivationalQuotes';
 import { GigI } from '@/types/gig';
@@ -10,20 +10,19 @@ import { useAuthStore } from '@/store/authStore';
 import { ErrorToast, SuccessToast } from '@/components/ui/Toast';
 import Loader from '@/components/global/Loader';
 import { useUserGigs } from '@/hooks/gigs/useGigs';
-import { GigCard } from '@/components/gig/GigCard';
 import { deleteGig } from '@/lib/gig/gig-api';
 import SafeHTML from '@/components/global/SafeHTML';
 import { LoadingCard } from '@/components/ui/loader/LoadingCard';
+import Link from 'next/link';
+import { MyGigCard } from '@/components/gig/MyGigCard';
+import Image from 'next/image';
+import clientLogger from '@/utils/logger';
 
 const MyGigsPage = () => {
     const router = useRouter();
     const { user, hasHydrated } = useAuthStore();
 
-    if (!hasHydrated || !user) {
-        return <Loader />;
-    }
-
-    const userId = user._id;
+    const userId = user?._id;
     const { gigs, isLoading, mutate } = useUserGigs(userId);
 
 
@@ -53,9 +52,14 @@ const MyGigsPage = () => {
             mutate();
         } catch (err) {
             ErrorToast("Failed to delete gig.");
+            clientLogger.error("Failed to delete gig", err);
         } finally {
-            setIsDeleteLoading(false); ``
+            setIsDeleteLoading(false); 
         }
+    }
+
+    if (!hasHydrated || !user) {
+        return <Loader />;
     }
 
     if (isLoading) return <Loader />
@@ -79,7 +83,7 @@ const MyGigsPage = () => {
 
                         {gig.images?.[0]?.url && (
                             <div className="mb-6">
-                                <img
+                                <Image
                                     src={gig.images[0].url}
                                     alt={gig.title}
                                     className="w-full h-64 object-cover rounded-lg"
@@ -125,10 +129,6 @@ const MyGigsPage = () => {
                             </div>
 
                             <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t">
-                                <button className="flex-1 bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700 transition-colors flex items-center justify-center gap-2">
-                                    <Trash2 className="w-4 h-4" />
-                                    Delete Gig
-                                </button>
                                 <button
                                     onClick={onClose}
                                     className="flex-1 bg-gray-200 text-gray-800 py-3 rounded-lg font-semibold hover:bg-gray-300 transition-colors"
@@ -185,7 +185,7 @@ const MyGigsPage = () => {
                         </div>
 
                         <div className='flex items-center justify-center'>
-                            <button onClick={() => router.push("/dashboard/job-seeker/create-gig")} className="w-full my-3 bg-primary text-white py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors flex items-center justify-center gap-2">
+                            <Link href={"/dashboard/job-seeker/create-gig"} className="w-full my-3 bg-primary text-white py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors flex items-center justify-center gap-2">
                                 <span>Create New Gig</span>
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-copy-plus">
                                     <line x1="15" x2="15" y1="12" y2="18" />
@@ -193,7 +193,7 @@ const MyGigsPage = () => {
                                     <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
                                     <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
                                 </svg>
-                            </button>
+                            </Link>
                         </div>
 
                         {/* Gigs List */}
@@ -206,7 +206,7 @@ const MyGigsPage = () => {
                                 </>
                             ) : gigs.length > 0 ? (
                                 gigs.map((gig: GigI) => (
-                                    <GigCard key={gig._id} gig={gig} onView={handleViewGig} onDelete={handleDeleteGig} />
+                                    <MyGigCard key={gig._id} gig={gig} onView={handleViewGig} onDelete={handleDeleteGig} />
                                 ))
                             ) : (
                                 <div className="bg-white rounded-xl p-8 text-center shadow-sm">

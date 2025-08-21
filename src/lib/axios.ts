@@ -45,7 +45,6 @@ axiosInstance.interceptors.response.use(
         return axiosInstance(originalRequest);
         
       } catch (refreshError) {
-        console.log("Refresh token failed:", refreshError);
         useAuthStore.getState().logout();
         return Promise.reject(refreshError);
       }

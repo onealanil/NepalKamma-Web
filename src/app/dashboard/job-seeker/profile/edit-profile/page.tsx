@@ -24,6 +24,7 @@ export default function EditProfile() {
     const [geometry, setGeometry] = useState<Geometry | null>({ coordinates: [], type: 'Point' });
     const [isLoading, setIsLoading] = useState(false);
 
+
     //setting the initial values
     useEffect(() => {
         if (user?.skills && Array.isArray(user.skills)) {
@@ -93,11 +94,13 @@ export default function EditProfile() {
                         address: {
                             ...user.address,
                             coordinates: [newValues.longitude, newValues.latitude] as [number, number]
-                        }
+                        },
+                        location: locationName
                     };
+
                     setUser(updatedUser);
                     SuccessToast('Profile Updated Successfully');
-                    router.push('/dashboard/job-seeker/profile');
+                    router.replace('/dashboard/job-seeker/profile');
                 }
             } catch (error: unknown) {
                 if (error instanceof AxiosError) {
@@ -198,6 +201,8 @@ export default function EditProfile() {
 
                                             {/* Location */}
                                             <div>
+                                                <span className='text-red-500 text-xs'>After changing the location, you will be redirected to your profile. Please refresh the page to see the changes.</span>
+
                                                 <div className="flex items-center justify-between mb-2">
                                                     <label className="block text-sm font-medium text-black">
                                                         Location
@@ -226,6 +231,11 @@ export default function EditProfile() {
                                                     <span className='text-black text-sm font-semibold'>Location: </span>
                                                     <span className='text-primary'>{locationName || 'Not selected'}</span>
                                                 </div>
+                                                <span className='text-red-500 text-xs'>
+                                                    The exact location may not appear. Please select the nearest location where you used to live.
+                                                </span>
+
+
                                             </div>
 
                                             {/* About Me */}
@@ -305,7 +315,7 @@ export default function EditProfile() {
 
                     {/* Right Sidebar - Hidden on mobile, visible on desktop */}
                     <div className="hidden lg:block lg:col-span-3 py-6">
-                        <MotivationalQuotes isProvider={false}/>
+                        <MotivationalQuotes isProvider={false} />
                     </div>
                 </div>
             </div>

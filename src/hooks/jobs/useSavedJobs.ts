@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { useSavedJobsStore } from '@/store/savedJobsStore';
 import { JobI } from '@/types/job';
 

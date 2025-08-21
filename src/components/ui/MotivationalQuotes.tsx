@@ -44,7 +44,7 @@ export const MotivationalQuotes = ({ isProvider }: {isProvider:boolean}) => {
                 </h3>
                 <div className="bg-primary/5 rounded-lg p-4 mb-4">
                     <p className="text-gray-700 italic text-center mb-2">
-                        "{quotes[currentQuoteIndex].text}"
+                        &apos;{quotes[currentQuoteIndex].text}&apos;
                     </p>
                     <p className="text-primary font-semibold text-center text-sm">
                         - {quotes[currentQuoteIndex].author}

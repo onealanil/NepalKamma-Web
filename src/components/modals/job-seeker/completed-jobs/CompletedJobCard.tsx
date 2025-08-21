@@ -1,5 +1,5 @@
 import { CompletedJob } from "@/types/job-provider/CompletedJob";
-import { Calendar, CheckCircle, CreditCard, DollarSign, Eye, MapPin } from "lucide-react";
+import { Calendar, CheckCircle, CreditCard, Eye, MapPin } from "lucide-react";
 
 const CompletedJobCard = ({
     data,

@@ -36,7 +36,7 @@ export default function AuthLayout({
                 router.push('/dashboard/job-provider');
             }
         }
-    }, [user, hasHydrated, isInitialized, router]);
+    }, [user, hasHydrated, isInitialized, router, fetchSavedJobs]);
 
     if (!hasHydrated || !isInitialized || isRedirecting) {
         return <Loader/>

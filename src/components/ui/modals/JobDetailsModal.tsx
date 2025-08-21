@@ -9,6 +9,7 @@ import { updateJob } from "@/lib/job/job-api";
 import { ErrorToast, SuccessToast } from "../Toast";
 import { User } from "@/types/user";
 import { useUserJobs } from "@/hooks/jobs/useJobs";
+import Image from "next/image";
 
 export const JobDetailsModal = ({
   isOpen,
@@ -95,7 +96,7 @@ export const JobDetailsModal = ({
                 </div>
                 <div className="flex items-center gap-3 flex-1 min-w-0">
                   <div className="flex-shrink-0">
-                    <img
+                    <Image
                       src={job.assignedTo.profilePic?.url || '/default-profile.png'}
                       alt={job.assignedTo.username}
                       className="w-10 h-10 rounded-full object-cover border-2 border-green-200"

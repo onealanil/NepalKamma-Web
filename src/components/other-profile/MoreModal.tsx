@@ -1,4 +1,9 @@
+"use client";
+
 import { Navigation, X } from "lucide-react";
+import { useState } from "react";
+import ReportModal from "../modals/report/ReportModal";
+import Link from "next/link";
 
 const MoreModal = ({
     isOpen,
@@ -15,15 +20,12 @@ const MoreModal = ({
     userLongitude?: number;
     isCurrentUserVerified: boolean;
 }) => {
-    if (!isOpen) return null;
 
-    const handleViewOnMap = () => {
-        if (userLatitude && userLongitude) {
-            // Use your custom map implementation
-            const mapUrl = `/dashboard/job-seeker/map?lat=${userLatitude}&lng=${userLongitude}`;
-            window.open(mapUrl, '_blank');
-        }
-    };
+    //state 
+    const [isReportModalOpen, setIsReportModalOpen] = useState<boolean>(false);
+
+
+    if (!isOpen) return null;
 
     return (
         <div
@@ -53,13 +55,13 @@ const MoreModal = ({
                     </div>
 
                     {isCurrentUserVerified && userLatitude && userLongitude && (
-                        <button
-                            onClick={handleViewOnMap}
+                        <Link
+                            href={`/dashboard/job-seeker/map?lat=${userLatitude}&lng=${userLongitude}`}
                             className="w-full bg-primary text-white py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
                         >
                             <Navigation size={20} />
                             View on Map
-                        </button>
+                        </Link>
                     )}
 
                     {!isCurrentUserVerified && (
@@ -70,7 +72,7 @@ const MoreModal = ({
                         </div>
                     )}
 
-                    <button className="w-full bg-red-500 text-white py-3 rounded-lg font-semibold hover:bg-red-600 transition-colors">
+                    <button onClick={() => setIsReportModalOpen(true)} className="w-full bg-red-500 text-white py-3 rounded-lg font-semibold hover:bg-red-600 transition-colors">
                         Report User
                     </button>
 
@@ -82,6 +84,12 @@ const MoreModal = ({
                     </button>
                 </div>
             </div>
+            {
+                isReportModalOpen && (
+                    <ReportModal />
+                )
+            }
+
         </div>
     );
 };

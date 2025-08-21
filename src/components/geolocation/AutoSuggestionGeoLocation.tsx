@@ -46,9 +46,6 @@ const AutoSuggestionGeoLocation = ({ setGeometry, setLocationName }: GeoLocation
 
         if (setGeometry) setGeometry(place.geometry);
         if (setLocationName) setLocationName(locationName);
-
-        console.log('Selected place:', locationName);
-        console.log('Coordinates:', place.geometry.coordinates);
     };
 
     return (

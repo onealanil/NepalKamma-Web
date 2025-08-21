@@ -12,6 +12,7 @@ import { ArrowLeft, Phone } from 'lucide-react';
 import Image from 'next/image';
 import { updatePhoneNumber } from '@/lib/profile/profile-api';
 import { useEnsureAuth } from '@/hooks/useEnsureAuth';
+import clientLogger from '@/utils/logger';
 
 /**
  * @function VerifyPhone
@@ -59,6 +60,7 @@ export default function VerifyPhone(){
                 }
             } catch (error) {
                 ErrorToast('An error occurred while validating phone number, Try again Later');
+                clientLogger.error("An error occured while validating phone number ", error);
                 return false;
             }
         } else {
@@ -117,6 +119,7 @@ export default function VerifyPhone(){
         }
         catch (error) {
             ErrorToast('An error occurred while validating phone number, Try again Later');
+            clientLogger.error("An error occured while validating phone number, ", error);
         }
         finally {
             setIsVerifying(false);

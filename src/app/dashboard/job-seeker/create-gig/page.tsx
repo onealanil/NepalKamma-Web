@@ -16,6 +16,8 @@ import { GigI } from '@/types/gig';
 import { AxiosError } from 'axios';
 import { gigSchema } from '@/types/schema/gigSchema';
 import { ZodError } from 'zod';
+import Loader from '@/components/global/Loader';
+import Image from 'next/image';
 
 const initialValues: GigI = {
     title: '',
@@ -123,6 +125,10 @@ const CreateGigPage = () => {
             setIsSubmitting(false);
         }
     };
+
+    if(isLoading){
+        return <Loader/>
+    }
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
@@ -251,7 +257,7 @@ const CreateGigPage = () => {
                                                     <div className="flex gap-4 overflow-x-auto">
                                                         {imagePreviews.map((preview, index) => (
                                                             <div key={index} className="relative flex-shrink-0">
-                                                                <img
+                                                                <Image
                                                                     src={preview}
                                                                     alt={`Preview ${index + 1}`}
                                                                     className="w-24 h-24 object-cover rounded-lg"

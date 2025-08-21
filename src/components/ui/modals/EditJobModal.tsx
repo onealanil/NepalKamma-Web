@@ -87,7 +87,7 @@ export const EditJobModal = ({ isOpen, onClose, job, onSave }: Props) => {
                     {selectedStatus === 'Cancelled' && (
                         <div className="bg-red-50 border border-red-200 rounded-lg p-4 mt-4">
                             <p className="text-red-700 text-sm">
-                                <strong>Note:</strong> Selecting "Cancelled" will reset this job back to "Pending" status
+                                <strong>Note:</strong> Selecting &apos;Cancelled&apos; will reset this job back to &apos;Pending&apos; status
                                 and remove any assigned worker. The job will be available for new applications.
                             </p>
                         </div>

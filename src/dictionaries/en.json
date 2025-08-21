@@ -8,6 +8,31 @@
       "localSkills": "Local Skills, Real Jobs",
       "trustedNeighbors": "Trusted Neighbors"
     },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "items": [
+        {
+          "question": "What is NepalKamma?",
+          "answer": "NepalKamma is a local job platform that connects talent with opportunities nearby. We focus on building trust and integrity."
+        },
+        {
+          "question": "How do I apply for a job?",
+          "answer": "Simply browse jobs, use the advanced search, or check nearby jobs. Once you find a suitable opportunity, click on the job to apply, it directly sends message to the job provider."
+        },
+        {
+          "question": "Can I post a job as a provider?",
+          "answer": "Yes! Job providers can post jobs, manage applications, and connect directly with local talent."
+        },
+        {
+          "question": "Is NepalKamma free to use?",
+          "answer": "Document verification is required and is free. Job seekers can browse and apply for jobs at no cost, while providers can access additional features for advanced visibility and tools."
+        },
+        {
+          "question": "How do I contact support?",
+          "answer": "You can reach out to us through the 'Connect With Us' section in the footer or by emailing support@nepalkamma.com."
+        }
+      ]
+    },
     "valueProps": {
       "title": "Why Choose Our Platform?",
       "subtitle": "Nepal's first local gig marketplace connecting skilled neighbors with quick jobs and linking talented professionals with those who need them.",
@@ -28,7 +53,7 @@
     },
     "howItWorks": {
       "title": "Unlock Opportunities, Simplified.",
-      "subtitle": "A simple process to launch your career and find your dream opportunities.",
+      "subtitle": "A simple process to turn your talent into income, right where you live.",
       "getStarted": "Get started in minutes",
       "steps": {
         "profile": {
@@ -43,7 +68,47 @@
           "title": "Complete & Get Paid",
           "description": "Accept jobs, complete tasks offline, and receive instant payment. Build your reputation in the local community."
         }
-      }
+      },
+      "start": "Start Your Journey"
+    },
+    "footer": {
+      "brand": {
+        "title": "NepalKamma",
+        "description1": "Connecting talent with opportunities, locally.", 
+        "description2": "Building trust and integrity."
+      },
+      "jobSeekers": {
+        "title": "For Job Seekers",
+        "links": {
+          "browseJobs": "Browse Jobs",
+          "advancedSearch": "Advanced Search",
+          "nearbyJobs": "Nearby Jobs",
+          "jobRecommendation": "Jobs Recommendation",
+          "skillsShowcase": "Skills Showcase",
+          "viewOnMap": "View on Map",
+          "directConnection": "Direct Connection with local provider"
+        }
+      },
+      "jobProviders": {
+        "title": "For Job Providers",
+        "links": {
+          "postJob": "Post a Job",
+          "advancedSearch": "Advanced Search",
+          "viewOnMap": "View on Map",
+          "rateReview": "Rate and Review",
+          "directConnection": "Direct connection with local talent"
+        }
+      },
+      "connect": {
+        "title": "Connect With Us",
+        "socials": {
+          "twitter": "Twitter",
+          "linkedin": "LinkedIn",
+          "facebook": "Facebook",
+          "instagram": "Instagram"
+        }
+      },
+      "copyright": "All rights reserved."
     }
   }
 }

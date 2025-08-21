@@ -148,9 +148,6 @@ export default function MapRoute({
           latitude={coord.latitude}
           longitude={coord.longitude}
           data={{ ...coord, index }}
-          onClick={({ data }) => {
-            console.log("Marker clicked:", data);
-          }}
         >
           <div className="relative">
             <div

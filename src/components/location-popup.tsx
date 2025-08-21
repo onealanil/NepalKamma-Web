@@ -129,9 +129,7 @@ export function LocationPopup({ location, onClose }: LocationPopupProps) {
             variant="outline"
             size="sm"
             className="flex items-center justify-center"
-            onClick={() => {
-              console.log("Saved location:", location);
-            }}
+
           >
             <Star className="h-4 w-4 mr-1.5" />
             Save

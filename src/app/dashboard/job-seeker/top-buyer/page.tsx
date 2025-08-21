@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
 import LeftSideSeeker from "@/components/ui/LeftSideSeeker";
@@ -8,6 +8,7 @@ import { useTopRatedProvider } from "@/hooks/useTopRatedProvider";
 import { User as JobProviderI } from "@/types/user";
 import PeopleCard from "@/components/user/PeopleCard";
 import RefreshingButton from "@/components/ui/RefreshingButton";
+import Link from "next/link";
 
 // Loading skeleton component
 const PeopleLoader = () => (
@@ -30,14 +31,9 @@ export default function TopBuyerPage() {
   const {
     users: jobProviders,
     isLoading,
-    isError,
     mutate,
   } = useTopRatedProvider();
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
-
-  const handleProfileClick = (id: string) => {
-    router.push(`/dashboard/job-seeker/profile/user/${id}`);
-  };
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
@@ -71,12 +67,12 @@ export default function TopBuyerPage() {
               </button>
               <div>
 
-            {/* Refresh Button */}
-            <RefreshingButton
-              handleRefresh={handleRefresh}
-              isRefreshing={isRefreshing}
-              isLoading={isLoading}
-              />
+                {/* Refresh Button */}
+                <RefreshingButton
+                  handleRefresh={handleRefresh}
+                  isRefreshing={isRefreshing}
+                  isLoading={isLoading}
+                />
               </div>
             </div>
 
@@ -103,11 +99,13 @@ export default function TopBuyerPage() {
                   ) : (
                     <div className="space-y-4">
                       {jobProviders.map((provider: JobProviderI) => (
-                        <PeopleCard
+                        <Link
                           key={provider._id}
-                          data={provider}
-                          onClick={() => handleProfileClick(provider._id)}
-                        />
+                          href={`/dashboard/job-seeker/profile/user/${provider._id}`}
+                          className="bg-none"
+                        >
+                          <PeopleCard key={provider._id} data={provider} />
+                        </Link>
                       ))}
                     </div>
                   )}

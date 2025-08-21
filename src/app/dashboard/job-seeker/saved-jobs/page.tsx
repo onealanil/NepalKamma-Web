@@ -7,7 +7,6 @@ import LeftSideSeeker from '@/components/ui/LeftSideSeeker';
 import { JobI } from '@/types/job';
 import { useSavedJobs } from '@/hooks/jobs/useSavedJobs';
 import JobCardSeeker from '@/components/job/JobCardSeeker';
-import { useSavedJobsStore } from '@/store/savedJobsStore';
 import RefreshingButton from '@/components/ui/RefreshingButton';
 
 const JobCardLoader = () => (
@@ -36,7 +35,7 @@ export default function SavedJobs() {
 
     useEffect(() => {
         fetchSavedJobs();
-    }, []);
+    }, [fetchSavedJobs]);
 
     const handleJobSelect = (job: JobI) => {
         router.push(`/dashboard/job-seeker/job/${job._id}`);
@@ -117,7 +116,7 @@ export default function SavedJobs() {
                                         No Saved Jobs Yet
                                     </h3>
                                     <p className="text-gray-600 mb-6">
-                                        Start saving jobs you're interested in to see them here.
+                                        Start saving jobs you&apos;re interested in to see them here.
                                         You can save jobs by clicking the bookmark icon on any job card.
                                     </p>
                                     <button
@@ -135,7 +134,7 @@ export default function SavedJobs() {
                                         Loading Saved Jobs...
                                     </h3>
                                     <p className="text-gray-600 mb-6">
-                                        You have {savedJobsCount} saved job{savedJobsCount > 1 ? 's' : ''}, but they're still loading.
+                                        You have {savedJobsCount} saved job{savedJobsCount > 1 ? 's' : ''}, but they&apos;re still loading.
                                         If this persists, try refreshing.
                                     </p>
                                     <div className="flex gap-3 justify-center">

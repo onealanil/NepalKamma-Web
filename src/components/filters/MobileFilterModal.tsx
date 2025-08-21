@@ -27,7 +27,7 @@ const MobileFilterModal = ({
 
     if (!isOpen) return null;
 
-    const handleLocalFilterChange = (key: keyof JobFilters, value: any) => {
+    const handleLocalFilterChange = <k extends keyof JobFilters>(key: k, value: JobFilters[k]) => {
         setLocalFilters(prev => ({
             ...prev,
             [key]: value
@@ -47,6 +47,12 @@ const MobileFilterModal = ({
     const handleReset = () => {
         setLocalFilters(DEFAULT_FILTERS);
         onFiltersChange(DEFAULT_FILTERS);
+    };
+
+    const handleSortChange = (value: string) => {
+        if (SORT_OPTIONS.some(option => option.value === value)) {
+            handleLocalFilterChange('sortBy', value as JobFilters['sortBy']);
+        }
     };
 
     return (
@@ -83,14 +89,12 @@ const MobileFilterModal = ({
                             <h4 className="font-semibold text-gray-900">Distance Search</h4>
                             <button
                                 onClick={() => handleLocalFilterChange('useDistanceFilter', !localFilters.useDistanceFilter)}
-                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${
-                                    localFilters.useDistanceFilter ? 'bg-primary' : 'bg-gray-200'
-                                }`}
+                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${localFilters.useDistanceFilter ? 'bg-primary' : 'bg-gray-200'
+                                    }`}
                             >
                                 <span
-                                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                                        localFilters.useDistanceFilter ? 'translate-x-6' : 'translate-x-1'
-                                    }`}
+                                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${localFilters.useDistanceFilter ? 'translate-x-6' : 'translate-x-1'
+                                        }`}
                                 />
                             </button>
                         </div>
@@ -159,7 +163,7 @@ const MobileFilterModal = ({
                                         name="sortBy"
                                         value={option.value}
                                         checked={localFilters.sortBy === option.value}
-                                        onChange={(e) => handleLocalFilterChange('sortBy', e.target.value)}
+                                        onChange={(e) => handleSortChange(e.target.value)}
                                         className="w-4 h-4 text-primary bg-gray-100 border-gray-300 focus:ring-primary focus:ring-2"
                                     />
                                     <span className="ml-3 text-sm text-gray-700">{option.label}</span>

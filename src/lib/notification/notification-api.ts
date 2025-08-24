@@ -8,8 +8,6 @@ import { NotificationResponse, NotificationFilters } from '@/types/notification'
 
 /**
  * Fetch user notifications by receiver ID
- * Since your backend route expects /:id but uses protect middleware,
- * we'll need to pass the user ID from the frontend
  */
 export const getNotifications = async (filters: NotificationFilters = {}, userId: string): Promise<NotificationResponse> => {
   try {
@@ -18,11 +16,8 @@ export const getNotifications = async (filters: NotificationFilters = {}, userId
     }
 
     const response = await axiosInstance.get(`/notification/getNotificationByReceiver/${userId}`);
-
-    // Transform backend response to match frontend expectations
     const notifications = response.data?.data || response.data || [];
 
-    // Apply client-side filtering if needed
     let filteredNotifications = notifications;
 
     if (filters.type) {
@@ -58,13 +53,9 @@ export const getNotifications = async (filters: NotificationFilters = {}, userId
 };
 
 /**
- * Mark notification as read (individual notification)
- * Note: Your backend doesn't have individual mark as read, so we'll use the bulk endpoint
  */
 export const markNotificationAsRead = async (): Promise<void> => {
   try {
-    // Since your backend only has bulk read, we'll call the bulk endpoint
-    // You might want to add individual read endpoint to your backend
     await axiosInstance.put('/notification/readAllNotifications');
   } catch (error) {
     console.error('Error marking notification as read:', error);
@@ -86,12 +77,9 @@ export const markAllNotificationsAsRead = async (): Promise<void> => {
 
 /**
  * Delete notification (not available in your backend)
- * This is a placeholder - you might want to add this endpoint to your backend
  */
 export const deleteNotification = async (): Promise<void> => {
   try {
-    // Your backend doesn't have delete endpoint
-    // For now, we'll just mark all as read
     await axiosInstance.put('/notification/readAllNotifications');
     console.warn('Delete notification not implemented in backend, marking as read instead');
   } catch (error) {
@@ -115,7 +103,6 @@ export const getUnreadNotificationCount = async (): Promise<number> => {
 
 /**
  * Clear all read notifications (not available in your backend)
- * This is a placeholder - you might want to add this endpoint to your backend
  */
 export const clearReadNotifications = async (): Promise<void> => {
   try {

@@ -24,6 +24,7 @@ import { useMessageStore } from "@/store/messageStore";
 import { CreateConversationData, CreateMessageData } from "@/types/message";
 import { ErrorToast, SuccessToast } from "@/components/ui/Toast";
 import clientLogger from "@/utils/logger";
+import { useOnlineStatusIndicator } from "@/hooks/socket/useSocketOnlineUsers";
 
 export default function UserProfilePage() {
     const router = useRouter();
@@ -45,6 +46,9 @@ export default function UserProfilePage() {
 
     // Use the hook to fetch user data and gigsmutateReviews
     const { user, userGigs, isLoading, isError } = useSingleUserSeeker(userId);
+
+      // Online status for other user
+      const { isOnline: isOtherUserOnline } = useOnlineStatusIndicator(userId || '');
 
     // Message store for handling conversations and messages
     const {
@@ -279,13 +283,15 @@ export default function UserProfilePage() {
                                             This may not be the exact location. It could be the nearest place to where the user is located.
                                         </span>
                                     </div>
-
-
-
-                                    <div className="inline-block border border-primary rounded-lg px-3 sm:px-4 py-2">
-                                        <span className="text-gray-700 font-medium text-sm sm:text-base">
-                                            Level {user.mileStone} Seller
-                                        </span>
+                                    <div>
+                                        <div className="flex items-center justify-center sm:justify-start lg:justify-start gap-1 mb-3">
+                                            <span className={`text-gray-700 borderborder-black text-sm py-2 flex gap-x-2 px-4 rounded-md sm:text-base `}>
+                                                User is
+                                                <span className="font-semibold">
+                                                    {isOtherUserOnline ? <span className="text-green-500">Online</span> : <span className="text-red-500">Offline</span>}
+                                                </span>
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -295,11 +301,10 @@ export default function UserProfilePage() {
                         <div className="flex sm:flex-row lg:flex-row items-stretch sm:items-center justify-between px-4 lg:px-0 lg:justify-between gap-3 sm:gap-2 lg:gap-2 mb-4 sm:mb-6">
                             <button
                                 onClick={handleMessagePress}
-                                className={`flex items-center justify-center gap-2 text-white px-4 sm:px-6 lg:px-10 py-3 sm:py-2 rounded-md font-semibold transition-colors ${
-                                    isCurrentUserVerified && !isCreatingConversation
+                                className={`flex items-center justify-center gap-2 text-white px-4 sm:px-6 lg:px-10 py-3 sm:py-2 rounded-md font-semibold transition-colors ${isCurrentUserVerified && !isCreatingConversation
                                         ? "bg-primary hover:bg-primary/90"
                                         : "bg-gray-400 cursor-not-allowed"
-                                }`}
+                                    }`}
                                 disabled={!isCurrentUserVerified || isCreatingConversation}
                             >
                                 {isCreatingConversation ? (

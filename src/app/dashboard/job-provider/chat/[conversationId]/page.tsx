@@ -11,6 +11,8 @@ import { CreateMessageData } from '@/types/message';
 import { ErrorToast, SuccessToast } from '@/components/ui/Toast';
 import clientLogger from '@/utils/logger';
 import Link from 'next/link';
+import { useSocketMessages } from '@/hooks/socket/useSocketMessages';
+import { useOnlineStatusIndicator } from '@/hooks/socket/useSocketOnlineUsers';
 
 export default function ConversationPageProvider() {
     const router = useRouter();
@@ -30,12 +32,28 @@ export default function ConversationPageProvider() {
     const [newMessage, setNewMessage] = useState('');
     const [isSending, setIsSending] = useState(false);
 
+    // Socket.IO integration
+    const { sendSocketMessage, markAsRead: socketMarkAsRead, isConnected } = useSocketMessages({
+        conversationId,
+        onMessageReceived: () => {
+            // Refresh messages when new message received
+            mutate();
+        }
+    });
+
+    // Online status for other user
+    const { isOnline: isOtherUserOnline, getStatusClasses } = useOnlineStatusIndicator(otherUser?._id || '');
+
     // Mark messages as read when conversation opens
     useEffect(() => {
         if (conversationId && messages.length > 0) {
           markAsReadAction(conversationId);
+          // Also mark as read via socket for real-time updates
+          if (isConnected) {
+              socketMarkAsRead();
+          }
         }
-    }, [conversationId, messages.length, markAsReadAction]);
+    }, [conversationId, messages.length, markAsReadAction, isConnected, socketMarkAsRead]);
 
     // Auto-scroll to bottom when new messages arrive
     useEffect(() => {
@@ -65,6 +83,11 @@ export default function ConversationPageProvider() {
         try {
             const sentMessage = await createMessageAction(messageData);
             if (sentMessage) {
+                // Send via Socket.IO for real-time delivery
+                if (isConnected && otherUser?._id) {
+                    sendSocketMessage(otherUser._id, messageText, conversationId);
+                }
+
                 // Refresh messages to get the latest
                 mutate();
                 SuccessToast('Message sent!');
@@ -79,7 +102,7 @@ export default function ConversationPageProvider() {
         } finally {
             setIsSending(false);
         }
-    }, [newMessage, user, otherUser, conversationId, createMessageAction, mutate]);
+    }, [newMessage, user, otherUser, conversationId, createMessageAction, mutate, isConnected, sendSocketMessage]);
 
     const formatTime = (dateString: string) => {
         const date = new Date(dateString);
@@ -149,13 +172,13 @@ export default function ConversationPageProvider() {
                                     height={40}
                                     className="w-10 h-10 rounded-full object-cover"
                                 />
-                                {/* Online status - can be implemented with Socket.IO later */}
-                                <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-gray-400 rounded-full border-2 border-white"></div>
+                                {/* Real-time online status */}
+                                <div className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-white ${getStatusClasses('bg-green-500', 'bg-gray-400')}`}></div>
                             </div>
                             <div>
                                 <h3 className="font-semibold text-gray-900 text-sm">{otherUser?.username || 'Loading...'}</h3>
                                 <p className="text-xs text-gray-500">
-                                    Last seen recently
+                                    {isOtherUserOnline ? 'Online' : 'Last seen recently'}
                                 </p>
                             </div>
                         </div>
@@ -163,10 +186,10 @@ export default function ConversationPageProvider() {
                     </div>
                     
                     <div className="flex items-center gap-1">
-                        <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                        <button className="p-2 hover:bg-gray-100 rounded-full transition-colors cursor-not-allowed">
                             <Phone size={18} className="text-gray-600" />
                         </button>
-                        <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                        <button className="p-2 hover:bg-gray-100 rounded-full transition-colors cursor-not-allowed">
                             <MoreVertical size={18} className="text-gray-600" />
                         </button>
                     </div>

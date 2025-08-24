@@ -4,6 +4,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import "./globals.css";
 import SWRProvider from '@/components/providers/SWRProvider';
+import { SocketProvider } from '@/contexts/SocketContext';
 import NextTopLoader from 'nextjs-toploader';
 
 const geistSans = Geist({
@@ -37,8 +38,10 @@ export default function RootLayout({
           shadow="0 0 10px #FF0000,0 0 5px #FF0000" 
         />
         <SWRProvider>
-          {children}
-          <ToastContainer />
+          <SocketProvider>
+            {children}
+            <ToastContainer />
+          </SocketProvider>
         </SWRProvider>
       </body>
     </html>

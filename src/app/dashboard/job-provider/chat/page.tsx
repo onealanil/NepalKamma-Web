@@ -12,6 +12,8 @@ import { getLastMessage } from '@/lib/message/message-api';
 import { ConversationI, MessageI } from '@/types/message';
 import { ErrorToast } from '@/components/ui/Toast';
 import clientLogger from '@/utils/logger';
+import { useSocketConversations } from '@/hooks/socket/useSocketMessages';
+import { useSocketOnlineUsers } from '@/hooks/socket/useSocketOnlineUsers';
 
 interface ConversationWithLastMessage extends ConversationI {
   lastMessage?: MessageI;
@@ -25,6 +27,40 @@ export default function ChatPageProvider() {
 
   const [conversationsWithLastMessage, setConversationsWithLastMessage] = useState<ConversationWithLastMessage[]>([]);
   const [isLoadingLastMessages, setIsLoadingLastMessages] = useState(false);
+
+  // Socket.IO integration with real-time last message updates
+  useSocketConversations((conversationId, message) => {
+    // Update the last message in real-time when a new message is received
+    setConversationsWithLastMessage(prev =>
+      prev.map(conversation => {
+        if (conversation._id === conversationId) {
+          const newLastMessage: MessageI = {
+            _id: message.conversationId + '_' + Date.now(), // Temporary ID
+            msg: message.message,
+            senderId: message.sender,
+            recipientId: message.receiver,
+            conversationId: message.conversationId,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            isRead: message.sender === user?._id, // Mark as read if current user sent it
+          };
+
+          return {
+            ...conversation,
+            lastMessage: newLastMessage
+          };
+        }
+        return conversation;
+      }).sort((a, b) => {
+        // Re-sort by last message time (most recent first)
+        const aTime = a.lastMessage?.createdAt ? new Date(a.lastMessage.createdAt).getTime() : 0;
+        const bTime = b.lastMessage?.createdAt ? new Date(b.lastMessage.createdAt).getTime() : 0;
+        return bTime - aTime;
+      })
+    );
+  });
+
+  const { getUserOnlineStatus } = useSocketOnlineUsers();
 
   // Fetch last messages for each conversation
   const fetchLastMessages = useCallback(async () => {
@@ -153,8 +189,10 @@ export default function ChatPageProvider() {
                         height={64}
                         className="w-16 h-16 rounded-full object-cover"
                       />
-                      {/* Online status - you can implement this with Socket.IO later */}
-                      <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-gray-400 rounded-full border-2 border-white"></div>
+                      {/* Real-time online status */}
+                      <div className={`absolute -bottom-1 -right-1 w-5 h-5 rounded-full border-2 border-white ${
+                        getUserOnlineStatus(otherUser?._id || '') ? 'bg-green-500' : 'bg-gray-400'
+                      }`}></div>
                     </div>
                     <span className="mt-2 text-xs font-semibold text-black text-center max-w-[60px] truncate">
                       {otherUser?.username || 'Unknown'}

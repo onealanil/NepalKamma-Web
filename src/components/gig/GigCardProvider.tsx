@@ -114,7 +114,7 @@ export const GigCardProvider = ({
                 View Details
               </button>
             </div>
-          </div>1
+          </div>
         </div>
       </div>
     </div>

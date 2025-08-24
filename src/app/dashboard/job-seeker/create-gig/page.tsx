@@ -18,6 +18,7 @@ import { gigSchema } from '@/types/schema/gigSchema';
 import { ZodError } from 'zod';
 import Loader from '@/components/global/Loader';
 import Image from 'next/image';
+import { useAuthStore } from '@/store/authStore';
 
 const initialValues: GigI = {
     title: '',
@@ -29,10 +30,14 @@ const initialValues: GigI = {
 const CreateGigPage = () => {
     const router = useRouter();
     const { isReady, isLoading } = useEnsureAuth();
+    const { user: loggedInUser } = useAuthStore();
     const { createGig } = useGigStore();
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
     const [images, setImages] = useState<File[]>([]);
     const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+
+    // Check if current user is verified
+    const isCurrentUserVerified = loggedInUser?.isDocumentVerified === "verified";
 
     /**
      * @function handleImageUpload
@@ -141,6 +146,22 @@ const CreateGigPage = () => {
 
                     {/* Main Content */}
                     <div className="lg:col-span-6 py-6">
+                        {/* Verification Notice for unverified users */}
+                        {!isCurrentUserVerified && (
+                            <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-3 sm:p-4 mb-4 sm:mb-6">
+                                <div className="flex items-start gap-2">
+                                    <div className="w-5 h-5 text-yellow-600 mt-0.5">⚠️</div>
+                                    <div>
+                                        <h4 className="font-semibold text-yellow-800 text-sm sm:text-base">
+                                            Verification Required
+                                        </h4>
+                                        <p className="text-yellow-700 text-xs sm:text-sm mt-1">
+                                            Verify your document to create your gig.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                         {/* Header */}
                         <div className="flex items-center gap-4 mb-6">
                             <button
@@ -282,7 +303,7 @@ const CreateGigPage = () => {
                                         <button
                                             type="button"
                                             onClick={() => handleSubmit()}
-                                            disabled={isSubmitting}
+                                            disabled={isSubmitting || !isCurrentUserVerified}
                                             className="w-full bg-primary text-white py-4 rounded-lg font-semibold hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-primary"
                                         >
                                             {isSubmitting ? (

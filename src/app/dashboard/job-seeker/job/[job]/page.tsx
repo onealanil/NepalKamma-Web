@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { X, MapPin, Star, Bookmark, BookmarkCheck, User } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
@@ -8,7 +8,6 @@ import LeftSideSeeker from "@/components/ui/LeftSideSeeker";
 import SafeHTML from "@/components/global/SafeHTML";
 import Image from "next/image";
 import { useSingleJob } from "@/hooks/jobs/useSingleJob";
-import { applyToJob } from "@/lib/job/job-api";
 import { useSavedJobs, useJobSaveStatus } from "@/hooks/jobs/useSavedJobs";
 import { ErrorToast, SuccessToast } from "@/components/ui/Toast";
 import ReviewCard from "@/components/review/ReviewCard";
@@ -18,6 +17,8 @@ import { usePaginatedReviews } from "@/hooks/review/useReviews";
 import { createReview } from "@/lib/review/review-api";
 import Link from "next/link";
 import clientLogger from "@/utils/logger";
+import { useMessageStore } from "@/store/messageStore";
+import { CreateConversationData, CreateMessageData } from "@/types/message";
 
 export default function SingleJobPage() {
   const router = useRouter();
@@ -25,6 +26,14 @@ export default function SingleJobPage() {
   const jobId = params.job as string;
   const { user: loggedInUser } = useAuthStore();
   const { job: jobData, isLoading, isError, mutate } = useSingleJob(jobId);
+
+  // Message store for handling conversations and messages
+  const {
+    createConversationAction,
+    createMessageAction,
+    error: messageError,
+    clearError: clearMessageError
+  } = useMessageStore();
 
   // Fetch paginated reviews for the job provider
   const {
@@ -52,11 +61,11 @@ export default function SingleJobPage() {
   // Use saved jobs store instead of local state
   const { isSaved: isPostSaved } = useJobSaveStatus(jobId);
   const [isLocationModalVisible, setIsLocationModalVisible] = useState(false);
-  const [isApplying, setIsApplying] = useState(false);
   const [isRating, setIsRating] = useState(false);
   const [rating, setRating] = useState(0);
   const [review, setReview] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isCreatingConversation, setIsCreatingConversation] = useState(false);
 
   useEffect(() => {
     if (!jobId) {
@@ -89,25 +98,73 @@ export default function SingleJobPage() {
   // Keep the same handler for both save and unsave
   const unsaveJobHandler = saveJobHandler;
 
-  const applyJobHandler = async () => {
-    if (!jobId) return;
+  // Send message handler function
+  const sendMessageHandler = useCallback(
+    async (conversationId: string) => {
+      if (!jobData?.title || !loggedInUser?.username || !jobData?.postedBy?._id) {
+        ErrorToast("Missing required information to send message");
+        return;
+      }
 
-    setIsApplying(true);
+      const messageData: CreateMessageData = {
+        conversationId,
+        msg: `Hello, I am interested in your job "${jobData.title}". Can we discuss more about it? My username is ${loggedInUser.username}.`,
+        recipientId: jobData.postedBy._id,
+      };
+
+      try {
+        const message = await createMessageAction(messageData);
+        if (message) {
+          SuccessToast("Message sent successfully!");
+          // Navigate to chat page
+          router.push(`/dashboard/job-seeker/chat/${conversationId}`);
+        } else {
+          ErrorToast(messageError || "Failed to send message");
+        }
+      } catch (error) {
+        ErrorToast("Failed to send message. Please try again.");
+        clientLogger.error("Send message error:", error);
+      } finally {
+        setIsCreatingConversation(false);
+      }
+    },
+    [jobData, loggedInUser, createMessageAction, messageError, router]
+  );
+
+  // Create conversation handler
+  const createConversationHandler = useCallback(async () => {
+    if (!loggedInUser?._id || !jobData?.postedBy?._id) {
+      ErrorToast("Missing user information");
+      return;
+    }
+
+    if (loggedInUser._id === jobData.postedBy._id) {
+      ErrorToast("You cannot message yourself");
+      return;
+    }
+
+    setIsCreatingConversation(true);
+    clearMessageError();
+
+    const conversationData: CreateConversationData = {
+      senderId: loggedInUser._id,
+      receiverId: jobData.postedBy._id,
+    };
+
     try {
-      const response = await applyToJob(jobId);
-      if (response.success) {
-        SuccessToast("Application submitted successfully!");
-        // Optionally redirect or update UI
+      const conversation = await createConversationAction(conversationData);
+      if (conversation) {
+        await sendMessageHandler(conversation._id);
       } else {
-        ErrorToast("Failed to apply to job. Please try again.");
+        ErrorToast(messageError || "Failed to create conversation");
+        setIsCreatingConversation(false);
       }
     } catch (error) {
-      ErrorToast("Failed to apply to job. Please try again.");
-      clientLogger.error("Failed to apply to job ", error);
-    } finally {
-      setIsApplying(false);
+      ErrorToast("Failed to create conversation. Please try again.");
+      clientLogger.error("Create conversation error:", error);
+      setIsCreatingConversation(false);
     }
-  };
+  }, [loggedInUser, jobData, createConversationAction, sendMessageHandler, messageError, clearMessageError]);
 
   const handleReviewSubmit = async () => {
     // Validate rating
@@ -446,11 +503,13 @@ export default function SingleJobPage() {
                   </h3>
                   <div className="flex flex-col sm:flex-row gap-4">
                     <button
-                      onClick={applyJobHandler}
-                      disabled={isApplying || !isCurrentUserVerified}
+                      onClick={createConversationHandler}
+                      disabled={isCreatingConversation || !isCurrentUserVerified || loggedInUser?._id === jobData?.postedBy?._id}
+
                       className="bg-primary text-white px-6 py-3 rounded-lg font-semibold transition-colors disabled:opacity-50"
                     >
-                      {isApplying ? "Applying..." : "Apply Now"}
+
+                      {isCreatingConversation ? "Applying..." : "Apply Now"}  
                     </button>
                     {jobData?.address?.coordinates && Array.isArray(jobData.address.coordinates) && jobData.address.coordinates[1] && jobData.address.coordinates[0] ? (
                       <Link
@@ -668,8 +727,8 @@ export default function SingleJobPage() {
                   <span className="font-medium text-red-500">
                     {jobData?.experiesIn
                       ? formatDistanceToNow(new Date(jobData.experiesIn), {
-                          addSuffix: true,
-                        })
+                        addSuffix: true,
+                      })
                       : "Not specified"
                     }
                   </span>

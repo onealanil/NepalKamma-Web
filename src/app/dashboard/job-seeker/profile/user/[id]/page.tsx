@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
 import {
   Star,
@@ -22,6 +22,10 @@ import { usePaginatedReviews } from "@/hooks/review/useReviews";
 import ReviewCard from "@/components/review/ReviewCard";
 import ReviewPagination from "@/components/review/ReviewPagination";
 import Image from "next/image";
+import { useMessageStore } from "@/store/messageStore";
+import { CreateConversationData, CreateMessageData } from "@/types/message";
+import { ErrorToast, SuccessToast } from "@/components/ui/Toast";
+import clientLogger from "@/utils/logger";
 
 export default function UserProfilePage() {
   const router = useRouter();
@@ -44,21 +48,98 @@ export default function UserProfilePage() {
   // Use the hook to fetch user data and jobs
   const { user, userJobs, isLoading, isError } = useSingleUserProvider(userId);
 
+  // Message store for handling conversations and messages
+  const {
+    createConversationAction,
+    createMessageAction,
+    error: messageError,
+    clearError: clearMessageError
+  } = useMessageStore();
+
   const [currentJobIndex, setCurrentJobIndex] = useState(0);
   const [moreModalVisible, setMoreModalVisible] = useState(false);
   const [callModalVisible, setCallModalVisible] = useState(false);
   const [selectedJob, setSelectedJob] = useState<JobI | null>(null);
   const [showJobModal, setShowJobModal] = useState(false);
+  const [isCreatingConversation, setIsCreatingConversation] = useState(false);
 
   // Check if current user is verified
   const isCurrentUserVerified = currentUser?.isDocumentVerified === "verified";
 
-  const handleMessagePress = () => {
-    if (!isCurrentUserVerified) {
-      alert("You need to be verified to send messages.");
+  // Send message handler function
+  const sendMessageHandler = useCallback(
+    async (conversationId: string) => {
+      if (!user?.username || !currentUser?.username || !user?._id) {
+        ErrorToast("Missing required information to send message");
+        return;
+      }
+
+      const messageData: CreateMessageData = {
+        conversationId,
+        msg: `Hello ${user.username}, I want to ask you something about your job. Can we discuss? My username is ${currentUser.username}.`,
+        recipientId: user._id,
+      };
+
+      try {
+        const message = await createMessageAction(messageData);
+        if (message) {
+          SuccessToast("Message sent successfully!");
+          // Navigate to chat page
+          router.push(`/dashboard/job-seeker/chat/${conversationId}`);
+        } else {
+          ErrorToast(messageError || "Failed to send message");
+        }
+      } catch (error) {
+        ErrorToast("Failed to send message. Please try again.");
+        clientLogger.error("Send message error:", error);
+      } finally {
+        setIsCreatingConversation(false);
+      }
+    },
+    [user, currentUser, createMessageAction, messageError, router]
+  );
+
+  // Create conversation handler
+  const createConversationHandler = useCallback(async () => {
+    if (!currentUser?._id || !user?._id) {
+      ErrorToast("Missing user information");
       return;
     }
-    router.push(`/dashboard/job-seeker/chat/${userId}`);
+
+    if (currentUser._id === user._id) {
+      ErrorToast("You cannot message yourself");
+      return;
+    }
+
+    setIsCreatingConversation(true);
+    clearMessageError();
+
+    const conversationData: CreateConversationData = {
+      senderId: currentUser._id,
+      receiverId: user._id,
+    };
+
+    try {
+      const conversation = await createConversationAction(conversationData);
+      if (conversation) {
+        await sendMessageHandler(conversation._id);
+      } else {
+        ErrorToast(messageError || "Failed to create conversation");
+        setIsCreatingConversation(false);
+      }
+    } catch (error) {
+      ErrorToast("Failed to create conversation. Please try again.");
+      clientLogger.error("Create conversation error:", error);
+      setIsCreatingConversation(false);
+    }
+  }, [currentUser, user, createConversationAction, sendMessageHandler, messageError, clearMessageError]);
+
+  const handleMessagePress = () => {
+    if (!isCurrentUserVerified) {
+      ErrorToast("You need to be verified to send messages.");
+      return;
+    }
+    createConversationHandler();
   };
 
   const handleCallPress = () => {
@@ -218,14 +299,21 @@ export default function UserProfilePage() {
             <div className="flex sm:flex-row lg:flex-row items-stretch sm:items-center justify-between px-4 lg:px-0 lg:justify-between gap-3 sm:gap-2 lg:gap-2 mb-4 sm:mb-6">
               <button
                 onClick={handleMessagePress}
-                className={`flex items-center justify-center gap-2 text-white px-4 sm:px-6 lg:px-10 py-3 sm:py-2 rounded-md font-semibold transition-colors ${isCurrentUserVerified
-                  ? "bg-primary hover:bg-primary/90"
-                  : "bg-gray-400 cursor-not-allowed"
-                  }`}
-                disabled={!isCurrentUserVerified}
+                className={`flex items-center justify-center gap-2 text-white px-4 sm:px-6 lg:px-10 py-3 sm:py-2 rounded-md font-semibold transition-colors ${
+                  isCurrentUserVerified && !isCreatingConversation
+                    ? "bg-primary hover:bg-primary/90"
+                    : "bg-gray-400 cursor-not-allowed"
+                }`}
+                disabled={!isCurrentUserVerified || isCreatingConversation}
               >
-                <MessageCircle size={17} />
-                <span className="text-sm sm:text-base">Message</span>
+                {isCreatingConversation ? (
+                  <div className="w-[17px] h-[17px] border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                ) : (
+                  <MessageCircle size={17} />
+                )}
+                <span className="text-sm sm:text-base">
+                  {isCreatingConversation ? "Sending..." : "Message"}
+                </span>
               </button>
 
               <button

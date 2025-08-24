@@ -1,9 +1,9 @@
 
 "use client";
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { ChevronLeft, ChevronRight, X, MapPin, Star, Send } from 'lucide-react';
+import { ChevronLeft, ChevronRight, X, MapPin, Star, Send, MessageCircle } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import LeftSideProvider from '@/components/ui/LeftSideProvider';
 import SafeHTML from '@/components/global/SafeHTML';
@@ -17,6 +17,8 @@ import { ErrorToast, SuccessToast } from '@/components/ui/Toast';
 import { createReview } from '@/lib/review/review-api';
 import Link from 'next/link';
 import logger from '@/utils/logger';
+import { useMessageStore } from '@/store/messageStore';
+import { CreateConversationData, CreateMessageData } from '@/types/message';
 
 const GigDetailPage = () => {
     // State management for all features
@@ -26,6 +28,7 @@ const GigDetailPage = () => {
     const [rating, setRating] = useState(0);
     const [review, setReview] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isCreatingConversation, setIsCreatingConversation] = useState(false);
 
     // Navigation using Next.js router
     const router = useRouter();
@@ -36,6 +39,14 @@ const GigDetailPage = () => {
     const { user: loggedInUser } = useAuthStore();
     // Fetch gig data using the hook
     const { gig: gigData, mutate, isLoading, isError } = useSingleGig(gigId);
+
+    // Message store for handling conversations and messages
+    const {
+        createConversationAction,
+        createMessageAction,
+        error: messageError,
+        clearError: clearMessageError
+    } = useMessageStore();
 
     // Fetch paginated reviews for the job provider
     const {
@@ -112,6 +123,74 @@ const GigDetailPage = () => {
             setIsSubmitting(false);
         }
     };
+
+    // Send message handler function
+    const sendMessageHandler = useCallback(
+        async (conversationId: string) => {
+            if (!gigData?.title || !loggedInUser?.username || !gigData?.postedBy?._id) {
+                ErrorToast("Missing required information to send message");
+                return;
+            }
+
+            const messageData: CreateMessageData = {
+                conversationId,
+                msg: `Hello, I am interested in hiring you for your gig "${gigData.title}". Can we discuss the details? My username is ${loggedInUser.username}.`,
+                recipientId: gigData.postedBy._id,
+            };
+
+            try {
+                const message = await createMessageAction(messageData);
+                if (message) {
+                    SuccessToast("Message sent successfully!");
+                    // Navigate to chat page
+                    router.push(`/dashboard/job-provider/chat/${conversationId}`);
+                } else {
+                    ErrorToast(messageError || "Failed to send message");
+                }
+            } catch (error) {
+                ErrorToast("Failed to send message. Please try again.");
+                logger.error("Send message error:", error);
+            } finally {
+                setIsCreatingConversation(false);
+            }
+        },
+        [gigData, loggedInUser, createMessageAction, messageError, router]
+    );
+
+    // Create conversation handler
+    const createConversationHandler = useCallback(async () => {
+        if (!loggedInUser?._id || !gigData?.postedBy?._id) {
+            ErrorToast("Missing user information");
+            return;
+        }
+
+        if (loggedInUser._id === gigData.postedBy._id) {
+            ErrorToast("You cannot message yourself");
+            return;
+        }
+
+        setIsCreatingConversation(true);
+        clearMessageError();
+
+        const conversationData: CreateConversationData = {
+            senderId: loggedInUser._id,
+            receiverId: gigData.postedBy._id,
+        };
+
+        try {
+            const conversation = await createConversationAction(conversationData);
+            if (conversation) {
+                await sendMessageHandler(conversation._id);
+            } else {
+                ErrorToast(messageError || "Failed to create conversation");
+                setIsCreatingConversation(false);
+            }
+        } catch (error) {
+            ErrorToast("Failed to create conversation. Please try again.");
+            logger.error("Create conversation error:", error);
+            setIsCreatingConversation(false);
+        }
+    }, [loggedInUser, gigData, createConversationAction, sendMessageHandler, messageError, clearMessageError]);
 
     if (isLoading) {
         return (
@@ -267,15 +346,15 @@ const GigDetailPage = () => {
                                 {/* Image Gallery */}
                                 {gigData && gigData.images && gigData.images.length > 0 && (
                                     <div className="space-y-4">
-                                        <div className="relative h-64 bg-gray-100 rounded-lg overflow-hidden">
+                                        <div className="relative h-45 bg-gray-100 rounded-lg overflow-hidden">
                                             <Image
                                                 src={gigData.images[currentImageIndex]?.url || ''}
                                                 alt={`Gig image ${currentImageIndex + 1}`}
-                                                width={1000}
-                                                height={400}
-                                                fill
-                                                className="object-cover"
+                                                width={600}
+                                                height={300}
+                                                className="w-full h-full object-cover"
                                             />
+                                        </div>
                                             {gigData.images.length > 1 && (
                                                 <>
                                                     <button
@@ -290,13 +369,12 @@ const GigDetailPage = () => {
                                                         onClick={() => setCurrentImageIndex(prev =>
                                                             prev === gigData.images!.length - 1 ? 0 : prev + 1
                                                         )}
-                                                        className="absolute left-[-2] top-1/2 transform -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
+                                                        className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
                                                     >
                                                         <ChevronRight size={20} />
                                                     </button>
                                                 </>
                                             )}
-                                        </div>
                                         <div className="text-center">
                                             <span className="text-sm text-gray-600">
                                                 Banner - {currentImageIndex + 1} of {gigData.images.length}
@@ -352,26 +430,24 @@ const GigDetailPage = () => {
                                     </p>
                                     <h3 className="text-xl font-bold text-gray-900 pt-4">For more Details</h3>
                                     <div className="flex flex-col sm:flex-row gap-4 pt-2">
-                                        {
-                                            gigData?.postedBy?._id ? (
-                                                <Link
-                                                    href={`/dashboard/job-provider/profile/user/${gigData.postedBy._id}
-                                                    
-                                                    `}
-                                                    className="bg-primary items-center justify-center flex disabled:opacity-50 text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors"
-                                                    aria-disabled={!isCurrentUserVerified}
-                                                >
-                                                    Contact Me
-                                                </Link>
-                                            ) : (
-                                                <button
-                                                    disabled={!isCurrentUserVerified}
-                                                    className="bg-primary disabled:opacity-50 text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors"
-                                                >
-                                                    Contact Me
-                                                </button>
-                                            )
-                                        }
+                                        <button
+                                            onClick={createConversationHandler}
+                                            disabled={isCreatingConversation || !isCurrentUserVerified || loggedInUser?._id === gigData?.postedBy?._id}
+                                            className="bg-green-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors disabled:opacity-50 hover:bg-green-700 flex items-center justify-center gap-2"
+                                        >
+                                            <MessageCircle size={20} />
+                                            {isCreatingConversation ? "Sending..." : "Contact Me"}
+                                        </button>
+
+                                        {gigData?.postedBy?._id && (
+                                            <Link
+                                                href={`/dashboard/job-provider/profile/user/${gigData.postedBy._id}`}
+                                                className="bg-primary items-center justify-center flex disabled:opacity-50 text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors"
+                                                aria-disabled={!isCurrentUserVerified}
+                                            >
+                                                View Profile
+                                            </Link>
+                                        )}
 
                                         <button
                                             onClick={() => setShowLocationModal(true)}
@@ -574,28 +650,24 @@ const GigDetailPage = () => {
                             </div>
 
                             <div className="mt-6 space-y-3">
-                                {
-                                    gigData?.postedBy?._id ? (
-                                        <Link href={`/dashboard/job-provider/profile/user/${gigData?.postedBy._id}`}
-                                            className="w-full disabled:opacity-50 bg-primary text-white py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
-                                            aria-disabled={!isCurrentUserVerified}
-                                        >
-                                            <Send size={20} />
+                                <button
+                                    onClick={createConversationHandler}
+                                    disabled={isCreatingConversation || !isCurrentUserVerified || loggedInUser?._id === gigData?.postedBy?._id}
+                                    className="w-full disabled:opacity-50 bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
+                                >
+                                    <MessageCircle size={20} />
+                                    {isCreatingConversation ? "Sending Message..." : "Contact Seller"}
+                                </button>
 
-                                            Contanct Seller
-                                        </Link>
-                                    ) : (
-                                        <button
-
-                                            disabled={!isCurrentUserVerified}
-                                            className="w-full disabled:opacity-50 bg-primary text-white py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
-                                        >
-                                            <Send size={20} />
-                                            Contact Seller Not available
-                                        </button>
-
-                                    )
-                                }
+                                {gigData?.postedBy?._id && (
+                                    <Link
+                                        href={`/dashboard/job-provider/profile/user/${gigData.postedBy._id}`}
+                                        className="w-full bg-primary text-white py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
+                                    >
+                                        <Send size={20} />
+                                        View Profile
+                                    </Link>
+                                )}
                             </div>
                         </div>
                     </div>

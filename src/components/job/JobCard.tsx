@@ -107,7 +107,9 @@ export default function JobCard({ job, onDelete, onView }: JobCardProps) {
 
                             )
                         }
-                        <button
+                        {
+                            (job.job_status === "Pending" || job.job_status === "Paid") && (
+                             <button
                             onClick={() => {
                                 if (job._id) onDelete(job);
                             }}
@@ -115,6 +117,8 @@ export default function JobCard({ job, onDelete, onView }: JobCardProps) {
                         >
                             <Trash2 className="w-4 h-4 text-red-600" />
                         </button>
+                            )
+                        }
                     </div>
                 </div>
             </div>

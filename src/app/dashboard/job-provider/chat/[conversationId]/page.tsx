@@ -12,12 +12,12 @@ import { ErrorToast, SuccessToast } from '@/components/ui/Toast';
 import clientLogger from '@/utils/logger';
 import Link from 'next/link';
 
-export default function ConversationPage() {
+export default function ConversationPageProvider() {
     const router = useRouter();
     const params = useParams();
     const conversationId = params.conversationId as string;
     const messagesEndRef = useRef<HTMLDivElement>(null);
-
+    
     const { user } = useAuthStore();
     const { messages: rawMessages, otherUser, isLoading, isError, mutate } = useMessages(conversationId);
     const { createMessageAction, markAsReadAction, isLoading: isSendingMessage } = useMessageStore();
@@ -26,14 +26,14 @@ export default function ConversationPage() {
     const messages = rawMessages.sort((a, b) =>
         new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
     );
-
+    
     const [newMessage, setNewMessage] = useState('');
     const [isSending, setIsSending] = useState(false);
 
     // Mark messages as read when conversation opens
     useEffect(() => {
         if (conversationId && messages.length > 0) {
-            markAsReadAction(conversationId);
+          markAsReadAction(conversationId);
         }
     }, [conversationId, messages.length, markAsReadAction]);
 
@@ -83,10 +83,10 @@ export default function ConversationPage() {
 
     const formatTime = (dateString: string) => {
         const date = new Date(dateString);
-        return date.toLocaleTimeString('en-US', {
-            hour: '2-digit',
+        return date.toLocaleTimeString('en-US', { 
+            hour: '2-digit', 
             minute: '2-digit',
-            hour12: true
+            hour12: true 
         });
     };
 
@@ -101,9 +101,9 @@ export default function ConversationPage() {
         } else if (date.toDateString() === yesterday.toDateString()) {
             return 'Yesterday';
         } else {
-            return date.toLocaleDateString('en-US', {
-                month: 'short',
-                day: 'numeric'
+            return date.toLocaleDateString('en-US', { 
+                month: 'short', 
+                day: 'numeric' 
             });
         }
     };
@@ -114,7 +114,7 @@ export default function ConversationPage() {
             <div className="min-h-screen flex items-center justify-center">
                 <div className="text-center">
                     <p className="text-red-500 font-semibold mb-4">Failed to load conversation</p>
-                    <button
+                    <button 
                         onClick={() => mutate()}
                         className="bg-primary text-white px-4 py-2 rounded-lg"
                     >
@@ -129,40 +129,39 @@ export default function ConversationPage() {
         <div className="min-h-screen flex items-center justify-center p-4 bg-gray-50">
             {/* Main Container */}
             <div className="w-full max-w-md lg:max-w-2xl bg-white rounded-2xl shadow-lg overflow-hidden flex flex-col h-[90vh] lg:h-[95vh]">
-
+                
                 {/* Header */}
                 <div className="border-b border-gray-200 px-6 py-4 flex items-center justify-between flex-shrink-0">
                     <div className="flex items-center gap-3">
-                        <button
+                        <button 
                             onClick={() => router.back()}
                             className="p-2 hover:bg-gray-100 rounded-full transition-colors"
                         >
                             <ChevronLeft size={20} className="text-gray-600" />
                         </button>
-
-                        <Link href={`/dashboard/job-seeker/profile/user/${otherUser?._id}`}>
-                            <div className="flex items-center gap-3 cursor-pointer">
-                                <div className="relative">
-                                    <Image
-                                        src={otherUser?.profilePic?.url || 'https://picsum.photos/100/100'}
-                                        alt={otherUser?.username || "User"}
-                                        width={40}
-                                        height={40}
-                                        className="w-10 h-10 rounded-full object-cover"
-                                    />
-                                    {/* Online status - can be implemented with Socket.IO later */}
-                                    <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-gray-400 rounded-full border-2 border-white"></div>
-                                </div>
-                                <div>
-                                    <h3 className="font-semibold text-gray-900 text-sm">{otherUser?.username || 'Loading...'}</h3>
-                                    <p className="text-xs text-gray-500">
-                                        Last seen recently
-                                    </p>
-                                </div>
+                        <Link href={`/dashboard/job-provider/profile/user/${otherUser?._id}`}>
+                        <div className="flex items-center gap-3 cursor-pointer">
+                            <div className="relative">
+                                <Image
+                                    src={otherUser?.profilePic?.url || 'https://picsum.photos/100/100'}
+                                    alt={otherUser?.username || "User"}
+                                    width={40}
+                                    height={40}
+                                    className="w-10 h-10 rounded-full object-cover"
+                                />
+                                {/* Online status - can be implemented with Socket.IO later */}
+                                <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-gray-400 rounded-full border-2 border-white"></div>
                             </div>
+                            <div>
+                                <h3 className="font-semibold text-gray-900 text-sm">{otherUser?.username || 'Loading...'}</h3>
+                                <p className="text-xs text-gray-500">
+                                    Last seen recently
+                                </p>
+                            </div>
+                        </div>
                         </Link>
                     </div>
-
+                    
                     <div className="flex items-center gap-1">
                         <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
                             <Phone size={18} className="text-gray-600" />
@@ -192,12 +191,12 @@ export default function ConversationPage() {
                     ) : (
                         <div className="space-y-4">
                             {messages.map((message, index) => {
-                                const isCurrentUser = typeof message.senderId === 'string'
-                                    ? message.senderId === user?._id
+                                const isCurrentUser = typeof message.senderId === 'string' 
+                                    ? message.senderId === user?._id 
                                     : message.senderId._id === user?._id;
-                                const showDate = index === 0 ||
+                                const showDate = index === 0 || 
                                     formatDate(messages[index - 1].createdAt) !== formatDate(message.createdAt);
-
+                                
                                 return (
                                     <div key={message._id}>
                                         {showDate && (
@@ -207,14 +206,15 @@ export default function ConversationPage() {
                                                 </span>
                                             </div>
                                         )}
-
+                                        
                                         <div className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'}`}>
                                             <div className={`max-w-[80%] ${isCurrentUser ? 'order-2' : 'order-1'}`}>
                                                 <div
-                                                    className={`px-4 py-3 rounded-2xl shadow-sm ${isCurrentUser
+                                                    className={`px-4 py-3 rounded-2xl shadow-sm ${
+                                                        isCurrentUser
                                                             ? 'bg-primary text-white rounded-br-md'
                                                             : 'bg-white text-gray-900 rounded-bl-md border border-gray-100'
-                                                        }`}
+                                                    }`}
                                                 >
                                                     <p className="text-sm leading-relaxed">{message.msg}</p>
                                                 </div>
@@ -253,14 +253,15 @@ export default function ConversationPage() {
                                 disabled={isSending || isSendingMessage}
                             />
                         </div>
-
-                        <button
+                        
+                        <button 
                             onClick={handleSendMessage}
                             disabled={!newMessage.trim() || isSending || isSendingMessage}
-                            className={`p-3 rounded-full transition-colors flex-shrink-0 ${newMessage.trim() && !isSending && !isSendingMessage
-                                    ? 'bg-primary hover:bg-primary/90 text-white shadow-md'
+                            className={`p-3 rounded-full transition-colors flex-shrink-0 ${
+                                newMessage.trim() && !isSending && !isSendingMessage
+                                    ? 'bg-primary hover:bg-primary/90 text-white shadow-md' 
                                     : 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                                }`}
+                            }`}
                         >
                             {isSending || isSendingMessage ? (
                                 <div className="w-[18px] h-[18px] border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>

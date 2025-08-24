@@ -132,7 +132,7 @@ export default function MyReviewPage() {
                                                 No review found
                                             </p>
                                             <button
-                                                onClick={() => router.push('/dashboard/job-seeker/explore')}
+                                                onClick={() => router.push('/dashboard/job-provider/explore')}
                                                 className="bg-primary text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors"
                                             >
                                                 Find freelancers to Get Reviews

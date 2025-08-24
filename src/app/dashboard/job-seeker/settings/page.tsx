@@ -4,25 +4,8 @@ import { useState } from 'react';
 import debounce from 'lodash.debounce';
 import clientLogger from '@/utils/logger';
 import { ErrorToast } from '@/components/ui/Toast';
+import { GeoapifyResponse, Place } from '@/types/settings/setting';
 
-interface Geometry {
-  coordinates: number[];
-  type: string;
-}
-
-interface Place {
-  geometry: Geometry;
-  properties: {
-    city: string;
-    country: string;
-    formatted?: string;
-  };
-  type: string;
-}
-
-interface GeoapifyResponse {
-  features: Place[];
-}
 
 const GeoLocation = () => {
   const [suggestions, setSuggestions] = useState<Place[]>([]);

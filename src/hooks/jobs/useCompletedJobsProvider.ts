@@ -1,5 +1,6 @@
 import useSWR from "swr";
 import { fetchCompletedJobsProvider } from "@/lib/job/job-api";
+import { JobI } from "@/types/job";
 
 /**
  * @function useCompletedJobsProvider
@@ -7,11 +8,11 @@ import { fetchCompletedJobsProvider } from "@/lib/job/job-api";
  * @description: Hook for fetching completed jobs for the job provider
  */
 export const useCompletedJobsProvider = () => {
-    const { data, error, isLoading, mutate } = useSWR(
+    const { data, error, isLoading, mutate } = useSWR<JobI[]>(
         '/job/completedJobs',
-        async () => {
+        async (): Promise<JobI[]> => {
             const response = await fetchCompletedJobsProvider();
-            return response.success ? response.data : [];
+            return response.success ? (response.data as JobI[]) : [];
         },
         {
             revalidateOnFocus: false,
@@ -20,7 +21,7 @@ export const useCompletedJobsProvider = () => {
             errorRetryInterval: 5000
         }
     );
-
+    
     return {
         jobs: data || [],
         isLoading,

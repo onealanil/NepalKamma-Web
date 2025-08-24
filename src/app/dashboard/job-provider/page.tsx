@@ -135,7 +135,7 @@ function JobProviderDashboard() {
                                             </Link>
                                         </div>
                                     ) : (
-                                        <div className="space-y-4">
+                                        <div className="space-y-4 ">
                                             {currentGigs.map((gig: GigI) => (
                                                 <Link
                                                     key={gig._id}

@@ -25,6 +25,11 @@ export const useSavedJobs = () => {
    */
   const toggleSaveJob = async (job: JobI): Promise<boolean> => {
     const jobId = job._id;
+
+    if (!jobId) {
+      return false; // Can't save/unsave a job without an ID
+    }
+
     const isCurrentlySaved = isSaved(jobId);
 
     if (isCurrentlySaved) {
@@ -56,6 +61,10 @@ export const useSavedJobs = () => {
    * Save a job with optimistic updates
    */
   const saveJob = async (job: JobI): Promise<boolean> => {
+    if (!job._id) {
+      return false; // Can't save a job without an ID
+    }
+
     if (isSaved(job._id)) {
       return true; // Already saved
     }
@@ -63,7 +72,7 @@ export const useSavedJobs = () => {
     // Optimistic update
     addJobOptimistic(job);
     const success = await saveJobAction(job._id);
-    
+
     if (!success) {
       // Revert optimistic update if failed
       removeJobOptimistic(job._id);

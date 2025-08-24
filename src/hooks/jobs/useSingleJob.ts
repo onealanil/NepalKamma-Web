@@ -1,6 +1,7 @@
 
 import useSWR from "swr";
 import { fetchJobById } from "@/lib/job/job-api";
+import { JobI } from "@/types/job";
 
 /**
  * @function useSingleJob
@@ -13,12 +14,14 @@ export const useSingleJob = (jobId?: string) => {
 
     const { data, error, isLoading, mutate: revalidate } = useSWR(
         key,
-        async () => {
+        async (): Promise<JobI | null> => {
             if (!jobId) return null;
             const response = await fetchJobById(jobId);
-            return response.success ? response.data : null;
+            // The API returns { success: true, data: { success: true, job: {...} } }
+            // So we need to access response.data.job
+            return response.success ? (response.data as { job: JobI }).job : null;
         },
-        { 
+        {
             revalidateOnFocus: false,
             refreshInterval: 0, // Don't auto-refresh job details
             errorRetryCount: 3,
@@ -27,7 +30,7 @@ export const useSingleJob = (jobId?: string) => {
     );
 
     return {
-        job: data?.job || null,
+        job: data || null,
         isLoading,
         isError: !!error,
         mutate: revalidate,

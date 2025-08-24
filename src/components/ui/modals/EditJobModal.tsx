@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 import { JobI } from '@/types/job';
-import { User } from '@/types/user';
+import { SearchUserData, User } from '@/types/user';
 import { FaUserTie } from 'react-icons/fa';
 import { ErrorToast } from '../Toast';
 import { searchUser } from '@/lib/job/job-api';
@@ -36,7 +36,7 @@ export const EditJobModal = ({ isOpen, onClose, job, onSave }: Props) => {
         if (searchText === "") return ErrorToast("Please enter a username");
         setIsSearching(true);
 
-        const response = await searchUser(searchText);
+        const response = await searchUser(searchText) as SearchUserData;
         if (response.success && response.data?.user) {
             setSearchedUser(response.data.user);
         } else {

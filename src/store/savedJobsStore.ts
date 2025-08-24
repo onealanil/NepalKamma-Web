@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { saveJob, unsaveJob, getSavedJobs } from '@/lib/job/job-api';
 import { JobI } from '@/types/job';
+import clientLogger from '@/utils/logger';
 
 interface SavedJobsState {
   // State
@@ -72,6 +73,7 @@ export const useSavedJobsStore = create<SavedJobsState>()(
             }))
           }
           set({ isLoading: false, error: 'Failed to save job. Please try again.' });
+          clientLogger.error("Failed to saved job:", error);
           return false;
         }
       },
@@ -114,6 +116,7 @@ export const useSavedJobsStore = create<SavedJobsState>()(
             }));
           }
           set({ isLoading: false });
+          clientLogger.error("Failed to unsave job: ", error);
           return false;
         }
       },
@@ -133,10 +136,10 @@ export const useSavedJobsStore = create<SavedJobsState>()(
           const response = await getSavedJobs();
 
           if (response.success && response.data) {
-            const jobs = response.data.savedPosts || [];
+            const jobs = (response.data as { savedPosts?: JobI[] }).savedPosts || [];
 
             if (Array.isArray(jobs)) {
-              const jobIds = jobs.map((job: JobI) => job._id).filter(Boolean);
+              const jobIds = jobs.map((job: JobI) => job._id).filter(Boolean) as string[];
 
               set({
                 savedJobs: jobs,
@@ -167,6 +170,7 @@ export const useSavedJobsStore = create<SavedJobsState>()(
             isLoading: false,
             isFetching: false
           });
+          clientLogger.error("Failed to fetch saved jobs: ", error);
         }
       },
 

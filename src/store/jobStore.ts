@@ -1,4 +1,4 @@
-import { createJob, fetchNearbyJobs } from "@/lib/job/job-api";
+import { createJob } from "@/lib/job/job-api";
 import { ApiResponse } from "@/types/job-provider/job-api";
 import { JobI } from "@/types/job";
 import { create } from "zustand";

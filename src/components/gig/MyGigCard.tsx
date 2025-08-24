@@ -17,6 +17,8 @@ export const MyGigCard = ({ gig, onView, onDelete }: MyGigCardProps) => (
                     <Image
                         src={gig.postedBy?.profilePic.url}
                         alt={gig.title}
+                        width={64}
+                        height={64}
                         className="w-12 h-12 md:w-full md:h-full object-cover"
                     />
                 ) : (

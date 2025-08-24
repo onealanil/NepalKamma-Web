@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { MapPin, Navigation } from "lucide-react";
 import mapboxgl from "mapbox-gl";
 
@@ -21,6 +21,38 @@ type MapRouteProps = {
   routeWidth?: number;
 };
 
+// Mapbox Directions API response types
+interface MapboxGeometry {
+  type: "LineString";
+  coordinates: [number, number][];
+}
+
+interface MapboxRoute {
+  geometry: MapboxGeometry;
+  distance: number;
+  duration: number;
+  weight?: number;
+  weight_name?: string;
+  legs?: Array<{
+    distance: number;
+    duration: number;
+    summary?: string;
+    steps?: unknown[];
+  }>;
+}
+
+interface MapboxDirectionsResponse {
+  routes: MapboxRoute[];
+  waypoints?: Array<{
+    hint?: string;
+    distance?: number;
+    name?: string;
+    location?: [number, number];
+  }>;
+  code?: string;
+  message?: string;
+}
+
 export default function MapRoute({
   coordinates,
   showRoute = true,
@@ -28,37 +60,41 @@ export default function MapRoute({
   routeWidth = 4,
 }: MapRouteProps) {
   const { map } = useMap();
-  const [routeData, setRouteData] = useState<any>(null);
+  const [routeData, setRouteData] = useState<MapboxRoute | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Fetch route data from Mapbox Directions API
-  const fetchRoute = async (coords: Coordinate[]) => {
-    if (coords.length < 2) return;
+  const fetchRoute = useCallback(async (coords: Coordinate[]) => {
+  if (coords.length < 2) return;
 
-    setIsLoading(true);
-    try {
-      const coordinatesString = coords
-        .map((coord) => `${coord.longitude},${coord.latitude}`)
-        .join(";");
+  setIsLoading(true);
+  try {
+    const coordinatesString = coords
+      .map((coord) => `${coord.longitude},${coord.latitude}`)
+      .join(";");
 
-      const response = await fetch(
-        `https://api.mapbox.com/directions/v5/mapbox/driving/${coordinatesString}?geometries=geojson&access_token=${mapboxgl.accessToken}`
-      );
+    const response = await fetch(
+      `https://api.mapbox.com/directions/v5/mapbox/driving/${coordinatesString}?geometries=geojson&access_token=${mapboxgl.accessToken}`
+    );
 
-      if (!response.ok) {
-        throw new Error("Failed to fetch route");
-      }
+    if (!response.ok) throw new Error("Failed to fetch route");
 
-      const data = await response.json();
-      if (data.routes && data.routes.length > 0) {
-        setRouteData(data.routes[0]);
-      }
-    } catch (error) {
-      console.error("Error fetching route:", error);
-    } finally {
-      setIsLoading(false);
+    const data: MapboxDirectionsResponse = await response.json();
+    if (data.routes && data.routes.length > 0) {
+      setRouteData(data.routes[0]);
     }
-  };
+  } catch (error) {
+    console.error("Error fetching route:", error);
+  } finally {
+    setIsLoading(false);
+  }
+}, []); // \u2705 empty deps or include mapboxgl.accessToken if needed
+
+useEffect(() => {
+  if (coordinates.length >= 2 && showRoute) {
+    fetchRoute(coordinates);
+  }
+}, [coordinates, showRoute, fetchRoute]);
+
 
   // Add route to map
   useEffect(() => {
@@ -123,7 +159,7 @@ export default function MapRoute({
     if (coordinates.length >= 2 && showRoute) {
       fetchRoute(coordinates);
     }
-  }, [coordinates, showRoute]);
+  }, [coordinates, showRoute, fetchRoute]);
 
   // Fit map to show all markers
   useEffect(() => {
@@ -147,7 +183,7 @@ export default function MapRoute({
           key={coord.id}
           latitude={coord.latitude}
           longitude={coord.longitude}
-          data={{ ...coord, index }}
+          data={{ ...coord , index }}
         >
           <div className="relative">
             <div
@@ -233,4 +269,3 @@ export default function MapRoute({
     </>
   );
 }
-

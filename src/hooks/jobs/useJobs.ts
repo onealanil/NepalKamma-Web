@@ -1,5 +1,6 @@
 import useSWR from "swr";
 import { fetchUserJobs } from "@/lib/job/job-api";
+import { UserJobs } from "@/types/job";
 
 /**
  * @function useUserJobs
@@ -15,7 +16,7 @@ export const useUserJobs = (userId?: string) => {
         async () => {
             if (!userId) return null;
             const response = await fetchUserJobs(userId);
-            return response.success ? response.data : null;
+            return response.success ? (response.data as UserJobs) : null;
         },
         { revalidateOnFocus: false }
     );

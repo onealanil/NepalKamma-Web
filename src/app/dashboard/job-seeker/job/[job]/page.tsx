@@ -41,11 +41,11 @@ export default function SingleJobPage() {
   const canReviewProvider =
     (loggedInUser?.can_review &&
       jobData?.postedBy?._id &&
-      loggedInUser._id !== jobData.postedBy._id && // Prevent self-review
+      loggedInUser._id !== jobData?.postedBy?._id && // Prevent self-review
       loggedInUser.can_review?.some(
         (reviewItem) =>
           (reviewItem as { user: string; _id: string }).user ===
-          jobData.postedBy._id
+          jobData?.postedBy?._id
       )) ||
     false;
 
@@ -132,7 +132,7 @@ export default function SingleJobPage() {
     try {
       const reviewData = {
         reviewedBy: loggedInUser._id,
-        reviewedTo: jobData.postedBy._id,
+        reviewedTo: jobData?.postedBy?._id,
         review: review.trim(),
         rating: rating,
       };
@@ -257,22 +257,22 @@ export default function SingleJobPage() {
                 {/* Job Title */}
                 <div>
                   <h1 className="text-2xl font-bold text-gray-900">
-                    {jobData.title}
+                    {jobData?.title}
                   </h1>
                 </div>
 
                 {/* Provider Profile */}
                 <div className="flex items-center gap-4">
                   {
-                    jobData?.postedBy._id && (
+                    jobData?.postedBy?._id && (
                       <Link
-                        href={`/dashboard/job-seeker/profile/user/${jobData.postedBy._id}`}
+                        href={`/dashboard/job-seeker/profile/user/${jobData.postedBy?._id}`}
                         className="relative">
                         <div className="relative">
                           {jobData.postedBy?.profilePic?.url ? (
                             <Image
                               src={jobData.postedBy.profilePic.url}
-                              alt={jobData.postedBy.username}
+                              alt={jobData.postedBy?.username || "User"}
                               width={40}
                               height={40}
                               className="w-12 h-12 rounded-full object-cover"
@@ -297,7 +297,7 @@ export default function SingleJobPage() {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2 w-[70%]">
                         <h3 className="font-bold text-gray-900">
-                          {jobData.postedBy?.username}
+                          {jobData?.postedBy?.username}
                         </h3>
                         {canReviewProvider && (
                           <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-medium">
@@ -345,7 +345,7 @@ export default function SingleJobPage() {
                 {/* category start  */}
                 <div className="flex gap-x-3 lg:hidden">
                   <span className="text-black font-bold ">Category:</span>
-                  <span className="font-medium">{jobData.category}</span>
+                  <span className="font-medium">{jobData?.category}</span>
                 </div>
 
                 {/* category end  */}
@@ -356,7 +356,7 @@ export default function SingleJobPage() {
                     About this Job
                   </h2>
                   <div className="prose prose-sm max-w-none">
-                    <SafeHTML html={jobData.job_description} />
+                    <SafeHTML html={jobData?.job_description || ""} />
                   </div>
                 </div>
 
@@ -366,7 +366,7 @@ export default function SingleJobPage() {
                     Skills Required
                   </h3>
                   <div className="flex flex-wrap gap-2">
-                    {jobData.skills_required?.map(
+                    {jobData?.skills_required?.map(
                       (skill: string, index: number) => (
                         <span
                           key={index}
@@ -385,7 +385,7 @@ export default function SingleJobPage() {
                   <p className="text-gray-700">
                     Payment Starts from Rs.{" "}
                     <span className="font-bold text-gray-900">
-                      ₹{jobData.price.toLocaleString()}
+                      Rs.{jobData?.price}
                     </span>
                   </p>
                   <p className="text-red-500 text-sm font-semibold leading-relaxed">
@@ -401,15 +401,12 @@ export default function SingleJobPage() {
                     Payment Method
                   </h3>
                   <div className="flex flex-wrap gap-2">
-                    {jobData.payment_method?.map(
-                      (method: string, index: number) => (
-                        <span
-                          key={index}
-                          className="border border-primary text-gray-800 px-3 py-1 rounded-md text-sm font-medium"
-                        >
-                          {method}
-                        </span>
-                      )
+                    {jobData?.payment_method && (
+                      <span
+                        className="border border-primary text-gray-800 px-3 py-1 rounded-md text-sm font-medium"
+                      >
+                        {jobData?.payment_method}
+                      </span>
                     )}
                   </div>
                 </div>
@@ -417,7 +414,7 @@ export default function SingleJobPage() {
                 {/* location start */}
                 <div className="space-y-4">
                   <h3 className="text-lg font-bold text-gray-900">Location</h3>
-                  <span className="font-medium">{jobData.location}</span>
+                  <span className="font-medium">{jobData?.location}</span>
                   <div>
                     <span className='text-red-500 text-xs'>
                       This may not be the exact location. If you are near it, you can contact the job provider.
@@ -431,14 +428,14 @@ export default function SingleJobPage() {
                 <div className="lg:hidden flex gap-x-3">
                   <span className="font-bold text-black">Priority:</span>
                   <span
-                    className={`font-medium ${jobData.priority === "Urgent"
+                    className={`font-medium ${jobData?.priority === "Urgent"
                       ? "text-red-600"
-                      : jobData.priority === "Medium"
+                      : jobData?.priority === "Medium"
                         ? "text-yellow-600"
                         : "text-green-600"
                       }`}
                   >
-                    {jobData.priority}
+                    {jobData?.priority}
                   </span>
                 </div>
 
@@ -455,9 +452,9 @@ export default function SingleJobPage() {
                     >
                       {isApplying ? "Applying..." : "Apply Now"}
                     </button>
-                    {jobData?.address?.coordinates?.[1] && jobData?.address?.coordinates?.[0] ? (
+                    {jobData?.address?.coordinates && Array.isArray(jobData.address.coordinates) && jobData.address.coordinates[1] && jobData.address.coordinates[0] ? (
                       <Link
-                        href={`/dashboard/job-seeker/map?lat=${jobData.address.coordinates[1]}&lng=${jobData.address.coordinates[0]}`}
+                        href={`/dashboard/job-seeker/map?lat=${jobData?.address.coordinates[1]}&lng=${jobData.address.coordinates[0]}`}
                         className={`bg-primary text-white px-6 py-3 rounded-lg flex items-center justify-center font-semibold transition-colors ${!isCurrentUserVerified ? "pointer-events-none opacity-50" : "hover:bg-primary/90"
                           }`}
                         aria-disabled={!isCurrentUserVerified}
@@ -482,7 +479,10 @@ export default function SingleJobPage() {
                     Job will expire in
                   </span>
                   <span className="text-red-500 font-bold text-lg">
-                    {formatDistanceToNow(new Date(jobData.experiesIn))}
+                    {jobData?.experiesIn
+                      ? formatDistanceToNow(new Date(jobData.experiesIn))
+                      : "Not specified"
+                    }
                   </span>
                 </div>
 
@@ -651,52 +651,55 @@ export default function SingleJobPage() {
               <div className="space-y-3">
                 <div className="flex justify-between">
                   <span className="text-gray-600">Category:</span>
-                  <span className="font-medium">{jobData.category}</span>
+                  <span className="font-medium">{jobData?.category}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Budget:</span>
                   <span className="font-medium">
-                    ₹{jobData.price.toLocaleString()}
+                    ₹{jobData?.price?.toLocaleString() || "0"}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600 mr-5">Location:</span>
-                  <span className="font-medium">{jobData.location}</span>
+                  <span className="font-medium">{jobData?.location}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Expires:</span>
                   <span className="font-medium text-red-500">
-                    {formatDistanceToNow(new Date(jobData.experiesIn), {
-                      addSuffix: true,
-                    })}
+                    {jobData?.experiesIn
+                      ? formatDistanceToNow(new Date(jobData.experiesIn), {
+                          addSuffix: true,
+                        })
+                      : "Not specified"
+                    }
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Status:</span>
                   <span
-                    className={`font-medium ${jobData.job_status === "Pending"
+                    className={`font-medium ${jobData?.job_status === "Pending"
                       ? "text-yellow-600"
-                      : jobData.job_status === "In_Progress"
+                      : jobData?.job_status === "In_Progress"
                         ? "text-blue-600"
-                        : jobData.job_status === "Completed"
+                        : jobData?.job_status === "Completed"
                           ? "text-green-600"
                           : "text-gray-600"
                       }`}
                   >
-                    {jobData.job_status}
+                    {jobData?.job_status}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Priority:</span>
                   <span
-                    className={`font-medium ${jobData.priority === "Urgent"
+                    className={`font-medium ${jobData?.priority === "Urgent"
                       ? "text-red-600"
-                      : jobData.priority === "Medium"
+                      : jobData?.priority === "Medium"
                         ? "text-yellow-600"
                         : "text-green-600"
                       }`}
                   >
-                    {jobData.priority}
+                    {jobData?.priority}
                   </span>
                 </div>
                 <div className="flex justify-between">
@@ -728,7 +731,7 @@ export default function SingleJobPage() {
                 </button>
                 {
                   jobData?.postedBy?._id ? (
-                    <Link href={`/dashboard/job-seeker/profile/user/${jobData.postedBy._id}`}
+                    <Link href={`/dashboard/job-seeker/profile/user/${jobData.postedBy?._id}`}
                       className="w-full bg-primary text-white py-3 rounded-lg font-semibold hover:bg-primary/90 disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
                     >
                       <User size={20} />
@@ -767,7 +770,7 @@ export default function SingleJobPage() {
             <div className="space-y-4">
               <div className="flex items-center gap-2">
                 <MapPin size={20} className="text-primary" />
-                <span className="text-gray-700">{jobData.location}</span>
+                <span className="text-gray-700">{jobData?.location}</span>
               </div>
               <div className="h-48 bg-gray-200 rounded-lg flex items-center justify-center">
                 <p className="text-gray-500">Map integration coming soon</p>

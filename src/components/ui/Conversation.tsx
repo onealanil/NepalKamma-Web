@@ -38,6 +38,8 @@ export default function Conversation({ data, user, formatDistanceToNow, isLoadin
                 <Image
                     src={otherUser?.profilePic?.url || 'https://picsum.photos/100/100'}
                     alt={otherUser?.username}
+                    width={40}
+                    height={40}
                     className="w-14 h-14 rounded-full object-cover"
                 />
             </div>

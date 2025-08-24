@@ -3,6 +3,7 @@ import { GigI } from "@/types/gig";
 import axiosInstance from "../axios";
 import { handleApiError } from "../job/job-api";
 import { ApiResponse } from "@/types/job-provider/job-api";
+import clientLogger from "@/utils/logger";
 
 
 /**
@@ -22,6 +23,7 @@ export async function uploadGigImages(formData: FormData) {
     }
     catch (error: unknown) {
         ErrorToast("Something went wrong while uploading your images!")
+        clientLogger.error("Somethine went wrong while uploading your images, ", error);
     }
 }
 
@@ -40,6 +42,7 @@ export async function createGig(id: string, gig: GigI) {
     }
     catch (error: unknown) {
         ErrorToast("Something Went wrong while Creating your gig!");
+        clientLogger.error("Something went wrong while creating your gig: ", error)
     }
 }
 
@@ -56,6 +59,7 @@ export async function fetchUserGigs(id: string) {
     }
     catch (error: unknown) {
         ErrorToast("Something Went wrong while fetching your gigs!");
+        clientLogger.error("Something went wrong while fetching your gigs: ", error);
     }
 }
 
@@ -72,6 +76,7 @@ export async function deleteGig(id: string) {
     }
     catch (error: unknown) {
         ErrorToast("Something Went wrong while fetching your gigs!");
+        clientLogger.error("Somethign went wrong while fetching your gigs: ", error);
     }
 }
 
@@ -94,6 +99,7 @@ export async function fetchAllGigs(page: number = 1, limit: number = 10): Promis
             message: "Gigs fetched successfully"
         };
     } catch (error: unknown) {
+        clientLogger.error("Failed to fetch gigs: ", error);
         return handleApiError(error, "Failed to fetch gigs. Please try again.");
     }
 }
@@ -118,6 +124,7 @@ export async function fetchNearbyGigs(latitude: number, longitude: number): Prom
             message: "Nearby gigs fetched successfully"
         };
     } catch (error: unknown) {
+        clientLogger.error("Failed to fetch nearby gigs: ", error);
         return handleApiError(error, "Failed to fetch nearby gigs. Please try again.");
     }
 }

@@ -21,7 +21,7 @@ export default function Header() {
       await logOut();
     } catch (error: unknown) {
       ErrorToast("Logout API error");
-      clientLogger.error("Logout APi error")
+      clientLogger.error("Logout APi error", error)
     } finally {
       logout();
       useSavedJobsStore.getState().clearSavedJobs();

@@ -99,6 +99,8 @@ export const JobDetailsModal = ({
                     <Image
                       src={job.assignedTo.profilePic?.url || '/default-profile.png'}
                       alt={job.assignedTo.username}
+                      width={40}
+                      height={40}
                       className="w-10 h-10 rounded-full object-cover border-2 border-green-200"
                     />
                   </div>

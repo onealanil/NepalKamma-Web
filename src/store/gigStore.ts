@@ -10,7 +10,7 @@ interface GigStore {
  * @function useGigStore
  * @description Actions for gig operations
  */
-export const useGigStore = create<GigStore>((set) => ({
+export const useGigStore = create<GigStore>(() => ({
     createGig: async (id, gig) => {
         const response = await createGig(id, gig);
         return response;

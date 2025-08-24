@@ -151,6 +151,8 @@ export default function ConversationPage() {
                                 <Image
                                     src={otherUser?.profilePic?.url || 'https://picsum.photos/100/100'}
                                     alt={otherUser?.username || "message-image"}
+                                    width={40}
+                                    height={40}
                                     className="w-10 h-10 rounded-full object-cover"
                                 />
                                 {isOnline && (

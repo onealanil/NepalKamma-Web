@@ -150,6 +150,8 @@ export default function VerifyDocument() {
                             key={index}
                             src={doc?.url || ''}
                             alt={`Document ${index + 1}`}
+                            width={1000}
+                            height={400}
                             className="w-full h-32 object-cover rounded-lg border border-gray-200"
                         />
                     ))}
@@ -258,6 +260,8 @@ export default function VerifyDocument() {
                                         <Image
                                             src={URL.createObjectURL(image)}
                                             alt={`Document ${index + 1}`}
+                                            width={1000}
+                                            height={400}
                                             className="w-full h-32 object-cover rounded-lg border border-gray-200"
                                         />
                                         <button

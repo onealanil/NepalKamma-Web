@@ -21,7 +21,12 @@ const SaveJobButton: React.FC<SaveJobButtonProps> = ({
   showText = false
 }) => {
   const { toggleSaveJob } = useSavedJobs();
-  const { isSaved, isLoading } = useJobSaveStatus(job._id);
+  const { isSaved, isLoading } = useJobSaveStatus(job._id || '');
+
+  // Early return if job doesn't have an ID
+  if (!job._id) {
+    return null;
+  }
 
   const handleSaveToggle = async (e: React.MouseEvent) => {
     e.preventDefault();

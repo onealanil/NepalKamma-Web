@@ -51,10 +51,8 @@ export default function MapSearch() {
         const res = await fetch(
           `https://api.mapbox.com/search/searchbox/v1/suggest?q=${encodeURIComponent(
             debouncedQuery
-          )}&access_token=${
-            process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN
-          }&session_token=${
-            process.env.NEXT_PUBLIC_MAPBOX_SESSION_TOKEN
+          )}&access_token=${process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN
+          }&session_token=${process.env.NEXT_PUBLIC_MAPBOX_SESSION_TOKEN
           }&country=np&limit=5&proximity=87.2718,26.5586`
         );
 
@@ -198,8 +196,9 @@ export default function MapSearch() {
         </Command>
       </section>
 
-      {selectedLocations.map((location) => (
+      {selectedLocations.map((location, i) => (
         <LocationMarker
+          index={i}
           key={location.properties.mapbox_id}
           location={location}
           onHover={(data) => setSelectedLocation(data)}

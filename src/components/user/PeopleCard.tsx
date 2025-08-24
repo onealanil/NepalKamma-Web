@@ -13,6 +13,8 @@ const PeopleCard = ({ data }: { data: JobProviderI }) => (
                 <Image
                     src={data.profilePic?.url || 'https://picsum.photos/100/100'}
                     alt={data.username}
+                    width={40}
+                    height={40}
                     className="w-16 h-16 rounded-full object-cover"
                 />
                 {data.isVerified && (

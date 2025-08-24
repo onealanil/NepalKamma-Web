@@ -86,6 +86,8 @@ const MyGigsPage = () => {
                                 <Image
                                     src={gig.images[0].url}
                                     alt={gig.title}
+                                    width={1000}
+                                    height={400}
                                     className="w-full h-64 object-cover rounded-lg"
                                 />
                             </div>

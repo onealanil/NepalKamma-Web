@@ -42,7 +42,7 @@ export const useAuthInit = (skipAuthCheck = false) => {
           
         } catch (error) {
           useAuthStore.getState().logout();
-          clientLogger.error("Something went wrong");
+          clientLogger.error("Something went wrong" , error);
         }
       }
       

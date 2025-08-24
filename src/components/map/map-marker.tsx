@@ -1,16 +1,21 @@
-
 "use client";
-
 import mapboxgl, { MarkerOptions } from "mapbox-gl";
 import React, { useEffect, useRef } from "react";
-
 import { useMap } from "@/contexts/map-context";
-import { LocationFeature } from "@/lib/mapbox/utils";
+
+// Add a coordinate type that matches what you're actually using
+type CoordinateWithIndex = {
+  latitude: number;
+  longitude: number;
+  id: string;
+  name?: string;
+  index: number;
+};
 
 type Props = {
   longitude: number;
   latitude: number;
-  data: any;
+  data: CoordinateWithIndex;
   onHover?: ({
     isHovered,
     position,
@@ -20,7 +25,7 @@ type Props = {
     isHovered: boolean;
     position: { longitude: number; latitude: number };
     marker: mapboxgl.Marker;
-    data: LocationFeature;
+    data: CoordinateWithIndex; // Updated callback type too
   }) => void;
   onClick?: ({
     position,
@@ -29,7 +34,7 @@ type Props = {
   }: {
     position: { longitude: number; latitude: number };
     marker: mapboxgl.Marker;
-    data: LocationFeature;
+    data: CoordinateWithIndex; // Updated callback type too
   }) => void;
   children?: React.ReactNode;
 } & MarkerOptions;
@@ -45,32 +50,32 @@ export default function Marker({
 }: Props) {
   const { map } = useMap();
   const markerRef = useRef<HTMLDivElement | null>(null);
-  let marker: mapboxgl.Marker | null = null;
-
-  const handleHover = (isHovered: boolean) => {
-    if (onHover && marker) {
-      onHover({
-        isHovered,
-        position: { longitude, latitude },
-        marker,
-        data,
-      });
-    }
-  };
-
-  const handleClick = () => {
-    if (onClick && marker) {
-      onClick({
-        position: { longitude, latitude },
-        marker,
-        data,
-      });
-    }
-  };
+  const markerInstanceRef = useRef<mapboxgl.Marker | null>(null);
 
   useEffect(() => {
     const markerEl = markerRef.current;
     if (!map || !markerEl) return;
+
+    const handleHover = (isHovered: boolean) => {
+      if (onHover && markerInstanceRef.current) {
+        onHover({
+          isHovered,
+          position: { longitude, latitude },
+          marker: markerInstanceRef.current,
+          data,
+        });
+      }
+    };
+
+    const handleClick = () => {
+      if (onClick && markerInstanceRef.current) {
+        onClick({
+          position: { longitude, latitude },
+          marker: markerInstanceRef.current,
+          data,
+        });
+      }
+    };
 
     // Check if map is loaded and has a canvas container
     if (!map.getCanvasContainer()) {
@@ -78,7 +83,6 @@ export default function Marker({
       const onMapLoad = () => {
         createMarker();
       };
-
       if (map.loaded()) {
         createMarker();
       } else {
@@ -109,7 +113,7 @@ export default function Marker({
       };
 
       try {
-        marker = new mapboxgl.Marker(options)
+        markerInstanceRef.current = new mapboxgl.Marker(options)
           .setLngLat([longitude, latitude])
           .addTo(map);
       } catch (error) {
@@ -119,9 +123,10 @@ export default function Marker({
 
     return () => {
       // Cleanup on unmount
-      if (marker) {
+      if (markerInstanceRef.current) {
         try {
-          marker.remove();
+          markerInstanceRef.current.remove();
+          markerInstanceRef.current = null;
         } catch (error) {
           console.error('Error removing marker:', error);
         }
@@ -132,7 +137,7 @@ export default function Marker({
         markerEl.removeEventListener("click", handleClick);
       }
     };
-  }, [map, longitude, latitude, props]);
+  }, [map, longitude, latitude, data, onHover, onClick, props]);
 
   return (
     <div>

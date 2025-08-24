@@ -1,5 +1,6 @@
 import useSWR from "swr";
 import { fetchGigById } from "@/lib/gig/gig-api";
+import { GigI } from "@/types/gig";
 
 /**
  * @function useSingleGig
@@ -17,7 +18,7 @@ export const useSingleGig = (gigId?: string) => {
             const response = await fetchGigById(gigId);
             return response.success ? response.data : null;
         },
-        { 
+        {
             revalidateOnFocus: false,
             refreshInterval: 0, // Don't auto-refresh gig details
             errorRetryCount: 3,
@@ -26,8 +27,8 @@ export const useSingleGig = (gigId?: string) => {
     );
 
     return {
-        gig: data?.gig || null,
-        isLoading,
+        gig: (data as { gig?: GigI })?.gig || null,
+            isLoading,
         isError: !!error,
         mutate: revalidate,
     };

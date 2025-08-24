@@ -1,5 +1,6 @@
 import useSWR from "swr";
 import { fetchAllGigs } from "@/lib/gig/gig-api";
+import { PaginatedGigs } from "@/types/gig";
 
 /**
  * @function useAllGigs
@@ -13,7 +14,7 @@ export const useAllGigs = (page: number = 1, limit: number = 10) => {
         `/gig?page=${page}&limit=${limit}`,
         async () => {
             const response = await fetchAllGigs(page, limit);
-            return response.success ? response.data : null;
+            return response.success ? (response.data as PaginatedGigs) : null;
         },
         {
             revalidateOnFocus: false,

@@ -68,12 +68,12 @@ const PayModal: React.FC<PayModalProps> = ({
         try {
             // Create payment data with proper type safety
             const paymentData: PaymentI = {
-                paymentBy: job.postedBy._id,
-                paymentTo: job.assignedTo._id,
-                job: job._id,
+                paymentBy: job.postedBy?._id || '',
+                paymentTo: job.assignedTo?._id || '',
+                job: job._id || '',
                 amount: parseFloat(amount),
                 paymentMethod: 'cash',
-                receiverNumber: job.assignedTo.phoneNumber,
+                receiverNumber: job.assignedTo?.phoneNumber || '',
             };
             const response = await createPayment(paymentData);
             if (response.success) {

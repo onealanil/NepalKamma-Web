@@ -63,7 +63,7 @@ export default function MapStyles() {
     if (activeStyle === "dark-v11") {
       setTheme("dark");
     } else setTheme("light");
-  }, [map, activeStyle]);
+  }, [map, activeStyle, setTheme]);
 
   return (
     <aside className="absolute bottom-4 left-4 z-10">

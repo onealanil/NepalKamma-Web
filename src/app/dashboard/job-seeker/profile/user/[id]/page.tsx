@@ -147,6 +147,8 @@ export default function UserProfilePage() {
                       user.profilePic?.url || "https://picsum.photos/200/200"
                     }
                     alt={user.username}
+                    width={96}
+                    height={96}
                     className="w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover border-2 border-primary"
                   />
                 </div>

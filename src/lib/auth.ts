@@ -82,7 +82,7 @@ export const refreshAccessToken = async () => {
         useAuthStore.getState().setAccessToken(data.accessToken);
     } catch (error) {
         useAuthStore.getState().logout();
-        clientLogger.error("Something went wrong while refreshing token")
+        clientLogger.error("Something went wrong while refreshing token", error)
     }
 };
 

@@ -13,6 +13,7 @@ import { useEnsureAuth } from '@/hooks/useEnsureAuth';
 import { useUserGigs } from '@/hooks/gigs/useGigs';
 import Link from 'next/link';
 import Image from 'next/image';
+import clientLogger from '@/utils/logger';
 
 /**
  * @function ProfilePageSeeker
@@ -85,6 +86,7 @@ export default function ProfilePageSeeker() {
 
         } catch (error) {
             ErrorToast('Failed to update profile picture');
+            clientLogger.error("Failed to update profile picture ", error);
         } finally {
             setIsUploadingImage(false);
         }
@@ -309,6 +311,8 @@ export default function ProfilePageSeeker() {
                             <Image
                                 src={imagePreview}
                                 alt="Preview"
+                                width={96}
+                                height={96}
                                 className="w-24 h-24 rounded-full object-cover border-4 border-primary"
                             />
                         </div>

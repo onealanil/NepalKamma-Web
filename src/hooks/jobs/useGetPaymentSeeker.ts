@@ -1,6 +1,6 @@
 import { getPaymentByProvider } from "@/lib/payment/payment-api";
+import { CompletedJob } from "@/types/job-provider/CompletedJob";
 import useSWR from "swr";
-
 
 /**
  * @function useGetPaymentSeeker
@@ -12,7 +12,7 @@ export const useGetPaymentSeeker = () => {
         '/payment/getPaymentByProvider',
         async () => {
             const response = await getPaymentByProvider();
-            return response.success ? response.data : [];
+            return response.success ? (response.data as CompletedJob[]) : [];
         },
         {
             revalidateOnFocus: false,

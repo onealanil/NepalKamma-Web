@@ -1,5 +1,6 @@
 import useSWR from "swr";
 import { fetchRecentJobs } from "@/lib/job/job-api";
+import { JobI } from "@/types/job";
 
 /**
  * @function useMostRecent
@@ -11,7 +12,7 @@ export const useMostRecent = () => {
         '/job/getRecentJob',
         async () => {
             const response = await fetchRecentJobs();
-            return response.success ? response.data : [];
+            return response.success ? (response.data as JobI[]) : [];
         },
         {
             revalidateOnFocus: false,

@@ -1,5 +1,6 @@
 import useSWR from "swr";
 import { fetchAllJobs } from "@/lib/job/job-api";
+import { PaginatedJobs } from "@/types/job";
 
 /**
  * @function useAllJobs
@@ -15,7 +16,7 @@ export const useAllJobs = (page: number = 1, limit: number = 5) => {
         key,
         async () => {
             const response = await fetchAllJobs(page, limit);
-            return response.success ? response.data : null;
+            return response.success ? (response.data as PaginatedJobs) : null;
         },
         {
             revalidateOnFocus: false,

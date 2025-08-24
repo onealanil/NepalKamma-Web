@@ -21,7 +21,7 @@ export const GigCardProvider = ({
   onViewDetails,
   showActions = false,
 }: GigCardProviderProps) => (
-  <div className="rounded-xl p-4 md:p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+  <div className="rounded-xl p-4 mb-4 md:p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
     <div className="flex items-start gap-4">
       {/* Profile Picture */}
       <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl flex items-center justify-center overflow-hidden flex-shrink-0">

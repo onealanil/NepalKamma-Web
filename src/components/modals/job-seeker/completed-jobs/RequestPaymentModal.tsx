@@ -336,6 +336,8 @@ const RequestPaymentModal = ({
                                             <Image
                                                 src={preview}
                                                 alt={`Preview ${index + 1}`}
+                                                width={1000}
+                                                height={400}
                                                 className="w-24 h-32 object-cover rounded-lg border border-gray-200"
                                             />
                                         </div>

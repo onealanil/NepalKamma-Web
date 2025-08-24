@@ -1,7 +1,6 @@
 "use client";
 
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
 import Link from "next/link";
 import { Dictionary } from '@/types/dictionary/dictionary';
 
@@ -14,7 +13,6 @@ interface HeroProps {
  * @returns The hero section of the landing page. It includes a floating animation for the title, a call to action, and a unique image.
  */
 export default function Hero({ dict }: HeroProps) {
-  const router = useRouter();
 
   // Function to render title with colored keywords
   const renderTitle = (title: string) => {

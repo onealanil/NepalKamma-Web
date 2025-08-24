@@ -245,7 +245,7 @@ export default function ProfilePageProvider() {
                                                     ₹{jobs[currentJobIndex].price.toLocaleString()}
                                                 </span>
                                             </div>
-                                            <p className="text-gray-600 mb-3">{jobs[currentJobIndex].description}</p>
+                                            <p className="text-gray-600 mb-3">{jobs[currentJobIndex].job_description}</p>
                                             <div className="flex items-center justify-between">
                                                 <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">
                                                     {jobs[currentJobIndex].category}
@@ -291,6 +291,8 @@ export default function ProfilePageProvider() {
                             <Image
                                 src={imagePreview}
                                 alt="Preview"
+                                width={96}
+                                height={96}
                                 className="w-24 h-24 rounded-full object-cover border-4 border-primary"
                             />
                         </div>

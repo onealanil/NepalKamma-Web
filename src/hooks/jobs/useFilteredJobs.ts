@@ -2,6 +2,7 @@ import useSWR from "swr";
 import { searchJobs } from "@/lib/job/job-api";
 import { JobFilters } from "@/types/filters";
 import { useAuthStore } from "@/store/authStore";
+import { PaginatedJobs } from "@/types/job";
 
 /**
  * @function useSearchJobs
@@ -98,7 +99,7 @@ export const useSearchJobs = (
                 shouldUseLocation ? userLng : null
             );
 
-            return response.success ? response.data : null;
+            return response.success ? (response.data as PaginatedJobs) : null;
         },
         {
             revalidateOnFocus: false,

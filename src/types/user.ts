@@ -40,3 +40,12 @@ export interface User {
   userAccountStatus: 'Active' | 'Inactive' | string;
   averageRating?: number;
 }
+
+
+export interface SearchUserData {
+  success: boolean;
+  data?:{
+    user: User[];
+  }
+  error?: string
+}

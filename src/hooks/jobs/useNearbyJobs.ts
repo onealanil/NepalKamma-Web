@@ -1,6 +1,7 @@
 import useSWR from "swr";
 import { fetchNearbyJobs } from "@/lib/job/job-api";
 import { useEffect } from "react";
+import { JobI } from "@/types/job";
 
 /**
  * @function useNearbyJobs
@@ -23,7 +24,7 @@ export const useNearbyJobs = (
         async () => {
             if (!latitude || !longitude) return null;
             const response = await fetchNearbyJobs(latitude, longitude);
-            return response.success ? response.data : [];
+            return response.success ? (response.data as JobI[]) : [];
         },
         { 
             revalidateOnFocus: true,

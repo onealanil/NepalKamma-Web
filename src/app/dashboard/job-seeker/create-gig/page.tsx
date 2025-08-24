@@ -126,8 +126,8 @@ const CreateGigPage = () => {
         }
     };
 
-    if(isLoading){
-        return <Loader/>
+    if (isLoading) {
+        return <Loader />
     }
 
     return (
@@ -260,6 +260,8 @@ const CreateGigPage = () => {
                                                                 <Image
                                                                     src={preview}
                                                                     alt={`Preview ${index + 1}`}
+                                                                    width={1000}
+                                                                    height={400}
                                                                     className="w-24 h-24 object-cover rounded-lg"
                                                                 />
                                                                 <button

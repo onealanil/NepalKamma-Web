@@ -51,6 +51,8 @@ const NotificationCard = ({ item }: { item: Notification }) => {
                 <Image
                     src={item.image}
                     alt="Notification"
+                    width={64}
+                    height={64}
                     className="w-16 h-16 rounded-full object-cover"
                 />
                 <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-1">

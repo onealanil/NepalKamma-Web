@@ -57,7 +57,7 @@ const GigDetailPage = () => {
             loggedInUser.can_review?.some(
                 (reviewItem) =>
                     (reviewItem as { user: string; _id: string }).user ===
-                    gigData.postedBy._id
+                    gigData?.postedBy?._id
             )) ||
         false;
 
@@ -205,13 +205,13 @@ const GigDetailPage = () => {
                             <div className="p-6 space-y-6">
                                 {/* Gig Title */}
                                 <div>
-                                    <h1 className="text-2xl font-bold text-gray-900">I will do {gigData.title}</h1>
+                                    <h1 className="text-2xl font-bold text-gray-900">I will do {gigData?.title}</h1>
                                 </div>
 
                                 {/* Provider Profile */}
                                 <div className="flex items-center gap-4">
                                     {
-                                        gigData?.postedBy._id && (
+                                        gigData?.postedBy && gigData?.postedBy._id && (
                                             <Link
                                                 href={`/dashboard/job-provider/profile/user/${gigData.postedBy._id}`}
                                                 className='relative'
@@ -241,7 +241,7 @@ const GigDetailPage = () => {
 
                                     <div className="flex-1">
                                         <div className="flex items-center justify-between">
-                                            <h3 className="font-bold text-gray-900">{gigData.postedBy?.username}</h3>
+                                            <h3 className="font-bold text-gray-900">{gigData?.postedBy?.username}</h3>
                                             {canReviewProvider && (
                                                 <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-medium">
                                                     Can Review
@@ -265,12 +265,14 @@ const GigDetailPage = () => {
                                 </div>
 
                                 {/* Image Gallery */}
-                                {gigData.images && gigData.images.length > 0 && (
+                                {gigData && gigData.images && gigData.images.length > 0 && (
                                     <div className="space-y-4">
                                         <div className="relative h-64 bg-gray-100 rounded-lg overflow-hidden">
                                             <Image
                                                 src={gigData.images[currentImageIndex]?.url || ''}
                                                 alt={`Gig image ${currentImageIndex + 1}`}
+                                                width={1000}
+                                                height={400}
                                                 fill
                                                 className="object-cover"
                                             />
@@ -307,14 +309,14 @@ const GigDetailPage = () => {
                                 <div className="space-y-4">
                                     <h2 className="text-xl font-bold text-gray-900">About this gig</h2>
                                     <div className="prose prose-sm max-w-none">
-                                        <SafeHTML html={gigData.gig_description} />
+                                        <SafeHTML html={gigData?.gig_description || ''} />
                                     </div>
                                 </div>
 
                                 {/* Skills */}
                                 <div className="space-y-4">
                                     <h3 className="text-lg font-bold text-gray-900">Skills</h3>
-                                    {gigData.postedBy?.skills && gigData.postedBy.skills.length > 0 ? (
+                                    {gigData?.postedBy?.skills && gigData.postedBy.skills.length > 0 ? (
                                         <div className="flex flex-wrap gap-2">
                                             {gigData.postedBy.skills.map((skill: string, index: number) => (
                                                 <span
@@ -335,7 +337,7 @@ const GigDetailPage = () => {
                                     <h2 className="text-xl font-bold text-gray-900">Pricing</h2>
                                     <p className="text-gray-700">
                                         I will start from Rs.{' '}
-                                        <span className="font-bold text-gray-900">₹{gigData.price}</span>{' '}
+                                        <span className="font-bold text-gray-900">₹{gigData?.price}</span>{' '}
                                         for this gig.
                                     </p>
                                     <p className="text-red-500 text-sm font-semibold leading-relaxed">
@@ -546,20 +548,20 @@ const GigDetailPage = () => {
                             <div className="space-y-3">
                                 <div className="flex justify-between">
                                     <span className="text-gray-600">Category:</span>
-                                    <span className="font-medium">{gigData.category}</span>
+                                    <span className="font-medium">{gigData?.category}</span>
                                 </div>
                                 <div className="flex justify-between">
                                     <span className="text-gray-600">Starting Price:</span>
-                                    <span className="font-medium">₹{gigData.price}</span>
+                                    <span className="font-medium">₹{gigData?.price}</span>
                                 </div>
                                 <div className="flex justify-between">
                                     <span className="text-gray-600">Provider:</span>
-                                    <span className="font-medium">{gigData.postedBy?.username}</span>
+                                    <span className="font-medium">{gigData?.postedBy?.username}</span>
                                 </div>
                                 <div className="flex justify-between">
                                     <span className="text-gray-600">Posted:</span>
                                     <span className="font-medium">
-                                        {formatDistanceToNow(new Date(gigData.createdAt), { addSuffix: true })}
+                                        {formatDistanceToNow(new Date(gigData?.createdAt as Date), { addSuffix: true })}
                                     </span>
                                 </div>
                                 <div className="flex justify-between">
@@ -574,7 +576,7 @@ const GigDetailPage = () => {
                             <div className="mt-6 space-y-3">
                                 {
                                     gigData?.postedBy?._id ? (
-                                        <Link href={`/dashboard/job-provider/profile/user/${gigData.postedBy._id}`}
+                                        <Link href={`/dashboard/job-provider/profile/user/${gigData?.postedBy._id}`}
                                             className="w-full disabled:opacity-50 bg-primary text-white py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
                                             aria-disabled={!isCurrentUserVerified}
                                         >
@@ -616,7 +618,7 @@ const GigDetailPage = () => {
                         <div className="space-y-4">
                             <div className="flex items-center gap-2">
                                 <MapPin size={20} className="text-color2" />
-                                <span className="text-gray-700">{gigData.postedBy?.location || 'Location not available'}</span>
+                                <span className="text-gray-700">{gigData?.postedBy?.location || 'Location not available'}</span>
                             </div>
                             <p className="text-sm text-gray-600">
                                 This is the general location of the service provider. Exact address will be shared after booking.

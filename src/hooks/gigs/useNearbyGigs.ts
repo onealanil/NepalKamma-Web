@@ -1,6 +1,7 @@
 import useSWR from "swr";
 import { fetchNearbyGigs } from "@/lib/gig/gig-api";
 import { useEffect } from "react";
+import { GigI } from "@/types/gig";
 
 /**
  * @function useNearbyGigs
@@ -17,7 +18,7 @@ export const useNearbyGigs = (latitude?: number, longitude?: number) => {
         async () => {
             if (!latitude || !longitude) return null;
             const response = await fetchNearbyGigs(latitude, longitude);
-            return response.success ? response.data : [];
+            return response.success ? (response.data as GigI[]) : [];
         },
         { 
             revalidateOnFocus: true,

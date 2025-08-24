@@ -14,3 +14,16 @@ export interface GigI {
     updatedAt?: Date;
 }
 
+export interface PaginatedGigs {
+  gig: GigI[];
+  totalGigs: number;
+  totalPages: number;
+  totalJobs: number;
+  currentPage: number;
+}
+
+export interface SingleGig{
+    gig: {
+        data: GigI[];
+    }
+}

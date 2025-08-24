@@ -1,6 +1,7 @@
 import useSWR from "swr";
 import { searchGigs, type GigSearchParams } from "@/lib/gig/gig-api";
 import { useMemo } from "react";
+import { PaginatedGigs } from "@/types/gig";
 
 export type { GigSearchParams };
 
@@ -27,14 +28,13 @@ export const useSearchGigs = (searchParams: GigSearchParams) => {
         async () => {
             if (!searchKey) return null;
             const response = await searchGigs(searchParams);
-            return response.success ? response.data : null;
+            return response.success ? (response.data as PaginatedGigs) : null;
         },
         {
             revalidateOnFocus: false,
             refreshInterval: 0,
             errorRetryCount: 3,
             errorRetryInterval: 5000,
-            // Don't fetch if no search parameters
             revalidateIfStale: !!searchKey
         }
     );

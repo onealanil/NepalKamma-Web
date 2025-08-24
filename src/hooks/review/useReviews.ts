@@ -19,10 +19,10 @@ export const useReviews = (providerId?: string) => {
 
     const { data, error, isLoading, mutate: revalidate } = useSWR(
         key,
-        async () => {
+        async (): Promise<ReviewI[] | null> => {
             if (!providerId) return null;
             const response = await fetchAllReviewsByProvider(providerId);
-            return response.success ? response.data : [];
+            return response.success ? (response.data as ReviewI[]) : [];
         },
         {
             revalidateOnFocus: false,
@@ -58,10 +58,10 @@ export const usePaginatedReviews = (providerId?: string, initialPage: number = 1
 
     const { data, error, isLoading, mutate: revalidate } = useSWR(
         key,
-        async () => {
+        async (): Promise<{ reviews: ReviewI[]; pagination: PaginationInfo } | null> => {
             if (!providerId) return null;
             const response = await fetchReviewsByProvider(providerId, currentPage);
-            return response.success ? response.data : null;
+            return response.success ? (response.data as { reviews: ReviewI[]; pagination: PaginationInfo }) : null;
         },
         {
             revalidateOnFocus: false,
@@ -74,10 +74,10 @@ export const usePaginatedReviews = (providerId?: string, initialPage: number = 1
     // Fetch all reviews for average rating calculation
     const { data: allReviewsData } = useSWR(
         providerId ? `/review/getAllReviews/${providerId}` : null,
-        async () => {
+        async (): Promise<ReviewI[] | null> => {
             if (!providerId) return null;
             const response = await fetchAllReviewsByProvider(providerId);
-            return response.success ? response.data : [];
+            return response.success ? (response.data as ReviewI[]) : [];
         },
         {
             revalidateOnFocus: false,

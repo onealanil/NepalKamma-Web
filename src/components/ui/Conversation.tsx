@@ -1,3 +1,4 @@
+import Image from "next/image";
 
 interface User {
     _id: string;
@@ -34,9 +35,11 @@ export default function Conversation({ data, user, formatDistanceToNow, isLoadin
         <div className="flex gap-4 p-4 border-b border-gray-100 transition-colors">
             {/* Profile Image */}
             <div className="flex-shrink-0">
-                <img
+                <Image
                     src={otherUser?.profilePic?.url || 'https://picsum.photos/100/100'}
                     alt={otherUser?.username}
+                    width={40}
+                    height={40}
                     className="w-14 h-14 rounded-full object-cover"
                 />
             </div>

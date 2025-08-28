@@ -1,7 +1,7 @@
 
 'use client'
 
-import { useState } from 'react';
+import { useState, useEffect, useRef, RefObject } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -9,6 +9,9 @@ import Who from '@/components/auth/Who';
 import { SignupFormData } from '@/types/auth';
 import { signup } from '@/lib/auth';
 import { AxiosError } from 'axios';
+import { ErrorToast } from '@/components/ui/Toast';
+import AutoSuggestionGeoLocation from '@/components/geolocation/AutoSuggestionGeoLocation';
+import ReCaptcha from "react-google-recaptcha";
 
 
 
@@ -21,12 +24,37 @@ export default function SignUp() {
     password: '',
     confirmPassword: '',
     security_answer: '',
-    gender: 'male'
+    gender: 'male',
+    location: '',
+    latitude: 0,
+    longitude: 0,
+    captchaToken: ''
   });
   const [errors, setErrors] = useState<Partial<SignupFormData>>({});
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [geometry, setGeometry] = useState<{ coordinates: number[]; type: string }>({
+    coordinates: [],
+    type: 'Point',
+  });
+  const [locationName, setLocationName] = useState<string>('');
   const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false);
+
+  //ref for recaptcha
+  const recaptcha: RefObject<ReCaptcha | null> = useRef(null);
+
+  // Sync location data when both locationName and geometry are available
+  useEffect(() => {
+    if (locationName && geometry.coordinates.length === 2) {
+      setFormData(prev => ({
+        ...prev,
+        location: locationName,
+        latitude: geometry.coordinates[1],
+        longitude: geometry.coordinates[0]
+      }));
+    }
+  }, [locationName, geometry]);
+
 
   const validateForm = (): boolean => {
     const newErrors: Partial<SignupFormData> = {};
@@ -59,6 +87,14 @@ export default function SignUp() {
       newErrors.security_answer = 'Security answer is required';
     }
 
+    if (!formData.location || !formData.latitude || !formData.longitude) {
+      newErrors.location = "Location is required, Select one from the suggestions";
+    }
+
+    if (!formData.captchaToken) {
+      newErrors.captchaToken = "Captcha is required";
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -79,7 +115,6 @@ export default function SignUp() {
         ...formData,
         role: who
       }
-
       const response = await signup(payload);
       if (response.status === 'pending' && response.data) {
         const params = new URLSearchParams({
@@ -93,11 +128,11 @@ export default function SignUp() {
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
         const errorMessage = error.response?.data?.message || 'Something went wrong';
-        alert(errorMessage);
+        ErrorToast(errorMessage);
       } else if (error instanceof Error) {
-        alert('An error occurred during verification');
+        ErrorToast('An error occurred during verification');
       } else {
-        alert('An unknown error occurred');
+        ErrorToast('An unknown error occurred');
       }
     } finally {
       setIsLoading(false);
@@ -110,6 +145,12 @@ export default function SignUp() {
     setFormData(prev => ({ ...prev, [field]: e.target.value }));
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: undefined }));
+    }
+  };
+
+  const onCaptchaChange = (token: string | null) => {
+    if (token) {
+      formData.captchaToken = token;
     }
   };
 
@@ -299,6 +340,36 @@ export default function SignUp() {
                   <option value="other">Other</option>
                 </select>
               </div>
+
+              {/* Location Field */}
+              <div>
+                <label htmlFor="location" className="block text-sm font-medium text-black mb-2">
+                  Location *
+                </label>
+                <AutoSuggestionGeoLocation
+                  setGeometry={setGeometry}
+                  setLocationName={setLocationName}
+                />
+                <div className='flex gap-x-2 mt-2'>
+                  <span className='text-black text-sm font-semibold'>Selected: </span>
+                  <span className='text-primary'>{formData.location || 'No location selected'}</span>
+                </div>
+                {errors.location && (
+                  <p className="text-red-500 text-sm mt-1">{errors.location}</p>
+                )}
+              </div>
+
+              {/* ReCaptcha */}
+              <ReCaptcha
+                size='normal'
+                sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!}
+                ref={recaptcha}
+                onChange={onCaptchaChange}
+                className='mt-4'
+              />
+              {errors.captchaToken && (
+                <p className="text-red-500 text-sm mt-1">{errors.captchaToken}</p>
+              )}
 
               {/* Submit Button */}
               <button

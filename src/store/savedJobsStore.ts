@@ -1,0 +1,214 @@
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
+import { saveJob, unsaveJob, getSavedJobs } from '@/lib/job/job-api';
+import { JobI } from '@/types/job';
+import clientLogger from '@/utils/logger';
+
+interface SavedJobsState {
+  // State
+  savedJobIds: string[];
+  savedJobs: JobI[];
+  isLoading: boolean;
+  error: string | null;
+  isFetching: boolean;
+
+  // Actions
+  saveJobAction: (jobId: string) => Promise<boolean>;
+  unsaveJobAction: (jobId: string) => Promise<boolean>;
+  fetchSavedJobs: () => Promise<void>;
+  isSaved: (jobId: string) => boolean;
+  clearError: () => void;
+  clearSavedJobs: () => void;
+
+  // Optimistic updates
+  addJobOptimistic: (job: JobI) => void;
+  removeJobOptimistic: (jobId: string) => void;
+}
+
+export const useSavedJobsStore = create<SavedJobsState>()(
+  persist(
+    (set, get) => ({
+      // Initial state
+      savedJobIds: [],
+      savedJobs: [],
+      isLoading: false,
+      error: null,
+      isFetching: false,
+
+      // Check if a job is saved
+      isSaved: (jobId: string) => {
+        return get().savedJobIds.includes(jobId);
+      },
+
+      // Save a job
+      saveJobAction: async (jobId: string) => {
+        const { savedJobIds } = get();
+        set({ isLoading: true, error: null });
+
+        // if it is already in store, skip the optimistic update 
+        if (!savedJobIds.includes(jobId)) {
+          set(sate => ({
+            savedJobIds: [...sate.savedJobIds, jobId]
+          }))
+        }
+
+        try {
+          const response = await saveJob(jobId);
+          if (response.success) {
+            set({ isLoading: false });
+            return true;
+          } else {
+            if (!savedJobIds.includes(jobId)) {
+              set(sate => ({
+                savedJobIds: sate.savedJobIds.filter(id => id !== jobId)
+              }))
+            }
+            set({ isLoading: false, error: response.message || 'Failed to save job' });
+            return false;
+          }
+        } catch (error) {
+          if (!savedJobIds.includes(jobId)) {
+            set(sate => ({
+              savedJobIds: sate.savedJobIds.filter(id => id !== jobId)
+            }))
+          }
+          set({ isLoading: false, error: 'Failed to save job. Please try again.' });
+          clientLogger.error("Failed to saved job:", error);
+          return false;
+        }
+      },
+      // Unsave a job 
+      unsaveJobAction: async (jobId: string) => {
+        const { savedJobIds } = get();
+        set({ isLoading: true, error: null });
+
+        // If it's in store, remove it optimistically
+        if (savedJobIds.includes(jobId)) {
+          set(state => ({
+            savedJobIds: state.savedJobIds.filter(id => id !== jobId),
+            savedJobs: state.savedJobs.filter(job => job._id !== jobId)
+          }));
+        }
+
+        try {
+          const response = await unsaveJob(jobId);
+
+          if (response.success) {
+            set({ isLoading: false });
+            return true;
+          } else {
+            // If optimistic update happened, revert
+            if (savedJobIds.includes(jobId)) {
+              set(state => ({
+                savedJobIds: [...state.savedJobIds, jobId],
+                error: response.message || 'Failed to unsave job',
+              }));
+            }
+            set({ isLoading: false });
+            return false;
+          }
+        } catch (error) {
+          // If optimistic update happened, revert
+          if (savedJobIds.includes(jobId)) {
+            set(state => ({
+              savedJobIds: [...state.savedJobIds, jobId],
+              error: 'Failed to unsave job. Please try again.',
+            }));
+          }
+          set({ isLoading: false });
+          clientLogger.error("Failed to unsave job: ", error);
+          return false;
+        }
+      },
+
+
+      // Fetch all saved jobs
+      fetchSavedJobs: async () => {
+        const { isFetching } = get();
+        
+        if (isFetching) {
+          return;
+        }
+
+        set({ isLoading: true, error: null, isFetching: true });
+
+        try {
+          const response = await getSavedJobs();
+
+          if (response.success && response.data) {
+            const jobs = (response.data as { savedPosts?: JobI[] }).savedPosts || [];
+
+            if (Array.isArray(jobs)) {
+              const jobIds = jobs.map((job: JobI) => job._id).filter(Boolean) as string[];
+
+              set({
+                savedJobs: jobs,
+                savedJobIds: jobIds,
+                isLoading: false,
+                error: null,
+                isFetching: false
+              });
+            } else {
+              set({
+                savedJobs: [],
+                savedJobIds: [],
+                isLoading: false,
+                error: 'Invalid response format: expected array of jobs',
+                isFetching: false
+              });
+            }
+          } else {
+            set({
+              error: response.message || 'Failed to fetch saved jobs',
+              isLoading: false,
+              isFetching: false
+            });
+          }
+        } catch (error) {
+          set({
+            error: 'Failed to fetch saved jobs. Please try again.',
+            isLoading: false,
+            isFetching: false
+          });
+          clientLogger.error("Failed to fetch saved jobs: ", error);
+        }
+      },
+
+      // Optimistic updates for better UX
+      addJobOptimistic: (job: JobI) => {
+        set(state => ({
+          savedJobs: [...state.savedJobs, job],
+          savedJobIds: [...state.savedJobIds, job._id].filter(Boolean) as string[]
+        }));
+      },
+
+      removeJobOptimistic: (jobId: string) => {
+        set(state => ({
+          savedJobs: state.savedJobs.filter(job => job._id !== jobId),
+          savedJobIds: state.savedJobIds.filter(id => id !== jobId)
+        }));
+      },
+      clearSavedJobs: () => {
+        set({ savedJobs: [], savedJobIds: [], error: null, isLoading: false });
+      },
+
+      // Clear error
+      clearError: () => {
+        set({ error: null });
+      }
+    }),
+    {
+      name: 'saved-jobs-storage',
+      partialize: (state) => ({
+        savedJobIds: state.savedJobIds,
+      })
+    }
+  )
+);
+
+// Selectors for better performance
+export const useSavedJobIds = () => useSavedJobsStore(state => state.savedJobIds);
+export const useSavedJobs = () => useSavedJobsStore(state => state.savedJobs);
+export const useIsSaved = (jobId: string) => useSavedJobsStore(state => state.isSaved(jobId));
+export const useSavedJobsLoading = () => useSavedJobsStore(state => state.isLoading);
+export const useSavedJobsError = () => useSavedJobsStore(state => state.error);

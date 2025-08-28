@@ -1,22 +1,46 @@
 "use client";
 
+import { useAuthStore } from '@/store/authStore';
 import Link from 'next/link';
-import { useState } from 'react';
-
-export interface User {
-    id: string;
-    name: string;
-    email: string;
-    avatar?: string;
-}
-
+/**3
+ * @function LeftSideSeeker
+ * @returns The left side of the dashboard for job seekers. It includes the profile card and quick actions.
+ * @description This component is used to display the left side of the dashboard for job seekers. It includes the profile card and quick actions.
+ */
 function LeftSideSeeker() {
-    const [user] = useState<User>({
-        id: '1',
-        name: 'John Doe',
-        email: 'john@example.com',
-        avatar: '/images/avatar.jpg'
-    });
+    const { user, hasHydrated } = useAuthStore();
+
+    if (!hasHydrated || !user) {
+        return (
+            <div className="hidden lg:block lg:col-span-3 py-6">
+                <div className="sticky top-6 space-y-6">
+                    {/* Profile Card Skeleton */}
+                    <div className="bg-white rounded-xl p-6 shadow-sm">
+                        <div className="text-center">
+                            <div className="w-20 h-20 bg-gray-200 rounded-full mx-auto mb-4 animate-pulse"></div>
+                            <div className="h-6 bg-gray-200 rounded mb-2 animate-pulse"></div>
+                            <div className="h-4 bg-gray-200 rounded mb-4 animate-pulse"></div>
+                            <div className="h-10 bg-gray-200 rounded animate-pulse"></div>
+                        </div>
+                    </div>
+
+                    {/* Quick Actions Skeleton */}
+                    <div className="bg-white rounded-xl p-6 shadow-sm">
+                        <div className="h-6 bg-gray-200 rounded mb-4 animate-pulse"></div>
+                        <div className="space-y-3">
+                            {[1, 2, 3, 4, 5].map((i) => (
+                                <div key={i} className="flex items-center gap-3 p-3">
+                                    <div className="w-8 h-8 bg-gray-200 rounded-lg animate-pulse"></div>
+                                    <div className="h-4 bg-gray-200 rounded flex-1 animate-pulse"></div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <>
             <div className="hidden lg:block lg:col-span-3 py-6">
@@ -25,13 +49,13 @@ function LeftSideSeeker() {
                     <div className="bg-white rounded-xl p-6 shadow-sm">
                         <div className="text-center">
                             <div className="w-20 h-20 bg-gradient-to-r from-primary to-green-600 rounded-full flex items-center justify-center text-white font-bold text-2xl mx-auto mb-4 shadow-lg">
-                                {user.name.charAt(0)}
+                                {user?.username.charAt(0)}
                             </div>
-                            <h3 className="font-bold text-lg text-gray-900">{user.name}</h3>
-                            <p className="text-gray-500 text-sm mb-4">{user.email}</p>
-                            <button className="w-full bg-primary/10 text-primary py-2 rounded-lg font-semibold hover:bg-primary/20 transition-colors">
+                            <h3 className="font-bold text-lg text-gray-900">{user?.username}</h3>
+                            <p className="text-gray-500 text-sm mb-4">{user?.email}</p>
+                            <Link href={"/dashboard/job-seeker/profile/edit-profile"} className="w-full bg-primary/10 text-primary py-2 px-4 rounded-lg font-semibold hover:bg-primary/20 transition-colors">
                                 Edit Profile
-                            </button>
+                            </Link>
                         </div>
                     </div>
 
@@ -39,6 +63,14 @@ function LeftSideSeeker() {
                     <div className="bg-white rounded-xl p-6 shadow-sm">
                         <h3 className="font-bold text-gray-900 mb-4">Quick Actions</h3>
                         <div className="space-y-3">
+                            <Link href="/dashboard/job-seeker/my-gigs" className="w-full flex items-center gap-3 p-3 text-left hover:bg-gray-50 rounded-lg transition-colors">
+                                <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                                    <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2-2v2m8 0H8m8 0v2a2 2 0 01-2 2H10a2 2 0 01-2-2V6m8 0H8m0 10v4a2 2 0 002 2h4a2 2 0 002-2v-4M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h2v12z" />
+                                    </svg>
+                                </div>
+                                <span className="text-gray-700">My Gigs</span>
+                            </Link>
                             <Link href="/dashboard/job-seeker/completed-jobs" className="w-full flex items-center gap-3 p-3 text-left hover:bg-gray-50 rounded-lg transition-colors">
                                 <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
                                     <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -55,14 +87,14 @@ function LeftSideSeeker() {
                                 </div>
                                 <span className="text-gray-700">Saved Jobs</span>
                             </Link>
-                            <Link href="/dashboard/job-seeker/my-earning" className="w-full flex items-center gap-3 p-3 text-left hover:bg-gray-50 rounded-lg transition-colors">
+                            {/* <Link href="/dashboard/job-seeker/my-earning" className="w-full flex items-center gap-3 p-3 text-left hover:bg-gray-50 rounded-lg transition-colors">
                                 <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
                                     <svg className="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
                                     </svg>
                                 </div>
                                 <span className="text-gray-700">Earnings</span>
-                            </Link>
+                            </Link> */}
                             <Link href="/dashboard/job-seeker/my-review" className="w-full flex items-center gap-3 p-3 text-left hover:bg-gray-50 rounded-lg transition-colors">
                                 <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
                                     <svg className="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">

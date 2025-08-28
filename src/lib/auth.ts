@@ -2,6 +2,7 @@ import axios from "axios";
 import axiosInstance, { baseURL } from "./axios";
 import { loginI, ResendOtpData, SignupI, VerifyOtpData } from "@/types/auth";
 import { useAuthStore } from "@/store/authStore";
+import clientLogger from "@/utils/logger";
 
 
 //signup user
@@ -61,6 +62,19 @@ export async function login(data: loginI) {
     }
 }
 
+//logout user
+export async function logOut() {
+    try {
+        await axiosInstance.get(`/user/logout`);
+
+    } catch (err: unknown) {
+        if (axios.isAxiosError(err)) {
+            throw err;
+        }
+        throw new Error('An unknown error occurred');
+    }
+}
+
 //refresh token 
 export const refreshAccessToken = async () => {
     try {
@@ -68,5 +82,7 @@ export const refreshAccessToken = async () => {
         useAuthStore.getState().setAccessToken(data.accessToken);
     } catch (error) {
         useAuthStore.getState().logout();
+        clientLogger.error("Something went wrong while refreshing token", error)
     }
 };
+

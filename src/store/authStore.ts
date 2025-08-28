@@ -1,21 +1,13 @@
+import { AuthState } from "@/types/store/authStoreI";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-interface User {
-    _id: string,
-    email: string,
-    username: string,
-    role: string,
-    [key: string]: unknown;
-}
-interface AuthState {
-    user: User | null;
-    accessToken: string | null;
-    setUser: (user: User) => void;
-    setAccessToken: (token: string) => void;
-    logout: () => void;
-}
 
+/**
+ * @function useAuthStore
+ * @description This hook is used to manage the auth state. It returns the user, access token, and functions to set them.
+ * @returns {user: User | null, accessToken: string | null, setUser: (user: User) => void, setAccessToken: (token: string) => void, logout: () => void, hasHydrated: boolean, setHasHydrated: (value: boolean) => void}
+ */
 export const useAuthStore = create<AuthState>()(
     persist(
         (set) => ({
@@ -23,11 +15,18 @@ export const useAuthStore = create<AuthState>()(
             accessToken: null,
             setUser: (user) => set({ user }),
             setAccessToken: (token: string) => set({ accessToken: token }),
-            logout: () => set({ user: null, accessToken: null })
+            logout: () => set({ user: null, accessToken: null }),
+            hasHydrated: false,
+            setHasHydrated: (value: boolean) => set({ hasHydrated: value })
         }),
         {
             name: 'auth-store',
-            partialize: (state) => ({ user: state.user })
+            partialize: (state) => ({
+                user: state.user
+            }),
+            onRehydrateStorage: () => (state) => {
+                state?.setHasHydrated(true);
+            },
         }
     )
 )

@@ -33,6 +33,7 @@ export interface SignupFormData {
     location: string;
     latitude: number;
     longitude: number;
+    captchaToken?: string;
 }
 
 //verify opt /auth/verify-otp/page.tsx

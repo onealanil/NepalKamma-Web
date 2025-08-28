@@ -1,7 +1,7 @@
 
 'use client'
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, RefObject } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -11,6 +11,7 @@ import { signup } from '@/lib/auth';
 import { AxiosError } from 'axios';
 import { ErrorToast } from '@/components/ui/Toast';
 import AutoSuggestionGeoLocation from '@/components/geolocation/AutoSuggestionGeoLocation';
+import ReCaptcha from "react-google-recaptcha";
 
 
 
@@ -26,7 +27,8 @@ export default function SignUp() {
     gender: 'male',
     location: '',
     latitude: 0,
-    longitude: 0
+    longitude: 0,
+    captchaToken: ''
   });
   const [errors, setErrors] = useState<Partial<SignupFormData>>({});
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -37,6 +39,9 @@ export default function SignUp() {
   });
   const [locationName, setLocationName] = useState<string>('');
   const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false);
+
+  //ref for recaptcha
+  const recaptcha: RefObject<ReCaptcha | null> = useRef(null);
 
   // Sync location data when both locationName and geometry are available
   useEffect(() => {
@@ -86,6 +91,10 @@ export default function SignUp() {
       newErrors.location = "Location is required, Select one from the suggestions";
     }
 
+    if (!formData.captchaToken) {
+      newErrors.captchaToken = "Captcha is required";
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -106,7 +115,6 @@ export default function SignUp() {
         ...formData,
         role: who
       }
-
       const response = await signup(payload);
       if (response.status === 'pending' && response.data) {
         const params = new URLSearchParams({
@@ -137,6 +145,12 @@ export default function SignUp() {
     setFormData(prev => ({ ...prev, [field]: e.target.value }));
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: undefined }));
+    }
+  };
+
+  const onCaptchaChange = (token: string | null) => {
+    if (token) {
+      formData.captchaToken = token;
     }
   };
 
@@ -344,6 +358,18 @@ export default function SignUp() {
                   <p className="text-red-500 text-sm mt-1">{errors.location}</p>
                 )}
               </div>
+
+              {/* ReCaptcha */}
+              <ReCaptcha
+                size='normal'
+                sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!}
+                ref={recaptcha}
+                onChange={onCaptchaChange}
+                className='mt-4'
+              />
+              {errors.captchaToken && (
+                <p className="text-red-500 text-sm mt-1">{errors.captchaToken}</p>
+              )}
 
               {/* Submit Button */}
               <button

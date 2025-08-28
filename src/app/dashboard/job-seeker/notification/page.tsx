@@ -158,7 +158,7 @@ function NotificationPage() {
                 className={`px-3 py-1 text-xs rounded-full transition-colors ${
                   typeFilter === type
                     ? "bg-primary text-white"
-                    : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                    : "border border-black py-2 px-3 text-gray-700 hover:bg-gray-300"
                 }`}
               >
                 {type === "all" ? "All Jobs" :

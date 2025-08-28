@@ -22,6 +22,7 @@ export interface JobI {
     createdAt?: Date;
     updatedAt?: Date;
     recommendationReason?: string;
+    captchaToken?: string;
 }
 
 export interface PaginatedJobs {

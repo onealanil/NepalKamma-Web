@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useAuthStore } from '@/store/authStore';
 import axiosInstance from '@/lib/axios';
-import axios from 'axios';
+// import axios from 'axios';
 import clientLogger from '@/utils/logger';
 
 /**
@@ -27,7 +27,7 @@ export const useAuthInit = (skipAuthCheck = false) => {
       if (user && !useAuthStore.getState().accessToken) {
         try {
           // Use regular axios to avoid circular dependency
-          const { data } = await axios.post(
+          const { data } = await axiosInstance.post(
             `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/refresh-token`,
             {},
             { withCredentials: true }

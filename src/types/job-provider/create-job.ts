@@ -8,4 +8,5 @@ export const initialValues: JobI = {
     phoneNumber: '',
     payment_method: 'cash',
     experiesInHrs: '6',
+    captchaToken: ''
 };

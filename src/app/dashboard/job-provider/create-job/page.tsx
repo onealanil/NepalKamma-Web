@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from 'react';
+import { RefObject, useCallback, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ChevronLeft } from 'lucide-react';
 import { Formik } from 'formik';
@@ -19,6 +19,7 @@ import { useAuthStore } from '@/store/authStore';
 import { jobSchema } from '@/types/schema/jobSchema';
 import Loader from '@/components/global/Loader';
 import { initialValues } from '@/types/job-provider/create-job';
+import ReCAPTCHA from 'react-google-recaptcha';
 
 const CreateJobPage = () => {
     const router = useRouter();
@@ -32,7 +33,10 @@ const CreateJobPage = () => {
         type: 'Point',
     });
     const [selectedSkills, setSelectedSkills] = useState<number[]>([]);
-
+    const [captchaToken, setCaptchaToken] = useState<string>('');
+    console.log(captchaToken);
+    //ref for recaptcha
+    const recaptcha: RefObject<ReCAPTCHA | null> = useRef(null);
 
     // Check if current user is verified
     const isCurrentUserVerified = user?.isDocumentVerified === "verified";
@@ -64,6 +68,12 @@ const CreateJobPage = () => {
             return;
         }
 
+        if (!captchaToken) {
+            setIsSubmitting(false);
+            ErrorToast('Please complete the captcha');
+            return;
+        }
+
 
         if (!isReady) {
             ErrorToast("Authentication not ready to proceed, Login Again!");
@@ -80,6 +90,7 @@ const CreateJobPage = () => {
                 latitude: geometry?.coordinates?.[1],
                 longitude: geometry?.coordinates?.[0],
                 phoneNumber: user?.phoneNumber || '9804077722',
+                captchaToken: captchaToken
             }
 
             const response = await createJob(newValues);
@@ -108,6 +119,13 @@ const CreateJobPage = () => {
                 : [...prev, skillId]
         );
     };
+
+    const onCaptchaChange = (token: string | null) => {
+        if (token) {
+            setCaptchaToken(token);
+        }
+    };
+
 
     if (isLoading) {
         return <Loader />
@@ -342,6 +360,14 @@ const CreateJobPage = () => {
                                         </div>
                                         {/* ------payment method end ------- */}
 
+                                        {/* ReCaptcha */}
+                                        <ReCAPTCHA
+                                            size='normal'
+                                            sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!}
+                                            ref={recaptcha}
+                                            onChange={onCaptchaChange}
+                                            className='mt-4'
+                                        />
                                         {/* Submit Button */}
                                         <button
                                             type="button"

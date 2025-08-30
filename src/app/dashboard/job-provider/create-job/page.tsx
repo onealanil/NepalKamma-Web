@@ -33,8 +33,7 @@ const CreateJobPage = () => {
         type: 'Point',
     });
     const [selectedSkills, setSelectedSkills] = useState<number[]>([]);
-    const [captchaToken, setCaptchaToken] = useState<string>('');
-    console.log(captchaToken);
+
     //ref for recaptcha
     const recaptcha: RefObject<ReCAPTCHA | null> = useRef(null);
 
@@ -68,15 +67,18 @@ const CreateJobPage = () => {
             return;
         }
 
-        if (!captchaToken) {
-            setIsSubmitting(false);
-            ErrorToast('Please complete the captcha');
-            return;
-        }
-
 
         if (!isReady) {
             ErrorToast("Authentication not ready to proceed, Login Again!");
+            return;
+        }
+
+        const token = await recaptcha.current?.executeAsync();
+        recaptcha.current?.reset();
+
+        if (!token) {
+            ErrorToast("Captcha verification failed, Please try again later!");
+            setIsSubmitting(false);
             return;
         }
 
@@ -90,7 +92,7 @@ const CreateJobPage = () => {
                 latitude: geometry?.coordinates?.[1],
                 longitude: geometry?.coordinates?.[0],
                 phoneNumber: user?.phoneNumber || '9804077722',
-                captchaToken: captchaToken
+                captchaToken: token
             }
 
             const response = await createJob(newValues);
@@ -120,11 +122,6 @@ const CreateJobPage = () => {
         );
     };
 
-    const onCaptchaChange = (token: string | null) => {
-        if (token) {
-            setCaptchaToken(token);
-        }
-    };
 
 
     if (isLoading) {
@@ -362,10 +359,9 @@ const CreateJobPage = () => {
 
                                         {/* ReCaptcha */}
                                         <ReCAPTCHA
-                                            size='normal'
+                                            size='invisible'
                                             sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!}
                                             ref={recaptcha}
-                                            onChange={onCaptchaChange}
                                             className='mt-4'
                                         />
                                         {/* Submit Button */}

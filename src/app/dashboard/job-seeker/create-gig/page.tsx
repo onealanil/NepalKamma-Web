@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { RefObject, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ChevronLeft, X, Image as ImageIcon } from 'lucide-react';
 import { Formik } from 'formik';
@@ -19,6 +19,8 @@ import { ZodError } from 'zod';
 import Loader from '@/components/global/Loader';
 import Image from 'next/image';
 import { useAuthStore } from '@/store/authStore';
+import ReCaptcha from "react-google-recaptcha";
+
 
 const initialValues: GigI = {
     title: '',
@@ -35,6 +37,9 @@ const CreateGigPage = () => {
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
     const [images, setImages] = useState<File[]>([]);
     const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+
+    //ref for recaptcha
+    const recaptcha: RefObject<ReCaptcha | null> = useRef(null);
 
     // Check if current user is verified
     const isCurrentUserVerified = loggedInUser?.isDocumentVerified === "verified";
@@ -103,6 +108,19 @@ const CreateGigPage = () => {
             images.forEach(image => {
                 formData.append('files', image);
             });
+
+
+            const token = await recaptcha.current?.executeAsync();
+            recaptcha.current?.reset();
+
+            if (!token) {
+                ErrorToast("Captcha verification failed, Please try again later!");
+                setIsSubmitting(false);
+                return;
+            }
+
+            formData.append('captchaToken', token);
+
             //uploading the image
             const responseImage = await uploadGigImages(formData);
             if (responseImage?.status !== 201) {
@@ -298,6 +316,14 @@ const CreateGigPage = () => {
                                                 </div>
                                             )}
                                         </div>
+
+                                        {/* ReCaptcha */}
+                                        <ReCaptcha
+                                            size='invisible'
+                                            sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!}
+                                            ref={recaptcha}
+                                            className='mt-4'
+                                        />
 
                                         {/* Submit Button */}
                                         <button

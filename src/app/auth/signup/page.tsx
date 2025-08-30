@@ -28,7 +28,6 @@ export default function SignUp() {
     location: '',
     latitude: 0,
     longitude: 0,
-    captchaToken: ''
   });
   const [errors, setErrors] = useState<Partial<SignupFormData>>({});
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -91,9 +90,6 @@ export default function SignUp() {
       newErrors.location = "Location is required, Select one from the suggestions";
     }
 
-    if (!formData.captchaToken) {
-      newErrors.captchaToken = "Captcha is required";
-    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -106,6 +102,15 @@ export default function SignUp() {
    */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const token = await recaptcha.current?.executeAsync();
+    recaptcha.current?.reset();
+
+    if (token) {
+      setFormData(prev => ({ ...prev, captchaToken: token }));
+    }
+
+
     if (!validateForm()) return;
 
     setIsLoading(true);
@@ -113,7 +118,8 @@ export default function SignUp() {
     try {
       const payload = {
         ...formData,
-        role: who
+        role: who, 
+        captchaToken: token
       }
       const response = await signup(payload);
       if (response.status === 'pending' && response.data) {
@@ -148,11 +154,6 @@ export default function SignUp() {
     }
   };
 
-  const onCaptchaChange = (token: string | null) => {
-    if (token) {
-      formData.captchaToken = token;
-    }
-  };
 
   return (
     <div className="min-h-screen bg-white pt-24 pb-8">
@@ -361,15 +362,11 @@ export default function SignUp() {
 
               {/* ReCaptcha */}
               <ReCaptcha
-                size='normal'
+                size='invisible'
                 sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!}
                 ref={recaptcha}
-                onChange={onCaptchaChange}
                 className='mt-4'
               />
-              {errors.captchaToken && (
-                <p className="text-red-500 text-sm mt-1">{errors.captchaToken}</p>
-              )}
               {/* Terms and Conditions */}
               <div className="text-sm text-gray-600">
                 By signing up, you agree to our{' '}
@@ -382,36 +379,36 @@ export default function SignUp() {
                 </Link>.
               </div>
 
-          {/* Submit Button */}
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="w-full bg-primary text-white py-3 px-4 rounded-md font-bold text-lg hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center mt-6"
-          >
-            {isLoading ? (
-              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-            ) : (
-              'Sign Up'
-            )}
-          </button>
+              {/* Submit Button */}
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full bg-primary text-white py-3 px-4 rounded-md font-bold text-lg hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center mt-6"
+              >
+                {isLoading ? (
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                ) : (
+                  'Sign Up'
+                )}
+              </button>
 
-          {/* Sign In Link */}
-          <div className="text-center mt-4">
-            <span className="text-gray-600">Already have an account? </span>
-            <Link href="/auth/signin" className="text-primary font-semibold hover:underline">
-              Log In
-            </Link>
-          </div>
-        </form>
+              {/* Sign In Link */}
+              <div className="text-center mt-4">
+                <span className="text-gray-600">Already have an account? </span>
+                <Link href="/auth/signin" className="text-primary font-semibold hover:underline">
+                  Log In
+                </Link>
+              </div>
+            </form>
           </div>
         </div >
       ) : (
-    // Who Selection
-    <div className="h-[calc(100vh-6rem)] flex items-center justify-center px-4">
-      <Who setWho={setWho} />
-    </div>
-  )
-}
+        // Who Selection
+        <div className="h-[calc(100vh-6rem)] flex items-center justify-center px-4">
+          <Who setWho={setWho} />
+        </div>
+      )
+      }
     </div >
   );
 }

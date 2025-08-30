@@ -370,36 +370,48 @@ export default function SignUp() {
               {errors.captchaToken && (
                 <p className="text-red-500 text-sm mt-1">{errors.captchaToken}</p>
               )}
-
-              {/* Submit Button */}
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="w-full bg-primary text-white py-3 px-4 rounded-md font-bold text-lg hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center mt-6"
-              >
-                {isLoading ? (
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                ) : (
-                  'Sign Up'
-                )}
-              </button>
-
-              {/* Sign In Link */}
-              <div className="text-center mt-4">
-                <span className="text-gray-600">Already have an account? </span>
-                <Link href="/auth/signin" className="text-primary font-semibold hover:underline">
-                  Log In
-                </Link>
+              {/* Terms and Conditions */}
+              <div className="text-sm text-gray-600">
+                By signing up, you agree to our{' '}
+                <Link href="/terms" className="text-primary hover:underline">
+                  Terms of Service
+                </Link>{' '}
+                and{' '}
+                <Link href="/privacy-policy" className="text-primary hover:underline">
+                  Privacy Policy
+                </Link>.
               </div>
-            </form>
+
+          {/* Submit Button */}
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="w-full bg-primary text-white py-3 px-4 rounded-md font-bold text-lg hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center mt-6"
+          >
+            {isLoading ? (
+              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+            ) : (
+              'Sign Up'
+            )}
+          </button>
+
+          {/* Sign In Link */}
+          <div className="text-center mt-4">
+            <span className="text-gray-600">Already have an account? </span>
+            <Link href="/auth/signin" className="text-primary font-semibold hover:underline">
+              Log In
+            </Link>
           </div>
-        </div>
+        </form>
+          </div>
+        </div >
       ) : (
-        // Who Selection
-        <div className="h-[calc(100vh-6rem)] flex items-center justify-center px-4">
-          <Who setWho={setWho} />
-        </div>
-      )}
+    // Who Selection
+    <div className="h-[calc(100vh-6rem)] flex items-center justify-center px-4">
+      <Who setWho={setWho} />
     </div>
+  )
+}
+    </div >
   );
 }

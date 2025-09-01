@@ -1,3 +1,4 @@
+
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ToastContainer } from 'react-toastify';
@@ -6,6 +7,7 @@ import "./globals.css";
 import SWRProvider from '@/components/providers/SWRProvider';
 import { SocketProvider } from '@/contexts/SocketContext';
 import NextTopLoader from 'nextjs-toploader';
+// import { useEffect } from "react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,6 +29,15 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  //   useEffect(() => {
+  //   const handler = (event: PromiseRejectionEvent) => {
+  //     console.error("Unhandled promise rejection:", event.reason);
+  //   };
+
+  //   window.addEventListener("unhandledrejection", handler);
+  //   return () => window.removeEventListener("unhandledrejection", handler);
+  // }, []);
+
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>

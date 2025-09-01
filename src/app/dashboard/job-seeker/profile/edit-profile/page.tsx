@@ -15,10 +15,12 @@ import SkillsGuide from '@/components/ui/SkillsGuide';
 import { Geometry } from '@/types/AutoSuggestionT';
 import AutoSuggestionGeoLocation from '@/components/geolocation/AutoSuggestionGeoLocation';
 import { EditProfileProps } from '@/types/job-seeker/EditProfileT';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function EditProfile() {
     const router = useRouter();
     const { user, setUser } = useAuthStore();
+    const {mutate} = useAuth();
     const [selectedSkills, setSelectedSkills] = useState<number[]>([]);
     const [locationName, setLocationName] = useState<string>('');
     const [geometry, setGeometry] = useState<Geometry | null>({ coordinates: [], type: 'Point' });
@@ -100,6 +102,7 @@ export default function EditProfile() {
 
                     setUser(updatedUser);
                     SuccessToast('Profile Updated Successfully');
+                    await mutate();
                     router.replace('/dashboard/job-seeker/profile');
                 }
             } catch (error: unknown) {

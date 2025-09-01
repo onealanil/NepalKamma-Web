@@ -16,10 +16,12 @@ import AutoSuggestionGeoLocation from '@/components/geolocation/AutoSuggestionGe
 import { EditProfileProps } from '@/types/job-seeker/EditProfileT';
 import { profileSchema } from '@/types/schema/profileSchema';
 import { ZodError } from 'zod';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function EditProfile() {
     const router = useRouter();
     const { user, setUser } = useAuthStore();
+    const {mutate} = useAuth();
     const [locationName, setLocationName] = useState<string>('');
     const [geometry, setGeometry] = useState<Geometry | null>({ coordinates: [], type: 'Point' });
     const [isLoading, setIsLoading] = useState(false);
@@ -97,6 +99,7 @@ export default function EditProfile() {
                     };
                     setUser(updatedUser);
                     SuccessToast('Profile Updated Successfully');
+                    await mutate();
                     router.push('/dashboard/job-provider/profile');
                 }
             } catch (error: unknown) {

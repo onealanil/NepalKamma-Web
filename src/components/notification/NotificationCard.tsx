@@ -12,11 +12,11 @@ import {
   Bell,
   Briefcase,
   MapPin,
-  Trash2,
   Eye
 } from 'lucide-react';
 import { NotificationI, NotificationType } from '@/types/notification';
 import { User } from '@/types/user';
+import SafeHTML from '../global/SafeHTML';
 
 interface NotificationCardProps {
   notification: NotificationI;
@@ -28,11 +28,10 @@ interface NotificationCardProps {
 const NotificationCard: React.FC<NotificationCardProps> = ({
   notification,
   onMarkAsRead,
-  onDelete,
   onClick
 }) => {
   const sender = notification.senderId as User;
-  
+
   const getNotificationIcon = (type: NotificationType) => {
     switch (type) {
       case 'job_posted':
@@ -74,7 +73,7 @@ const NotificationCard: React.FC<NotificationCardProps> = ({
   };
 
   return (
-    <div 
+    <div
       className={`
         relative p-4 border-l-4 rounded-lg shadow-sm transition-all duration-200 cursor-pointer
         ${notification.isRead ? 'bg-white border-l-gray-300' : getNotificationColor(notification.type)}
@@ -113,16 +112,16 @@ const NotificationCard: React.FC<NotificationCardProps> = ({
               {getNotificationTitle(notification.type)}
             </h4>
           </div>
-          
-          <p className="text-sm text-gray-700 mb-2 line-clamp-2">
-            {notification.notification}
-          </p>
-          
+
+          <div className="text-sm text-gray-700 mb-2 line-clamp-2">
+            <SafeHTML html={notification?.notification || ""} />
+          </div>
+
           <div className="flex items-center justify-between">
             <span className="text-xs text-gray-500">
               {formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true })}
             </span>
-            
+
             <div className="flex items-center space-x-2">
               {!notification.isRead && (
                 <button
@@ -136,17 +135,6 @@ const NotificationCard: React.FC<NotificationCardProps> = ({
                   <Eye className="w-4 h-4" />
                 </button>
               )}
-              
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onDelete(notification._id);
-                }}
-                className="p-1 text-gray-400 hover:text-red-600 transition-colors"
-                title="Delete notification"
-              >
-                <Trash2 className="w-4 h-4" />
-              </button>
             </div>
           </div>
         </div>

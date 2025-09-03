@@ -232,6 +232,25 @@ export default function ProfilePageSeeker() {
                                 </div>
                             </div>
 
+                            {/* my stats  */}
+                            <div className="bg-white rounded-xl p-6 shadow-sm mb-6">
+                                <h2 className="text-xl font-bold text-gray-900 mb-4">My Stats</h2>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div className="bg-gray-50 p-4 rounded-lg text-center">
+                                        <p className="text-3xl font-bold text-gray-900">{userData?.totalCompletedJobs || 0}</p>
+                                        <p className="text-gray-600">Jobs Completed</p>
+                                    </div>
+                                    <div className="bg-gray-50 p-4 rounded-lg text-center">
+                                        <p className="text-3xl font-bold text-gray-900">
+                                            Rs. {userData?.totalIncome ? userData?.totalIncome.toLocaleString() : 0}
+                                        </p>
+                                        <p className="text-gray-600">Earnings</p>
+                                    </div>
+                                </div>
+                            </div>
+
+
+
                             {/* Skills Section */}
                             <div className="bg-white rounded-xl p-6 shadow-sm mb-6">
                                 <h2 className="text-xl font-bold text-gray-900 mb-4">Skills</h2>

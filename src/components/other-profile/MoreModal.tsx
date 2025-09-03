@@ -20,17 +20,16 @@ const MoreModal = ({
     userLongitude?: number;
     isCurrentUserVerified: boolean;
 }) => {
-
+    
     //state 
     const [isReportModalOpen, setIsReportModalOpen] = useState<boolean>(false);
-
-
+    
     if (!isOpen) return null;
+
 
     return (
         <div
             className="fixed inset-0 bg-backdrop-blur-sm bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
-            onClick={onClose}
         >
             <div
                 className="bg-white rounded-xl max-w-sm sm:max-w-md w-full p-4 sm:p-6"
@@ -86,7 +85,7 @@ const MoreModal = ({
             </div>
             {
                 isReportModalOpen && (
-                    <ReportModal />
+                    <ReportModal setIsReportModal={setIsReportModalOpen} />
                 )
             }
 

@@ -2,6 +2,8 @@
 
 import { Navigation, X } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
+import ReportModal from "../modals/report/ReportModal";
 
 const MoreModalProvider = ({
     isOpen,
@@ -18,9 +20,12 @@ const MoreModalProvider = ({
     userLongitude?: number;
     isCurrentUserVerified: boolean;
 }) => {
+    
+    //state 
+    const [isReportModalOpen, setIsReportModalOpen] = useState<boolean>(false);
+    
     if (!isOpen) return null;
-
-
+    
     return (
         <div
             className="fixed inset-0 bg-backdrop-blur-sm bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
@@ -65,7 +70,7 @@ const MoreModalProvider = ({
                         </div>
                     )}
 
-                    <button className="w-full bg-red-500 text-white py-3 rounded-lg font-semibold hover:bg-red-600 transition-colors">
+                    <button onClick={() => setIsReportModalOpen(true)} className="w-full bg-red-500 text-white py-3 rounded-lg font-semibold hover:bg-red-600 transition-colors">
                         Report User
                     </button>
 
@@ -77,6 +82,12 @@ const MoreModalProvider = ({
                     </button>
                 </div>
             </div>
+
+            {
+                isReportModalOpen && (
+                    <ReportModal setIsReportModal={setIsReportModalOpen} />
+                )
+            }
         </div>
     );
 };

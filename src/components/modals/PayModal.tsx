@@ -140,9 +140,13 @@ const PayModal: React.FC<PayModalProps> = ({
                     {/* Job Info */}
                     <div className="bg-gray-50 rounded-lg p-3 mb-6">
                         <div className="text-sm flex flex-col gap-1">
-                            <p className="font-semibold text-gray-900">{job.title}</p>
-                            <p className="text-gray-600">Worker: {job.assignedTo?.username}</p>
-                            <p className="text-gray-600">Original Price: Rs. {job.price}</p>
+                            <div className="font-semibold text-gray-900">{job.title}</div>
+                            <div className="text-gray-600">
+                                <span className="font-semibold">Worker:</span> {job.assignedTo?.username}
+                            </div>
+                            <div className="text-gray-600">
+                                <span className="font-semibold">Original Price:</span> Rs. {job.price}
+                            </div>
                         </div>
                     </div>
 

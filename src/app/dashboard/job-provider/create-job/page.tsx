@@ -244,7 +244,14 @@ const CreateJobPage = () => {
                                         </div>
                                         {/* Location */}
                                         <div>
+                                            <div className="p-2 bg-yellow-100 border text-xs border-yellow-300 text-yellow-800 rounded-md">
+                                                <svg className="inline w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                                Instead of choosing an exact address like &apos;Salakpur&apos; choose a nearby cities like &apos;Biratnagar&apos;, &apos;Itahari&apos;, &apos;Kathmandu&apos;, &apos;Pokhara&apos; etc. Or you can choose a unique name of your location like sundarharaincha, morang etc. This will help our map to show job location correctly. Sometimes the exact location may not appear in the map, we apologize for the inconvenience and we are working to improve it.
+                                            </div>
                                             <div className="flex items-center justify-between mb-2">
+
                                                 <label className="block text-sm font-medium text-black">
                                                     Location
                                                 </label>
@@ -339,7 +346,7 @@ const CreateJobPage = () => {
                                         {/* ----payment method start --- */}
                                         <div>
                                             <label className="block text-sm font-medium text-gray-900 mb-2">
-                                                Set Payment method * (Default Cash: Online payment is not available yet)
+                                                Set Payment method &quot;(Default Cash: Online payment is not available yet)
                                             </label>
                                             <select
                                                 className="w-full px-4 py-3 border border-green-100 rounded-lg"

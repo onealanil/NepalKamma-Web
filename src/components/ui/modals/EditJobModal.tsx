@@ -16,13 +16,6 @@ interface Props {
     onSave: (status: string, users: User[]) => void;
 }
 
-const statusOptions = [
-    'In_Progress',
-    'Pending',
-    'Completed',
-    'Cancelled',
-];
-
 export const EditJobModal = ({ isOpen, onClose, job, onSave }: Props) => {
     const [selectedStatus, setSelectedStatus] = useState(job.job_status || 'Pending');
     const [searchText, setSearchText] = useState<string>('');
@@ -31,6 +24,34 @@ export const EditJobModal = ({ isOpen, onClose, job, onSave }: Props) => {
     const [isSearching, setIsSearching] = useState<boolean>(false);
 
     if (!isOpen) return null;
+
+    const allStatusOptions = [
+        'In_Progress',
+        'Pending',
+        'Completed',
+        'Cancelled',
+    ];
+
+    const inProgressOptions = [
+        'In_Progress',
+        'Completed',
+    ]
+    /**
+     * Filter available status options based on current job status
+     * - If job is 'In_Progress', only show 'In_Progress' and 'Completed'
+     * - If job is not 'In_Progress', show all options except 'Completed' (to prevent skipping)
+     * - Always include current job status to prevent loss of data
+     */
+    const availableStatusOptions = allStatusOptions.filter(status => {
+        if (status === 'Completed' && job.job_status !== 'In_Progress') {
+            return false;
+        }
+        return true;
+    });
+
+    if (!availableStatusOptions.includes(job.job_status as string)) {
+        availableStatusOptions.push(job.job_status as string);
+    }
 
     const handleSearch = async () => {
         if (searchText === "") return ErrorToast("Please enter a username");
@@ -77,8 +98,17 @@ export const EditJobModal = ({ isOpen, onClose, job, onSave }: Props) => {
                             onChange={e => setSelectedStatus(e.target.value)}
                             className="w-full border border-gray-300 rounded-md p-2"
                         >
-                            {statusOptions.map(status => (
-                                <option key={status} value={status}>{status}</option>
+                            {
+                                job.job_status === 'In_Progress' && inProgressOptions.map(status => (
+                                    <option key={status} value={status}>
+                                        {status}
+                                    </option>
+                                ))
+                            }
+                            {job.job_status !== "In_Progress" && availableStatusOptions.map(status => (
+                                <option key={status} value={status}>
+                                    {status}
+                                </option>
                             ))}
                         </select>
                     </div>
@@ -131,20 +161,19 @@ export const EditJobModal = ({ isOpen, onClose, job, onSave }: Props) => {
                     <div className="mt-6 flex justify-center">
                         <button
                             onClick={handleSave}
-                            className={`px-6 py-2 rounded-md text-white ${
-                                selectedStatus === 'Cancelled'
-                                    ? 'bg-red-600 hover:bg-red-700'
-                                    : 'bg-primary hover:bg-primary/90'
-                            }`}
+                            className={`px-6 py-2 rounded-md text-white ${selectedStatus === 'Cancelled'
+                                ? 'bg-red-600 hover:bg-red-700'
+                                : 'bg-primary hover:bg-primary/90'
+                                }`}
                         >
                             {selectedStatus === 'Cancelled' ? 'Reset Job' : 'Update Status'}
                         </button>
                     </div>
                 ) : selectedStatus !== 'Pending' &&
-                   selectedStatus !== 'Cancelled' &&
-                   selectedUsers &&
-                   Array.isArray(selectedUsers) &&
-                   selectedUsers.length > 0 ? (
+                    selectedStatus !== 'Cancelled' &&
+                    selectedUsers &&
+                    Array.isArray(selectedUsers) &&
+                    selectedUsers.length > 0 ? (
                     <div className="mt-6 flex justify-center">
                         <button
                             onClick={handleSave}

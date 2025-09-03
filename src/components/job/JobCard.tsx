@@ -30,7 +30,6 @@ export default function JobCard({ job, onDelete, onView }: JobCardProps) {
         }
     };
 
-
     return (
         <div className="space-y-4">
             <div
@@ -93,8 +92,8 @@ export default function JobCard({ job, onDelete, onView }: JobCardProps) {
 
                     <div className="flex items-center gap-2">
                         {
-                            (job.job_status === "Paid" || job.job_status==="Completed" || job.job_status === "Cancelled") ? (
-                                <span className={`px-2 py-1 rounded-full text-xs font-medium ${job.job_status === "Paid" || job.job_status === "Completed"? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
+                            (job.job_status === "Paid" || job.job_status === "can_delete"|| job.job_status === "Completed" || job.job_status === "Cancelled") ? (
+                                <span className={`px-2 py-1 rounded-full text-xs font-medium ${job.job_status === "Paid" || job.job_status === "Completed" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
                                     {job.job_status}
                                 </span>
                             ) : (
@@ -108,15 +107,15 @@ export default function JobCard({ job, onDelete, onView }: JobCardProps) {
                             )
                         }
                         {
-                            (job.job_status === "Pending" || job.job_status === "Paid") && (
-                             <button
-                            onClick={() => {
-                                if (job._id) onDelete(job);
-                            }}
-                            className="p-2 hover:bg-red-100 rounded-lg transition-colors"
-                        >
-                            <Trash2 className="w-4 h-4 text-red-600" />
-                        </button>
+                            (job.job_status === "Pending" || job.job_status === "can_delete") && (
+                                <button
+                                    onClick={() => {
+                                        if (job._id) onDelete(job);
+                                    }}
+                                    className="p-2 hover:bg-red-100 rounded-lg transition-colors"
+                                >
+                                    <Trash2 className="w-4 h-4 text-red-600" />
+                                </button>
                             )
                         }
                     </div>

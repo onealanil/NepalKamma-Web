@@ -24,7 +24,7 @@ const RequestPaymentModal = ({
     const [selectedImages, setSelectedImages] = useState<File[]>([]);
     const [previewImages, setPreviewImages] = useState<string[]>([]);
     const [isRequesting, setIsRequesting] = useState(false);
-    const [errors, setErrors] = useState<{[key: string]: string}>({});
+    const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
     // Reset form when modal opens/closes
     useEffect(() => {
@@ -121,7 +121,7 @@ const RequestPaymentModal = ({
      * @description Validates the form before submission
      */
     const validateForm = (): boolean => {
-        const newErrors: {[key: string]: string} = {};
+        const newErrors: { [key: string]: string } = {};
 
         if (!data?._id) {
             ErrorToast('Something went wrong, Please try again later');
@@ -215,151 +215,169 @@ const RequestPaymentModal = ({
 
     const deductedAmount = data.amount * 0.95; // 5% deduction
 
+
     return (
         <div className="fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
                 <div className="p-6">
-                    {/* Header */}
-                    <div className="flex items-center justify-between mb-6">
-                        <div>
-                            <h2 className="text-xl font-bold text-gray-900">Request Payment</h2>
-                            <p className="text-sm text-gray-500">Payment Confirmation slip</p>
-                        </div>
-                        <button
-                            onClick={onClose}
-                            className="w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-colors"
-                        >
-                            <X size={16} />
-                        </button>
-                    </div>
-
-                    {/* Payment Amount Info - Only show for non-cash payments */}
-                    {data?.paymentType !== 'cash' && (
-                        <>
-                            <div className="mb-6">
-                                <p className="text-gray-700 mb-2 font-bold">
-                                    Payment You will received after 5% deduction
+                    {
+                        isRequesting ? (
+                            <div className="min-h-[200px] flex flex-col items-center justify-center">
+                                <p className="text-lg font-medium text-gray-700 flex items-center justify-center gap-1">
+                                    Requesting
+                                    <span className="flex space-x-1">
+                                        <span className="animate-bounce">.</span>
+                                        <span className="animate-bounce [animation-delay:200ms]">.</span>
+                                        <span className="animate-bounce [animation-delay:400ms]">.</span>
+                                    </span>
                                 </p>
-                                <p className="text-2xl font-bold text-gray-900">
-                                    Rs.{Math.floor(deductedAmount)}/-
+                                <p className="text-sm text-gray-500 mt-2 text-center">
+                                    Please do not refresh or navigate away from the page.
                                 </p>
                             </div>
+                        ) : (
+                            <>
+                                {/* Header */}
+                                <div className="flex items-center justify-between mb-6">
+                                    <div>
+                                        <h2 className="text-xl font-bold text-gray-900">Request Payment</h2>
+                                        <p className="text-sm text-gray-500">Payment Confirmation slip</p>
+                                    </div>
+                                    <button
+                                        onClick={onClose}
+                                        className="w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-colors"
+                                    >
+                                        <X size={16} />
+                                    </button>
+                                </div>
 
-                            {/* Note for online payments */}
-                            <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-6">
-                                <p className="text-red-600 text-sm text-center font-bold">
-                                    <span className="font-medium">Note:</span> Enter your khalti number correctly. Payment will be sent to the provided khalti number.
-                                </p>
-                            </div>
+                                {/* Payment Amount Info - Only show for non-cash payments */}
+                                {data?.paymentType !== 'cash' && (
+                                    <>
+                                        <div className="mb-6">
+                                            <p className="text-gray-700 mb-2 font-bold">
+                                                Payment You will received after 5% deduction
+                                            </p>
+                                            <p className="text-2xl font-bold text-gray-900">
+                                                Rs.{Math.floor(deductedAmount)}/-
+                                            </p>
+                                        </div>
 
-                            {/* Khalti Number Input */}
-                            <div className="mb-6">
-                                <label className="block text-gray-700 font-medium mb-2">
-                                    Enter your Khalti Number
-                                </label>
-                                <input
-                                    type="text"
-                                    value={khaltiNumber}
-                                    onChange={(e) => {
-                                        setKhaltiNumber(e.target.value);
-                                        if (errors.khaltiNumber) {
-                                            setErrors(prev => ({ ...prev, khaltiNumber: '' }));
-                                        }
-                                    }}
-                                    placeholder="9803234563"
-                                    className={`w-full px-4 py-3 bg-green-50 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent ${
-                                        errors.khaltiNumber ? 'border-red-500' : 'border-gray-200'
-                                    }`}
-                                />
-                                {errors.khaltiNumber && (
-                                    <p className="text-red-500 text-sm mt-1">{errors.khaltiNumber}</p>
+                                        {/* Note for online payments */}
+                                        <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-6">
+                                            <p className="text-red-600 text-sm text-center font-bold">
+                                                <span className="font-medium">Note:</span> Enter your khalti number correctly. Payment will be sent to the provided khalti number.
+                                            </p>
+                                        </div>
+
+                                        {/* Khalti Number Input */}
+                                        <div className="mb-6">
+                                            <label className="block text-gray-700 font-medium mb-2">
+                                                Enter your Khalti Number
+                                            </label>
+                                            <input
+                                                type="text"
+                                                value={khaltiNumber}
+                                                onChange={(e) => {
+                                                    setKhaltiNumber(e.target.value);
+                                                    if (errors.khaltiNumber) {
+                                                        setErrors(prev => ({ ...prev, khaltiNumber: '' }));
+                                                    }
+                                                }}
+                                                placeholder="9803234563"
+                                                className={`w-full px-4 py-3 bg-green-50 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent ${errors.khaltiNumber ? 'border-red-500' : 'border-gray-200'
+                                                    }`}
+                                            />
+                                            {errors.khaltiNumber && (
+                                                <p className="text-red-500 text-sm mt-1">{errors.khaltiNumber}</p>
+                                            )}
+                                        </div>
+                                    </>
                                 )}
-                            </div>
-                        </>
-                    )}
 
-                    {/* Upload Note */}
-                    <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
-                        <p className="text-red-600 text-sm text-center font-bold">
-                            <span className="font-medium">Note:</span> {
-                                data?.paymentType !== 'cash'
-                                    ? 'Upload the Screenshot of confirmation message between you and job provider or any other proof of payment. It is mandatory and with this proof we acknowledge that you have received the payment. And this proof will boost your profile and you will get more job opportunities.'
-                                    : 'Upload the Screenshot of confirmation message between you and job provider or any other proof of payment. It is mandatory and with this proof we acknowledge that you have received the payment. And this proof will boost your profile and you will get more job opportunities.'
-                            } 
-                        </p>
-                    </div>
-
-                    {/* Image Upload */}
-                    <div className="mb-6">
-                        <label className="block text-gray-700 font-medium mb-2">
-                            Add Images
-                        </label>
-
-                        <input
-                            type="file"
-                            accept="image/*"
-                            multiple
-                            onChange={handleImageUpload}
-                            className="hidden"
-                            id="image-upload"
-                        />
-
-                        <label
-                            htmlFor="image-upload"
-                            className={`w-full py-3 px-4 bg-green-50 border rounded-lg flex items-center justify-center cursor-pointer hover:bg-green-100 transition-colors ${
-                                errors.images ? 'border-red-500' : 'border-gray-300'
-                            }`}
-                        >
-                            <div className="text-center">
-                                <p className="text-gray-700 font-semibold">
-                                    {selectedImages.length === 0 ? 'Click to add images' : 'Images added'}
-                                </p>
-                            </div>
-                        </label>
-
-                        {errors.images && (
-                            <p className="text-red-500 text-sm mt-1">{errors.images}</p>
-                        )}
-
-                        {selectedImages.length > 0 && (
-                            <div className="mt-4">
-                                <div className="flex items-center gap-3 mb-2">
-                                    <p className="text-gray-700 font-medium">Preview</p>
-                                    <p className="text-red-500 text-sm">
-                                        Only First 2 images will be selected
+                                {/* Upload Note */}
+                                <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
+                                    <p className="text-red-600 text-sm text-center font-bold">
+                                        <span className="font-medium">Note:</span> {
+                                            data?.paymentType !== 'cash'
+                                                ? 'Upload the Screenshot of confirmation message between you and job provider or any other proof of payment. It is mandatory and with this proof we acknowledge that you have received the payment. And this proof will boost your profile and you will get more job opportunities.'
+                                                : 'Upload the Screenshot of confirmation message between you and job provider or any other proof of payment. It is mandatory and with this proof we acknowledge that you have received the payment. And this proof will boost your profile and you will get more job opportunities.'
+                                        }
                                     </p>
                                 </div>
 
-                                <div className="flex gap-3 overflow-x-auto">
-                                    {previewImages.slice(0, 2).map((preview: string, index: number) => (
-                                        <div key={index} className="relative flex-shrink-0">
-                                            <Image
-                                                src={preview}
-                                                alt={`Preview ${index + 1}`}
-                                                width={1000}
-                                                height={400}
-                                                className="w-24 h-32 object-cover rounded-lg border border-gray-200"
-                                            />
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-                    </div>
+                                {/* Image Upload */}
+                                <div className="mb-6">
+                                    <label className="block text-gray-700 font-medium mb-2">
+                                        Add Images
+                                    </label>
 
-                    {/* Submit Button */}
-                    <button
-                        onClick={handleSubmit}
-                        disabled={isRequesting}
-                        className={`w-full py-4 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 ${
-                            isRequesting
-                                ? 'bg-gray-400 cursor-not-allowed'
-                                : 'bg-green-500 hover:bg-green-600'
-                        } text-white`}
-                    >
-                        <CreditCard size={20} />
-                        {isRequesting ? 'Requesting...' : 'Request Payment'}
-                    </button>
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        multiple
+                                        onChange={handleImageUpload}
+                                        className="hidden"
+                                        id="image-upload"
+                                    />
+
+                                    <label
+                                        htmlFor="image-upload"
+                                        className={`w-full py-3 px-4 bg-green-50 border rounded-lg flex items-center justify-center cursor-pointer hover:bg-green-100 transition-colors ${errors.images ? 'border-red-500' : 'border-gray-300'
+                                            }`}
+                                    >
+                                        <div className="text-center">
+                                            <p className="text-gray-700 font-semibold">
+                                                {selectedImages.length === 0 ? 'Click to add images' : 'Images added'}
+                                            </p>
+                                        </div>
+                                    </label>
+
+                                    {errors.images && (
+                                        <p className="text-red-500 text-sm mt-1">{errors.images}</p>
+                                    )}
+
+                                    {selectedImages.length > 0 && (
+                                        <div className="mt-4">
+                                            <div className="flex items-center gap-3 mb-2">
+                                                <p className="text-gray-700 font-medium">Preview</p>
+                                                <p className="text-red-500 text-sm">
+                                                    Only First 2 images will be selected
+                                                </p>
+                                            </div>
+
+                                            <div className="flex gap-3 overflow-x-auto">
+                                                {previewImages.slice(0, 2).map((preview: string, index: number) => (
+                                                    <div key={index} className="relative flex-shrink-0">
+                                                        <Image
+                                                            src={preview}
+                                                            alt={`Preview ${index + 1}`}
+                                                            width={1000}
+                                                            height={400}
+                                                            className="w-24 h-32 object-cover rounded-lg border border-gray-200"
+                                                        />
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Submit Button */}
+                                <button
+                                    onClick={handleSubmit}
+                                    disabled={isRequesting}
+                                    className={`w-full py-4 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 ${isRequesting
+                                        ? 'bg-gray-400 cursor-not-allowed'
+                                        : 'bg-green-500 hover:bg-green-600'
+                                        } text-white`}
+                                >
+                                    <CreditCard size={20} />
+                                    {isRequesting ? 'Requesting...' : 'Request Payment'}
+                                </button>
+                            </>
+                        )
+                    }
                 </div>
             </div>
         </div>

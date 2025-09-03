@@ -235,7 +235,7 @@ export default function ProfilePageProvider() {
 
                             {/* My jobs Section */}
                             <div className="bg-white rounded-xl p-6 shadow-sm">
-                                <h2 className="text-xl font-bold text-gray-900 mb-4">My Gigs</h2>
+                                <h2 className="text-xl font-bold text-gray-900 mb-4">My Jobs</h2>
                                 {jobs.length > 0 ? (
                                     <div>
                                         <div className="border rounded-xl p-4 mb-4">
@@ -265,7 +265,7 @@ export default function ProfilePageProvider() {
                                     </div>
                                 ) : (
                                     <p className="text-red-500 font-bold text-center py-4">
-                                        No Gigs available
+                                        No Jobs available
                                     </p>
                                 )}
                             </div>

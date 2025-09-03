@@ -4,7 +4,6 @@ import React, { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import {
   Bell,
-  Trash2,
   CheckCheck,
   RefreshCw
 } from "lucide-react";
@@ -28,7 +27,6 @@ function NotificationPage() {
     markAsRead,
     markAllAsRead,
     deleteNotif,
-    clearRead,
     loadMore,
     refresh,
   } = useNotifications({
@@ -116,14 +114,6 @@ function NotificationPage() {
                   <CheckCheck className="w-5 h-5 text-gray-600" />
                 </button>
               )}
-
-              <button
-                onClick={clearRead}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                title="Clear read notifications"
-              >
-                <Trash2 className="w-5 h-5 text-gray-600" />
-              </button>
             </div>
           </div>
 

@@ -1,4 +1,4 @@
-import useSWR, { mutate } from "swr";
+import useSWR from "swr";
 import { fetcher } from "@/lib/fetcher";
 import { useAuthStore } from "@/store/authStore";
 

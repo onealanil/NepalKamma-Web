@@ -13,7 +13,7 @@ export interface JobI {
     category: string;
     postedBy?: User;
     rating?: number;
-    job_status?: "Pending" | "In_Progress" | "Completed" | "Cancelled" | "Paid" | string;
+    job_status?: "Pending" | "In_Progress" | "Completed" | "Cancelled" | "Paid" | "can_delete"| string;
     assignedTo?: User;
     experiesIn?: Date;
     visibility?: "public" | "private" | string;

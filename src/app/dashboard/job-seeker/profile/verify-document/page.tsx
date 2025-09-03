@@ -35,7 +35,7 @@ export default function VerifyDocument() {
             }
         }
         setLocalVerificationStatus(null);
-    }, [user?._id])
+    }, [user?._id, user?.isDocumentVerified, localVerificationStatus])
 
     const getCurrentVerificationStatus = () => {
         return localVerificationStatus || user?.isDocumentVerified;
@@ -124,7 +124,7 @@ export default function VerifyDocument() {
         } finally {
             setIsSubmitting(false);
         }
-    }, [images, setUser, user, isReady]);
+    }, [images, setUser, user, mutate,  isReady]);
 
     if (!user) {
         return <Loader />

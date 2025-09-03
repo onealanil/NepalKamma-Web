@@ -35,6 +35,7 @@ export default function CompletedJobs() {
   const { jobs, isLoading, mutate } = useGetPaymentSeeker();
   const [isRefreshing, setIsRefreshing] = useState(false);
 
+
   const handleViewPayment = (job: CompletedJob) => {
     setSelectedJob(job);
     setShowPaymentModal(true);

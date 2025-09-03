@@ -20,7 +20,7 @@ import { useAuth } from '@/hooks/useAuth';
 export default function EditProfile() {
     const router = useRouter();
     const { user, setUser } = useAuthStore();
-    const {mutate} = useAuth();
+    const { mutate } = useAuth();
     const [selectedSkills, setSelectedSkills] = useState<number[]>([]);
     const [locationName, setLocationName] = useState<string>('');
     const [geometry, setGeometry] = useState<Geometry | null>({ coordinates: [], type: 'Point' });
@@ -116,7 +116,7 @@ export default function EditProfile() {
                 setIsLoading(false);
             }
         },
-        [user, selectedSkills, locationName, geometry, setUser, router],
+        [user, selectedSkills, locationName, geometry, mutate,  setUser, router],
     );
 
     const toggleSkill = (skillId: number) => {
@@ -205,6 +205,14 @@ export default function EditProfile() {
                                             {/* Location */}
                                             <div>
                                                 <span className='text-red-500 text-xs'>After changing the location, you will be redirected to your profile. Please refresh the page to see the changes.</span>
+                                                {/* alert */}
+                                                <div className="mt-1"></div>
+                                                <div className="p-2 bg-yellow-100 border text-xs border-yellow-300 text-yellow-800 rounded-md">
+                                                    <svg className="inline w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                    </svg>
+                                                    Instead of choosing an exact address like &apos;Salakpur&apos; choose a nearby cities like &apos;Biratnagar&apos;, &apos;Itahari&apos;, &apos;Kathmandu&apos;, &apos;Pokhara&apos; etc. Or you can choose a unique name of your location like sundarharaincha, morang etc. This will help our map to show your location correctly. Sometimes the exact location may not appear in the map, we apologize for the inconvenience and we are working to improve it.
+                                                </div>
 
                                                 <div className="flex items-center justify-between mb-2">
                                                     <label className="block text-sm font-medium text-black">

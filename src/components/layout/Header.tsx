@@ -117,6 +117,12 @@ export default function Header() {
                 Top Buyer
               </Link>
               <Link
+                href="/dashboard/job-seeker/near-by-buyer"
+                className="text-black hover:text-gray-500 transition-colors"
+              >
+                Near by Buyer
+              </Link>
+              <Link
                 href="/dashboard/job-seeker/profile"
                 className="text-black hover:text-gray-500 transition-colors"
               >
@@ -308,6 +314,13 @@ export default function Header() {
                   onClick={closeMobileMenu}
                 >
                   Top Buyer
+                </Link>
+                <Link
+                  href="/dashboard/job-seeker/near-by-buyer"
+                  className="block text-lg font-medium text-gray-900 hover:text-primary transition-colors"
+                  onClick={closeMobileMenu}
+                >
+                  Near by Buyer
                 </Link>
                 <Link
                   href="/dashboard/job-seeker/profile"

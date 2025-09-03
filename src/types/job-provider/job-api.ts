@@ -3,6 +3,14 @@ export interface ApiResponse<T = unknown> {
     data?: T;
     message?: string;
     error?: string;
+    pagination?: {
+        currentPage: number;
+        totalPages: number;
+        totalItems: number;
+        hasNextPage: boolean;
+        hasPrevPage: boolean;
+        limit: number;
+    };
     meta?: {
         totalCount: number;
         algorithm: string;

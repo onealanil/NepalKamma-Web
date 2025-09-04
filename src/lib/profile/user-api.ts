@@ -4,9 +4,9 @@ import { handleApiError } from "../job/job-api";
 
 // --------------------------------------- Top rated provider and seeker --------------------------------------------------
 
-export async function fetchTopRatedProvider() {
+export async function fetchTopRatedProvider(page:number = 1): Promise<ApiResponse> {
   try {
-    const response = await axiosInstance.get(`/user/top-rated-job-provider`);
+    const response = await axiosInstance.get(`/user/top-rated-job-provider?page=${page}`);
     return {
       success: true,
       data: response.data,
@@ -39,7 +39,22 @@ export const fetchTopRatedSeeker = async (page: number = 1): Promise<ApiResponse
 export const fetchNearbyProviders = async (page: number = 1, latitude?: number, longitude?: number): Promise<ApiResponse> => {
   try {
     const response = await axiosInstance.get(`/user/getNearbyJobProvider/${latitude}/${longitude}?page=${page}`);
-    console.log("Nearby Providers Response:", response.data);
+    return {
+      success: true,
+      data: response.data,
+      pagination: response.data,
+    };
+  } catch (error: unknown) {
+    return handleApiError(
+      error,
+      "Failed to fetch top rated job seekers. Please try again."
+    );
+  }
+}
+
+export const fetchNearbySeekers = async (page: number = 1, latitude?: number, longitude?: number): Promise<ApiResponse> => {
+  try {
+    const response = await axiosInstance.get(`/user/getNearbyJobSeeker/${latitude}/${longitude}?page=${page}`);
     return {
       success: true,
       data: response.data,

@@ -4,11 +4,12 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
 import LeftSideSeeker from "@/components/ui/LeftSideSeeker";
-import { useTopRatedProvider } from "@/hooks/useTopRatedProvider";
-import { User as JobProviderI } from "@/types/user";
+import { User as jobProviderI } from "@/types/user";
 import PeopleCard from "@/components/user/PeopleCard";
-import RefreshingButton from "@/components/ui/RefreshingButton";
 import Link from "next/link";
+import RefreshingButton from "@/components/ui/RefreshingButton";
+import { useTopRatedProvider } from "@/hooks/useTopRatedProvider";
+import TopRatedJobProviderPagination from "@/components/top-rated-provider/TopRatedJobProviderPagination";
 
 // Loading skeleton component
 const PeopleLoader = () => (
@@ -25,14 +26,12 @@ const PeopleLoader = () => (
   </div>
 );
 
-export default function TopBuyerPage() {
+export default function TopProviderPage() {
   const router = useRouter();
 
-  const {
-    users: jobProviders,
-    isLoading,
-    mutate,
-  } = useTopRatedProvider();
+  const [currentPage, setCurrentPage] = useState(1);
+  const { users: jobProviders, pagination, isLoading, isError, mutate } = useTopRatedProvider(currentPage);
+
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
 
   const handleRefresh = async () => {
@@ -46,6 +45,14 @@ export default function TopBuyerPage() {
       setIsRefreshing(false);
     }
   };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  if (isError) {
+    return <div>Error loading job seekers</div>;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
@@ -63,7 +70,7 @@ export default function TopBuyerPage() {
                 className="flex items-center gap-2 mb-4 p-2 rounded-lg transition-colors"
               >
                 <ChevronLeft size={24} className="text-gray-600" />
-                <h1 className="text-xl font-bold text-gray-900">Top Buyers</h1>
+                <h1 className="text-xl font-bold text-gray-900">Top Providers</h1>
               </button>
               <div>
 
@@ -93,20 +100,28 @@ export default function TopBuyerPage() {
                         No Job Providers Found
                       </h3>
                       <p className="text-gray-600">
-                        Check back later for top buyers in your area
+                        Check back later for top providers in your area
                       </p>
                     </div>
                   ) : (
                     <div className="space-y-4">
-                      {jobProviders.map((provider: JobProviderI) => (
+                      {jobProviders.map((provider: jobProviderI) => (
                         <Link
                           key={provider._id}
-                          href={`/dashboard/job-seeker/profile/user/${provider._id}`}
-                          className="bg-none"
+                          href={`/dashboard/job-provider/profile/user/${provider._id}`}
                         >
-                          <PeopleCard key={provider._id} data={provider} />
+                          <PeopleCard
+                            key={provider._id}
+                            data={provider}
+                          />
                         </Link>
                       ))}
+                      <TopRatedJobProviderPagination
+                        pagination={pagination}
+                        currentPage={currentPage}
+                        onPageChange={handlePageChange}
+                        isLoading={isLoading}
+                      />
                     </div>
                   )}
                 </>

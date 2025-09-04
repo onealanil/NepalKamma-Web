@@ -56,7 +56,7 @@ export default function Header() {
           </Link>
 
 
-          {/* Desktop Navigation for job-seeker */}
+          {/* Desktop Navigation for job-provider */}
           {user?.role === "job_provider" && (
             <nav className="hidden md:flex items-center space-x-8 font-medium">
               <Link
@@ -73,6 +73,9 @@ export default function Header() {
               </Link>
               <Link href="/dashboard/job-provider/top-seller" className="text-black hover:text-gray-500 transition-colors">
                 Top Seller
+              </Link>
+              <Link href="/dashboard/job-provider/near-by-seller" className="text-black hover:text-gray-500 transition-colors">
+                Near by Seller
               </Link>
               <Link
                 href="/dashboard/job-provider/profile"
@@ -219,6 +222,13 @@ export default function Header() {
                   onClick={closeMobileMenu}
                 >
                   Top Seller
+                </Link>
+                <Link
+                  href="/dashboard/job-provider/near-by-seller"
+                  className="block text-lg font-medium text-gray-900 hover:text-primary transition-colors"
+                  onClick={closeMobileMenu}
+                >
+                  Near by Sellers
                 </Link>
                 <Link
                   href="/dashboard/job-provider/profile"

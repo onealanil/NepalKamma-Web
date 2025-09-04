@@ -69,7 +69,7 @@ export default function NearBySellerPage() {
                         {/* Back button */}
                         <div className="mb-6 flex items-center justify-between ">
                             <button
-                                onClick={() => router.push("/dashboard/job-seeker")}
+                                onClick={() => router.push("/dashboard/job-provider")}
                                 className="flex items-center gap-2 mb-4 p-2 rounded-lg transition-colors"
                             >
                                 <ChevronLeft size={24} className="text-gray-600" />

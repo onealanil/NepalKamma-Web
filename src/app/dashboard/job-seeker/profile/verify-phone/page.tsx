@@ -13,6 +13,7 @@ import Image from 'next/image';
 import { updatePhoneNumber } from '@/lib/profile/profile-api';
 import { useEnsureAuth } from '@/hooks/useEnsureAuth';
 import clientLogger from '@/utils/logger';
+import { useAuth } from '@/hooks/useAuth';
 
 /**
  * @function VerifyPhone
@@ -22,6 +23,7 @@ import clientLogger from '@/utils/logger';
 export default function VerifyPhone() {
     const router = useRouter();
     const { isReady, isLoading } = useEnsureAuth();
+    const { mutate } = useAuth();
     const { user } = useAuthStore();
     const [phoneNumber, setPhoneNumber] = useState<string>(user?.phoneNumber || '');
     const [countryCode, setCountryCode] = useState<string>('+977');
@@ -84,7 +86,7 @@ export default function VerifyPhone() {
             if (response.status === 200) {
                 SuccessToast('Phone number added successfully');
             }
-            // router.push('/dashboard/job-seeker/profile');
+            // router.push('/dashboard/job-seeker/profile/verify-document');
         } catch (error: unknown) {
             if (error instanceof AxiosError) {
                 const errorMessage = error.response?.data?.message || 'Failed to update phone number';
@@ -116,6 +118,8 @@ export default function VerifyPhone() {
             }
 
             await updatePhoneDatabase();
+            await mutate();
+
         }
         catch (error) {
             ErrorToast('An error occurred while validating phone number, Try again Later');

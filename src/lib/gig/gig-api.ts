@@ -5,46 +5,86 @@ import { handleApiError } from "../job/job-api";
 import { ApiResponse } from "@/types/job-provider/job-api";
 import clientLogger from "@/utils/logger";
 
-
-/**
- * @function uploadGigImages
- * @param formData Images form data
- * @returns the response from the server
- * @route POST /gig/upload-photo
- */
-export async function uploadGigImages(formData: FormData) {
-    try {
-        const response = await axiosInstance.post(`/gig/upload-photo`, formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-            },
-        });
-        return response;
-    }
-    catch (error: unknown) {
-        ErrorToast("Something went wrong while uploading your images!")
-        clientLogger.error("Somethine went wrong while uploading your images, ", error);
-    }
-}
-
 /**
  * @function createGig
- * @description this function helps to create the gig
- * @param id:string Id of the user
- * @param gig: Gigdata of the user
+ * @description Create a gig with images + details in one request
+ * @param values - Gig data including images
  * @returns Response from the server
- * @route PUT /gig/creategig/{id}
-*/
-export async function createGig(id: string, gig: GigI) {
+ * @route POST /gig
+ */
+export async function createGig(values: {
+    title: string;
+    gig_description: string;
+    price: number;
+    category: string;
+    images: File[];
+    captchaToken: string;
+}) {
     try {
-        const response = await axiosInstance.put(`/gig/creategig/${id}`, gig);
+        const formData = new FormData();
+
+        values.images.forEach((file) => {
+            formData.append("files", file);
+        });
+
+        formData.append("title", values.title);
+        formData.append("gig_description", values.gig_description);
+        formData.append("price", values.price.toString());
+        formData.append("category", values.category);
+        formData.append("captchaToken", values.captchaToken);
+
+        const response = await axiosInstance.post(`/gig`, formData, {
+            headers: { "Content-Type": "multipart/form-data" },
+        });
+
         return response.data;
-    }
-    catch (error: unknown) {
-        ErrorToast("Something Went wrong while Creating your gig!");
-        clientLogger.error("Something went wrong while creating your gig: ", error)
+    } catch (error: unknown) {
+        ErrorToast("Something went wrong while creating your gig!");
+        clientLogger.error("Error while creating gig: ", error);
+        throw error;
     }
 }
+
+
+// /**
+//  * @function uploadGigImages
+//  * @param formData Images form data
+//  * @returns the response from the server
+//  * @route POST /gig/upload-photo
+//  */
+// export async function uploadGigImages(formData: FormData) {
+//     try {
+//         const response = await axiosInstance.post(`/gig/upload-photo`, formData, {
+//             headers: {
+//                 'Content-Type': 'multipart/form-data',
+//             },
+//         });
+//         return response;
+//     }
+//     catch (error: unknown) {
+//         ErrorToast("Something went wrong while uploading your images!")
+//         clientLogger.error("Somethine went wrong while uploading your images, ", error);
+//     }
+// }
+
+// /**
+//  * @function createGig
+//  * @description this function helps to create the gig
+//  * @param id:string Id of the user
+//  * @param gig: Gigdata of the user
+//  * @returns Response from the server
+//  * @route PUT /gig/creategig/{id}
+// */
+// export async function createGig(id: string, gig: GigI) {
+//     try {
+//         const response = await axiosInstance.put(`/gig/creategig/${id}`, gig);
+//         return response.data;
+//     }
+//     catch (error: unknown) {
+//         ErrorToast("Something Went wrong while Creating your gig!");
+//         clientLogger.error("Something went wrong while creating your gig: ", error)
+//     }
+// }
 
 /**
  * @function fetchUserGigs

@@ -9,7 +9,6 @@ import { MotivationalQuotes } from '@/components/ui/MotivationalQuotes';
 import { SuccessToast, ErrorToast } from '@/components/ui/Toast';
 import { Skills_data } from '@/utils/data/data';
 import RichTextEditor from '@/components/ui/RichTextEditor';
-import { uploadGigImages } from '@/lib/gig/gig-api';
 import { useGigStore } from '@/store/gigStore';
 import { useEnsureAuth } from '@/hooks/useEnsureAuth';
 import { GigI } from '@/types/gig';
@@ -81,35 +80,27 @@ const CreateGigPage = () => {
      */
     const handleSubmit = async (values: GigI) => {
         try {
-            //validation
             gigSchema.parse(values);
         } catch (error: unknown) {
             if (error instanceof ZodError) {
-                const firstError = error.issues[0]?.message || "Validation failed";
-                ErrorToast(firstError);
+                ErrorToast(error.issues[0]?.message || "Validation failed");
                 return;
             }
         }
 
         if (images.length === 0) {
-            ErrorToast('Please add at least one image');
+            ErrorToast("Please add at least one image");
             return;
         }
 
         if (!isReady) {
-            ErrorToast("Authentication not ready to proceed, Login Again!");
+            ErrorToast("Authentication not ready, Login Again!");
             return;
         }
 
         setIsSubmitting(true);
+
         try {
-            // Create FormData for image upload
-            const formData = new FormData();
-            images.forEach(image => {
-                formData.append('files', image);
-            });
-
-
             const token = await recaptcha.current?.executeAsync();
             recaptcha.current?.reset();
 
@@ -119,35 +110,27 @@ const CreateGigPage = () => {
                 return;
             }
 
-            formData.append('captchaToken', token);
+            const responseGig = await createGig({
+                ...values,
+                images: images || [],
+                captchaToken: token,
+            });
 
-            //uploading the image
-            const responseImage = await uploadGigImages(formData);
-            if (responseImage?.status !== 201) {
-                ErrorToast("Something went wrong uploading your image, Please try again later!");
-                return;
-            }
-            //Creating the gig
-            const newValues = {
-                ...values
-            }
-
-            const responseGig = await createGig(responseImage?.data?.imagesData?._id, newValues);
             if (responseGig.status === "success") {
                 SuccessToast("Successfully Created your Gig!");
-                router.push('/dashboard/job-seeker/my-gigs');
+                router.push("/dashboard/job-seeker/my-gigs");
             }
         } catch (error: unknown) {
             if (error instanceof AxiosError) {
-                const errorMessage = error.response?.data?.message || 'Failed to Create the Gig!';
-                ErrorToast(errorMessage);
+                ErrorToast(error.response?.data?.message || "Failed to create the gig!");
             } else {
-                ErrorToast('An error occurred while creating your gig');
+                ErrorToast("An error occurred while creating your gig");
             }
         } finally {
             setIsSubmitting(false);
         }
     };
+
 
     if (isLoading) {
         return <Loader />

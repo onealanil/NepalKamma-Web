@@ -111,7 +111,7 @@ export default function NearByBuyerPage() {
                                             {jobProviders.map((provider: JobProviderI) => (
                                                 <Link
                                                     key={provider._id}
-                                                    href={`/dashboard/job-provider/profile/user/${provider._id}`}
+                                                    href={`/dashboard/job-seeker/profile/user/${provider._id}`}
                                                 >
                                                     <PeopleCard
                                                         key={provider._id}

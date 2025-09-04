@@ -383,7 +383,6 @@ export async function fetchNearbyJobs(
             throw new Error("Latitude and longitude are required");
         }
         const response = await axiosInstance.get(`/job/getNearbyJob/${latitude}/${longitude}`);
-        console.log('Nearby jobs response:', response.data);
         return {
             success: true,
             data: response.data.nearBy || [], // Extract the nearBy array

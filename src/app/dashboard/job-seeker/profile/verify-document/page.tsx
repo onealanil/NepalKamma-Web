@@ -124,7 +124,7 @@ export default function VerifyDocument() {
         } finally {
             setIsSubmitting(false);
         }
-    }, [images, setUser, user, mutate,  isReady]);
+    }, [images, setUser, user, mutate, isReady]);
 
     if (!user) {
         return <Loader />
@@ -221,7 +221,8 @@ export default function VerifyDocument() {
                 </div>
                 <p className="text-yellow-700 mb-4">
                     Your documents are pending. NepalKamma is currently reviewing them.
-                    We will email you once your documents have been verified. Thank you for your patience.
+                    We will email you once your documents have been verified. If you don&apos;t see the email in your inbox, please check your spam folder. Thank you for your patience.
+
                 </p>
                 <button
                     onClick={() => router.push('/dashboard/job-seeker/profile')}

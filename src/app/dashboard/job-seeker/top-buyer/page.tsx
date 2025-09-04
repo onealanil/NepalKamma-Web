@@ -108,7 +108,7 @@ export default function TopProviderPage() {
                       {jobProviders.map((provider: jobProviderI) => (
                         <Link
                           key={provider._id}
-                          href={`/dashboard/job-provider/profile/user/${provider._id}`}
+                          href={`/dashboard/job-seeker/profile/user/${provider._id}`}
                         >
                           <PeopleCard
                             key={provider._id}

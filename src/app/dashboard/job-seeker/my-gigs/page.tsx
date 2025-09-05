@@ -280,7 +280,7 @@ v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
                                 </div>
                                 <div className="ml-3">
                                     <p className="text-sm text-blue-700">
-                                        You can't create more than 2 gigs until you delete an existing one. This helps us maintain quality and manageability on the platform. Please consider removing an old gig to make space for a new one.
+                                        You can&apos;t create more than 2 gigs until you delete an existing one. This helps us maintain quality and manageability on the platform. Please consider removing an old gig to make space for a new one.
                                     </p>
                                 </div>
                             </div>

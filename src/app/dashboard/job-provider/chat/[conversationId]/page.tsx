@@ -24,7 +24,6 @@ export default function ConversationPageProvider() {
     const { messages: rawMessages, otherUser, isLoading, isError, mutate } = useMessages(conversationId);
     const { createMessageAction, markAsReadAction, isLoading: isSendingMessage } = useMessageStore();
 
-    // Sort messages chronologically (oldest first)
     const messages = rawMessages.sort((a, b) =>
         new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
     );
@@ -32,30 +31,24 @@ export default function ConversationPageProvider() {
     const [newMessage, setNewMessage] = useState('');
     const [isSending, setIsSending] = useState(false);
 
-    // Socket.IO integration
     const { sendSocketMessage, markAsRead: socketMarkAsRead, isConnected } = useSocketMessages({
         conversationId,
         onMessageReceived: () => {
-            // Refresh messages when new message received
             mutate();
         }
     });
 
-    // Online status for other user
     const { isOnline: isOtherUserOnline, getStatusClasses } = useOnlineStatusIndicator(otherUser?._id || '');
 
-    // Mark messages as read when conversation opens
     useEffect(() => {
         if (conversationId && messages.length > 0) {
           markAsReadAction(conversationId);
-          // Also mark as read via socket for real-time updates
           if (isConnected) {
               socketMarkAsRead();
           }
         }
     }, [conversationId, messages.length, markAsReadAction, isConnected, socketMarkAsRead]);
 
-    // Auto-scroll to bottom when new messages arrive
     useEffect(() => {
         scrollToBottom();
     }, [messages]);
@@ -64,14 +57,13 @@ export default function ConversationPageProvider() {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
 
-    // Send message handler
     const handleSendMessage = useCallback(async () => {
         if (!newMessage.trim() || !user?._id || !otherUser?._id || !conversationId) {
             return;
         }
 
         const messageText = newMessage.trim();
-        setNewMessage(''); // Clear input immediately for better UX
+        setNewMessage(''); 
         setIsSending(true);
 
         const messageData: CreateMessageData = {
@@ -83,21 +75,19 @@ export default function ConversationPageProvider() {
         try {
             const sentMessage = await createMessageAction(messageData);
             if (sentMessage) {
-                // Send via Socket.IO for real-time delivery
                 if (isConnected && otherUser?._id) {
                     sendSocketMessage(otherUser._id, messageText, conversationId);
                 }
 
-                // Refresh messages to get the latest
                 mutate();
                 SuccessToast('Message sent!');
             } else {
                 ErrorToast('Failed to send message');
-                setNewMessage(messageText); // Restore message on failure
+                setNewMessage(messageText); 
             }
         } catch (error) {
             ErrorToast('Failed to send message. Please try again.');
-            setNewMessage(messageText); // Restore message on failure
+            setNewMessage(messageText); 
             clientLogger.error('Send message error:', error);
         } finally {
             setIsSending(false);

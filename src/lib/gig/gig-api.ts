@@ -1,5 +1,4 @@
 import { ErrorToast } from "@/components/ui/Toast";
-import { GigI } from "@/types/gig";
 import axiosInstance from "../axios";
 import { handleApiError } from "../job/job-api";
 import { ApiResponse } from "@/types/job-provider/job-api";

@@ -31,10 +31,8 @@ export default function UserProfilePage() {
     const params = useParams();
     const userId = params.id as string;
 
-    // Get current logged-in user for verification checks
     const { user: currentUser } = useAuthStore();
 
-    // Fetch paginated reviews for the job seeker
     const {
         reviews: reviewData,
         pagination,
@@ -44,13 +42,10 @@ export default function UserProfilePage() {
         setCurrentPage,
     } = usePaginatedReviews(userId);
 
-    // Use the hook to fetch user data and gigsmutateReviews
     const { user, userGigs, isLoading, isError } = useSingleUserSeeker(userId);
 
-    // Online status for other user
     const { isOnline: isOtherUserOnline } = useOnlineStatusIndicator(userId || '');
 
-    // Message store for handling conversations and messages
     const {
         createConversationAction,
         createMessageAction,

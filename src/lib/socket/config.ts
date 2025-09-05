@@ -8,7 +8,6 @@ import { SocketType } from '@/types/socket';
 
 // Socket.IO configuration
 export const SOCKET_CONFIG = {
-  // Use environment variable for backend URL (remove /api/v1 for socket connection)
   url: process.env.NEXT_PUBLIC_BACKEND_URL?.replace('/api/v1', '') || 'http://localhost:8000',
   options: {
     transports: ['websocket', 'polling'],
@@ -18,11 +17,10 @@ export const SOCKET_CONFIG = {
     reconnectionDelay: 1000,
     reconnectionDelayMax: 5000,
     maxReconnectionAttempts: 5,
-    autoConnect: false, // We'll connect manually when user is authenticated
+    autoConnect: false, 
   }
 };
 
-// Singleton socket instance
 let socketInstance: SocketType | null = null;
 
 /**
@@ -33,7 +31,6 @@ export const createSocket = (): SocketType => {
   if (!socketInstance) {
     socketInstance = io(SOCKET_CONFIG.url, SOCKET_CONFIG.options);
     
-    // Add global error handling
     socketInstance.on('connect_error', (error: Error) => {
       console.error('Socket connection error:', error);
     });

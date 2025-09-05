@@ -7,6 +7,7 @@ import "./globals.css";
 import SWRProvider from '@/components/providers/SWRProvider';
 import { SocketProvider } from '@/contexts/SocketContext';
 import NextTopLoader from 'nextjs-toploader';
+import ClientLayout from "@/contexts/ClientLayout";
 // import { useEffect } from "react";
 
 const geistSans = Geist({
@@ -42,15 +43,17 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <NextTopLoader
-          color="#32b327" 
-          height={6} 
-          showSpinner={false} 
-          easing="ease-in-out" 
-          shadow="0 0 10px #FF0000,0 0 5px #FF0000" 
+          color="#32b327"
+          height={6}
+          showSpinner={false}
+          easing="ease-in-out"
+          shadow="0 0 10px #FF0000,0 0 5px #FF0000"
         />
         <SWRProvider>
           <SocketProvider>
-            {children}
+            <ClientLayout>
+              {children}
+            </ClientLayout>
             <ToastContainer />
           </SocketProvider>
         </SWRProvider>

@@ -13,7 +13,7 @@ import clientLogger from '@/utils/logger';
 interface UseSocketOnlineUsersProps {
   onOnlineUsersUpdate?: (users: OnlineUser[]) => void;
   autoRefresh?: boolean;
-  refreshInterval?: number; // in milliseconds
+  refreshInterval?: number; 
 }
 
 export const useSocketOnlineUsers = ({
@@ -23,14 +23,12 @@ export const useSocketOnlineUsers = ({
 }: UseSocketOnlineUsersProps = {}) => {
   const { onlineUsers, getOnlineUsers, isConnected, isUserOnline } = useSocket();
 
-  // Call custom handler when online users update
   useEffect(() => {
     if (onOnlineUsersUpdate) {
       onOnlineUsersUpdate(onlineUsers);
     }
   }, [onlineUsers, onOnlineUsersUpdate]);
 
-  // Auto-refresh online users if enabled
   useEffect(() => {
     if (!autoRefresh || !isConnected) return;
 
@@ -42,7 +40,6 @@ export const useSocketOnlineUsers = ({
     return () => clearInterval(interval);
   }, [autoRefresh, isConnected, refreshInterval, getOnlineUsers]);
 
-  // Refresh online users manually
   const refreshOnlineUsers = useCallback(() => {
     if (isConnected) {
       getOnlineUsers();
@@ -52,17 +49,14 @@ export const useSocketOnlineUsers = ({
     }
   }, [isConnected, getOnlineUsers]);
 
-  // Get online status of specific user
   const getUserOnlineStatus = useCallback((userId: string): boolean => {
     return isUserOnline(userId);
   }, [isUserOnline]);
 
-  // Get online users count
   const getOnlineUsersCount = useCallback((): number => {
     return onlineUsers.length;
   }, [onlineUsers.length]);
 
-  // Get online users list (filtered by specific criteria if needed)
   const getFilteredOnlineUsers = useCallback((
     filterFn?: (user: OnlineUser) => boolean
   ): OnlineUser[] => {
@@ -72,12 +66,10 @@ export const useSocketOnlineUsers = ({
     return onlineUsers;
   }, [onlineUsers]);
 
-  // Check if any users from a list are online
   const areAnyUsersOnline = useCallback((userIds: string[]): boolean => {
     return userIds.some(userId => isUserOnline(userId));
   }, [isUserOnline]);
 
-  // Get online users from a specific list
   const getOnlineUsersFromList = useCallback((userIds: string[]): OnlineUser[] => {
     return onlineUsers.filter(user => userIds.includes(user.userId));
   }, [onlineUsers]);
@@ -100,7 +92,6 @@ export const useSocketOnlineUsers = ({
 export const useConversationOnlineStatus = (participantIds: string[]) => {
   const { isUserOnline, onlineUsers } = useSocket();
 
-  // Get online status for all participants
   const getParticipantsOnlineStatus = useCallback(() => {
     return participantIds.map(userId => ({
       userId,
@@ -108,12 +99,10 @@ export const useConversationOnlineStatus = (participantIds: string[]) => {
     }));
   }, [participantIds, isUserOnline]);
 
-  // Check if any participant is online
   const isAnyParticipantOnline = useCallback(() => {
     return participantIds.some(userId => isUserOnline(userId));
   }, [participantIds, isUserOnline]);
 
-  // Get count of online participants
   const getOnlineParticipantsCount = useCallback(() => {
     return participantIds.filter(userId => isUserOnline(userId)).length;
   }, [participantIds, isUserOnline]);
@@ -134,7 +123,6 @@ export const useOnlineStatusIndicator = (userId: string) => {
 
   const isOnline = isUserOnline(userId);
 
-  // Get appropriate CSS classes for online status
   const getStatusClasses = useCallback((
     onlineClass: string = 'bg-green-500',
     offlineClass: string = 'bg-gray-400'
@@ -142,7 +130,6 @@ export const useOnlineStatusIndicator = (userId: string) => {
     return isOnline ? onlineClass : offlineClass;
   }, [isOnline]);
 
-  // Get status text
   const getStatusText = useCallback((
     onlineText: string = 'Online',
     offlineText: string = 'Offline'

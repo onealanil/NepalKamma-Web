@@ -22,7 +22,7 @@ export interface GigI {
     gig_description: string;
     price: number;
     category: string;
-    images?: [{ url: string, public_id: string }] | File[];
+    images?: [{ url: string, public_id: string }];
     postedBy?: User;
     visibility?: 'public' | 'private' | string;
     createdAt?: Date;

@@ -46,46 +46,6 @@ export async function createGig(values: {
 }
 
 
-// /**
-//  * @function uploadGigImages
-//  * @param formData Images form data
-//  * @returns the response from the server
-//  * @route POST /gig/upload-photo
-//  */
-// export async function uploadGigImages(formData: FormData) {
-//     try {
-//         const response = await axiosInstance.post(`/gig/upload-photo`, formData, {
-//             headers: {
-//                 'Content-Type': 'multipart/form-data',
-//             },
-//         });
-//         return response;
-//     }
-//     catch (error: unknown) {
-//         ErrorToast("Something went wrong while uploading your images!")
-//         clientLogger.error("Somethine went wrong while uploading your images, ", error);
-//     }
-// }
-
-// /**
-//  * @function createGig
-//  * @description this function helps to create the gig
-//  * @param id:string Id of the user
-//  * @param gig: Gigdata of the user
-//  * @returns Response from the server
-//  * @route PUT /gig/creategig/{id}
-// */
-// export async function createGig(id: string, gig: GigI) {
-//     try {
-//         const response = await axiosInstance.put(`/gig/creategig/${id}`, gig);
-//         return response.data;
-//     }
-//     catch (error: unknown) {
-//         ErrorToast("Something Went wrong while Creating your gig!");
-//         clientLogger.error("Something went wrong while creating your gig: ", error)
-//     }
-// }
-
 /**
  * @function fetchUserGigs
  * @description This function is used to fetch the gigs of the user

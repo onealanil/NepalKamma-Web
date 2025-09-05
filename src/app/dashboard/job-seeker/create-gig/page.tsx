@@ -50,7 +50,7 @@ const CreateGigPage = () => {
      */
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = Array.from(e.target.files || []);
-        const maxImages = 3;
+        const maxImages = 2;
 
         if (files.length > maxImages) {
             ErrorToast(`Maximum ${maxImages} images allowed`);
@@ -98,7 +98,6 @@ const CreateGigPage = () => {
             return;
         }
 
-        setIsSubmitting(true);
 
         try {
             const token = await recaptcha.current?.executeAsync();
@@ -109,6 +108,8 @@ const CreateGigPage = () => {
                 setIsSubmitting(false);
                 return;
             }
+
+            setIsSubmitting(true);
 
             const responseGig = await createGig({
                 ...values,
@@ -134,6 +135,26 @@ const CreateGigPage = () => {
 
     if (isLoading) {
         return <Loader />
+    }
+
+    if (isSubmitting) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="text-center">
+                    <p className="text-lg font-medium text-gray-700 flex items-center justify-center gap-1">
+                        Requesting
+                        <span className="flex space-x-1">
+                            <span className="animate-bounce">.</span>
+                            <span className="animate-bounce [animation-delay:200ms]">.</span>
+                            <span className="animate-bounce [animation-delay:400ms]">.</span>
+                        </span>
+                    </p>
+                    <div className='p-5 flex items-center justify-center'>
+                        <p className="text-sm text-gray-500 mt-2">Please do not refresh or navigate away from the page.</p>
+                    </div>
+                </div>
+            </div>
+        )
     }
 
     return (
@@ -254,7 +275,7 @@ const CreateGigPage = () => {
                                         {/* Image Upload */}
                                         <div>
                                             <label className="block text-sm font-medium text-gray-900 mb-2">
-                                                Gig Images * (Max 3) (Banner)
+                                                Gig Images * (Max 2) (Banner)
                                             </label>
                                             <div className="border-2 border-dashed border-green-200 rounded-lg p-6 text-center hover:border-primary transition-colors">
                                                 <input

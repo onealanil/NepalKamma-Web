@@ -19,6 +19,7 @@ import Loader from '@/components/global/Loader';
 import Image from 'next/image';
 import { useAuthStore } from '@/store/authStore';
 import ReCaptcha from "react-google-recaptcha";
+import { useUserGigs } from '@/hooks/gigs/useGigs';
 
 
 const initialValues: GigI = {
@@ -33,6 +34,7 @@ const CreateGigPage = () => {
     const { isReady, isLoading } = useEnsureAuth();
     const { user: loggedInUser } = useAuthStore();
     const { createGig } = useGigStore();
+    const { mutate } = useUserGigs(loggedInUser?._id || "");
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
     const [images, setImages] = useState<File[]>([]);
     const [imagePreviews, setImagePreviews] = useState<string[]>([]);
@@ -119,6 +121,7 @@ const CreateGigPage = () => {
 
             if (responseGig.status === "success") {
                 SuccessToast("Successfully Created your Gig!");
+                await mutate();
                 router.push("/dashboard/job-seeker/my-gigs");
             }
         } catch (error: unknown) {

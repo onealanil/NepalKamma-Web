@@ -156,7 +156,13 @@ export default function MyJobsPage() {
                                 >
                                     {status === "In_Progress" ? "In Progress" : (status === "can_delete" ? "Can Delete" : status)}
 
-                                    ({jobs.filter((job: JobI) => job.job_status === status).length})
+                                    ({jobs.filter((job: JobI) => {
+                                        if (job.job_status && job.visibility === "public" && job.job_status === "Pending") {
+                                            return job.job_status === status;
+                                        }
+                                        if (job.job_status && job.job_status !== "Pending") return job.job_status === status;
+                                    }).length
+                                    })
                                 </button>
                             ))}
                         </div>
@@ -207,7 +213,7 @@ v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
                                         </div>
                                         <div className="ml-3">
                                             <p className="text-sm text-yellow-700">
-                                                Jobs listed under &apos;Can Delete&apos; can be removed from your job list. These jobs are either cancelled or completed and no longer active. Make sure to delete these jobs to keep your job list organized.
+                                                Jobs listed under &apos;Can Delete&apos; can be removed from your job list. These jobs are either cancelled or completed or private and no longer active. Make sure to delete these jobs to keep your job list organized.
                                             </p>
                                         </div>
                                     </div>
@@ -285,12 +291,12 @@ v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
                             ) : jobs.length > 0 ? (
                                 jobs
                                     .filter((job: JobI) => {
-                                        if (activeTab === "pending") return job.job_status === "Pending";
+                                        if (activeTab === "pending") return job.job_status === "Pending" && job.visibility === "public";
                                         if (activeTab === "in_progress") return job.job_status === "In_Progress";
                                         if (activeTab === "completed") return job.job_status === "Completed";
                                         if (activeTab === "cancelled") return job.job_status === "Cancelled";
                                         if (activeTab === "paid") return job.job_status === "Paid";
-                                        if (activeTab === "can_delete") return job.job_status === "can_delete";
+                                        if (activeTab === "can_delete") return job.job_status === "can_delete" || job.visibility === "private";
                                         return false;
                                     })
                                     .map((job: JobI) => (

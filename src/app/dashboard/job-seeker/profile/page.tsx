@@ -21,7 +21,7 @@ import clientLogger from '@/utils/logger';
  * @returns {JSX.Element}
  */
 export default function ProfilePageSeeker() {
-    const { isLoading } = useAuth();
+    const { isLoading, mutate } = useAuth();
     const { isReady } = useEnsureAuth();
     const { user: userData, setUser } = useAuthStore();
     const { gigs } = useUserGigs(userData?._id ? userData?._id : "");
@@ -78,6 +78,7 @@ export default function ProfilePageSeeker() {
             const response = await updateProfilePicture(formData);
             if (response.status === 200) {
                 setUser({ ...userData, profilePic: { public_id: response.data.public_id, url: response.data.url } });
+                await mutate();
                 SuccessToast('Profile picture updated successfully!');
                 setShowImageModal(false);
                 setImage(null);
@@ -110,6 +111,26 @@ export default function ProfilePageSeeker() {
             setCurrentGigIndex(0);
         }
     };
+
+    if (isUploadingImage) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="text-center">
+                    <p className="text-lg font-medium text-gray-700 flex items-center justify-center gap-1">
+                        Requesting
+                        <span className="flex space-x-1">
+                            <span className="animate-bounce">.</span>
+                            <span className="animate-bounce [animation-delay:200ms]">.</span>
+                            <span className="animate-bounce [animation-delay:400ms]">.</span>
+                        </span>
+                    </p>
+                    <div className='p-5 flex items-center justify-center'>
+                        <p className="text-sm text-gray-500 mt-2">Please do not refresh or navigate away from the page.</p>
+                    </div>
+                </div>
+            </div>
+        )
+    }
 
     if (isLoading) return <Loader />;
     if (!userData) return <p>No user data found</p>;

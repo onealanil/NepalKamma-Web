@@ -24,7 +24,7 @@ import SafeHTML from '@/components/global/SafeHTML';
  */
 export default function ProfilePageProvider() {
     const router = useRouter();
-    const { isLoading } = useAuth();
+    const { isLoading, mutate } = useAuth();
     const { isReady } = useEnsureAuth();
     const { user: userData, setUser } = useAuthStore();
     const { jobs } = useUserJobs(userData?._id || '');
@@ -80,6 +80,7 @@ export default function ProfilePageProvider() {
             const response = await updateProfilePicture(formData);
             if (response.status === 200) {
                 setUser({ ...userData, profilePic: { public_id: response.data.public_id, url: response.data.url } });
+                await mutate();
                 SuccessToast('Profile picture updated successfully!');
                 setShowImageModal(false);
                 setImage(null);

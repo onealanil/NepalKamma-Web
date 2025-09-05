@@ -32,8 +32,6 @@ const MyGigsPage = () => {
     const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-
-
     /**
   * @function handleRefresh
   * @description Function to refresh the jobs list

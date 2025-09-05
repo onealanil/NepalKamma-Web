@@ -92,7 +92,7 @@ export default function JobCard({ job, onDelete, onView }: JobCardProps) {
 
                     <div className="flex items-center gap-2">
                         {
-                            (job.job_status === "Paid" || job.job_status === "can_delete"|| job.job_status === "Completed" || job.job_status === "Cancelled") ? (
+                            (job.job_status === "Paid" || job.job_status === "can_delete"|| job.job_status === "Completed" || job.job_status === "Cancelled" || (job.job_status !== "In_Progress" &&job.visibility==="private")) ? (
                                 <span className={`px-2 py-1 rounded-full text-xs font-medium ${job.job_status === "Paid" || job.job_status === "Completed" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
                                     {job.job_status}
                                 </span>

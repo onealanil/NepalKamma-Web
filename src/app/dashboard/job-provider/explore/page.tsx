@@ -8,15 +8,14 @@ import { GigCardProvider } from '@/components/gig/GigCardProvider';
 import { useSearchGigs, GigSearchParams } from '@/hooks/gigs/useSearchGigs';
 import { useUserLocation } from '@/hooks/useUserLocation';
 import { GigI } from '@/types/gig';
-import { CATEGORY_OPTIONS } from '@/types/filters';
 import RefreshingButton from '@/components/ui/RefreshingButton';
 import Loader from '@/components/global/Loader';
 import Link from 'next/link';
+import { Skills_data } from '@/utils/data/data';
 
 function JobProviderExplorePage() {
     const { latitude, longitude } = useUserLocation();
 
-    // Search state
     const [searchText, setSearchText] = useState('');
     const [category, setCategory] = useState('');
     const [sortBy, setSortBy] = useState('');
@@ -24,9 +23,6 @@ function JobProviderExplorePage() {
     const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
     const [isRefreshing, setIsRefreshing] = useState(false);
 
-
-
-    // Build search parameters
     const searchParams: GigSearchParams = {
         text: searchText || undefined,
         category: category || undefined,
@@ -36,7 +32,7 @@ function JobProviderExplorePage() {
         sortByPriceHighToLow: sortBy === 'priceHigh' || undefined,
         sortByPriceLowToHigh: sortBy === 'priceLow' || undefined,
         page: currentPage,
-        limit: 10
+        limit: 5
     };
 
 
@@ -313,8 +309,8 @@ function JobProviderExplorePage() {
                                     className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
                                 >
                                     <option value="">All Categories</option>
-                                    {CATEGORY_OPTIONS.map((cat) => (
-                                        <option key={cat.value} value={cat.value}>
+                                    {Skills_data.map((cat) => (
+                                        <option key={cat.id} value={cat.name}>
                                             {cat.label}
                                         </option>
                                     ))}

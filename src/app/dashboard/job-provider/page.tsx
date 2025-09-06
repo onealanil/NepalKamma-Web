@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState} from 'react';
+import { useState } from 'react';
 import LeftSideProvider from '@/components/ui/LeftSideProvider';
 import { GigCardProvider } from '@/components/gig/GigCardProvider';
 import { useAllGigs } from '@/hooks/gigs/useAllGigs';
@@ -10,15 +10,17 @@ import { useUserLocation } from '@/hooks/useUserLocation';
 import { GigI } from '@/types/gig';
 import RefreshingButton from '@/components/ui/RefreshingButton';
 import Link from 'next/link';
+import logger from '@/utils/logger';
 
 function JobProviderDashboard() {
     const [isPopular, setIsPopular] = useState(true);
+    const [currentPage, setCurrentPage] = useState(1);
 
     // Get user location for nearby gigs
     const { latitude, longitude } = useUserLocation();
 
     // Fetch all gigs for browse tab
-    const { gigs: allGigs, totalGigs, isLoading: isLoadingAllGigs, mutate: allGigsMutate } = useAllGigs(1, 10);
+    const { gigs: allGigs, totalPages, totalGigs, isLoading: isLoadingAllGigs, mutate: allGigsMutate } = useAllGigs(currentPage, 5);
 
     // Fetch nearby gigs for nearby tab
     const { gigs: nearbyGigsData, isLoading: isLoadingNearbyGigs, mutate: nearbyGigsMutate } = useNearbyGigs(
@@ -28,6 +30,8 @@ function JobProviderDashboard() {
 
     const setPopularTrueFunction = () => setIsPopular(true);
     const setPopularFalseFunction = () => setIsPopular(false);
+
+
 
     // Determine which gigs to show based on active tab
     const currentGigs = isPopular ? allGigs : nearbyGigsData;
@@ -44,7 +48,7 @@ function JobProviderDashboard() {
                 await nearbyGigsMutate();
             }
         } catch (error) {
-            console.error('Failed to refresh gigs:', error);
+            logger.error('Failed to refresh gigs:', error);
         } finally {
             setIsRefreshing(false);
         }
@@ -147,6 +151,45 @@ function JobProviderDashboard() {
                                                     />
                                                 </Link>
                                             ))}
+                                            {/* Pagination */}
+                                            {isPopular && totalPages > 1 && (
+                                                <div className="flex items-center justify-center gap-2 mt-8">
+                                                    <button
+                                                        onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                                                        disabled={currentPage === 1}
+                                                        className="px-4 py-2 border border-gray-300 rounded-lg font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                                                    >
+                                                        Previous
+                                                    </button>
+
+                                                    {/* Page Numbers */}
+                                                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                                                        const pageNum = Math.max(1, currentPage - 2) + i;
+                                                        if (pageNum > totalPages) return null;
+
+                                                        return (
+                                                            <button
+                                                                key={pageNum}
+                                                                onClick={() => setCurrentPage(pageNum)}
+                                                                className={`px-4 py-2 rounded-lg font-medium ${pageNum === currentPage
+                                                                    ? 'bg-primary text-white'
+                                                                    : 'border border-gray-300 text-gray-700 hover:bg-gray-50'
+                                                                    }`}
+                                                            >
+                                                                {pageNum}
+                                                            </button>
+                                                        );
+                                                    })}
+
+                                                    <button
+                                                        onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                                                        disabled={currentPage === totalPages}
+                                                        className="px-4 py-2 border border-gray-300 rounded-lg font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                                                    >
+                                                        Next
+                                                    </button>
+                                                </div>
+                                            )}
                                         </div>
                                     )}
                                 </>

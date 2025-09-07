@@ -15,7 +15,12 @@ export const useAuthStore = create<AuthState>()(
             accessToken: null,
             setUser: (user) => set({ user }),
             setAccessToken: (token: string) => set({ accessToken: token }),
-            logout: () => set({ user: null, accessToken: null }),
+            logout: () => {
+                set({ user: null, accessToken: null });
+                if (typeof window !== "undefined") {
+                    window.location.href = "/auth/signin";
+                }
+            },
             hasHydrated: false,
             setHasHydrated: (value: boolean) => set({ hasHydrated: value })
         }),

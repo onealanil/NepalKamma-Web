@@ -56,9 +56,9 @@ export default function Header() {
           </Link>
 
 
-          {/* Desktop Navigation for job-seeker */}
+          {/* Desktop Navigation for job-provider */}
           {user?.role === "job_provider" && (
-            <nav className="hidden md:flex items-center space-x-8 font-medium">
+            <nav className="hidden lg:flex items-center space-x-8 font-medium">
               <Link
                 href="/dashboard/job-provider"
                 className="text-black hover:text-gray-500 transition-colors"
@@ -73,6 +73,9 @@ export default function Header() {
               </Link>
               <Link href="/dashboard/job-provider/top-seller" className="text-black hover:text-gray-500 transition-colors">
                 Top Seller
+              </Link>
+              <Link href="/dashboard/job-provider/near-by-seller" className="text-black hover:text-gray-500 transition-colors">
+                Near by Seller
               </Link>
               <Link
                 href="/dashboard/job-provider/profile"
@@ -91,7 +94,7 @@ export default function Header() {
 
           {/* Desktop Navigation for job-seeker */}
           {user?.role === "job_seeker" && (
-            <nav className="hidden md:flex items-center space-x-8 font-medium">
+            <nav className="hidden lg:flex items-center space-x-8 font-medium">
               <Link
                 href="/dashboard/job-seeker"
                 className="text-black hover:text-gray-500 transition-colors"
@@ -117,6 +120,12 @@ export default function Header() {
                 Top Buyer
               </Link>
               <Link
+                href="/dashboard/job-seeker/near-by-buyer"
+                className="text-black hover:text-gray-500 transition-colors"
+              >
+                Near by Buyer
+              </Link>
+              <Link
                 href="/dashboard/job-seeker/profile"
                 className="text-black hover:text-gray-500 transition-colors"
               >
@@ -134,7 +143,7 @@ export default function Header() {
           {/* Mobile Hamburger Button */}
           <button
             onClick={toggleMobileMenu}
-            className="md:hidden p-2 text-black hover:text-gray-500 transition-colors"
+            className="lg:hidden p-2 text-black hover:text-gray-500 transition-colors"
           >
             {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
@@ -151,7 +160,7 @@ export default function Header() {
           />
 
           {/* Sidebar */}
-          <div className="fixed top-0 right-0 h-full w-80 bg-gradient-to-br from-gray-50 to-gray-100 shadow-lg z-50 md:hidden transform transition-transform duration-300">
+          <div className="fixed top-0 right-0 h-full w-80 bg-gradient-to-br from-gray-50 to-gray-100 shadow-lg z-50 lg:hidden transform transition-transform duration-300">
             <div className="p-6">
               {/* Close button */}
               <div className="flex justify-end mb-8">
@@ -215,6 +224,13 @@ export default function Header() {
                   Top Seller
                 </Link>
                 <Link
+                  href="/dashboard/job-provider/near-by-seller"
+                  className="block text-lg font-medium text-gray-900 hover:text-primary transition-colors"
+                  onClick={closeMobileMenu}
+                >
+                  Near by Sellers
+                </Link>
+                <Link
                   href="/dashboard/job-provider/profile"
                   className="block text-lg font-medium text-gray-900 hover:text-primary transition-colors"
                   onClick={closeMobileMenu}
@@ -245,7 +261,7 @@ export default function Header() {
           />
 
           {/* Sidebar */}
-          <div className="fixed top-0 right-0 h-full w-80 bg-gradient-to-br from-gray-50 to-gray-100 shadow-lg z-50 md:hidden transform transition-transform duration-300">
+          <div className="fixed top-0 right-0 h-full w-80 bg-gradient-to-br from-gray-50 to-gray-100 shadow-lg z-50 lg:hidden transform transition-transform duration-300">
             <div className="p-6">
               {/* Close button */}
               <div className="flex justify-end mb-8">
@@ -308,6 +324,13 @@ export default function Header() {
                   onClick={closeMobileMenu}
                 >
                   Top Buyer
+                </Link>
+                <Link
+                  href="/dashboard/job-seeker/near-by-buyer"
+                  className="block text-lg font-medium text-gray-900 hover:text-primary transition-colors"
+                  onClick={closeMobileMenu}
+                >
+                  Near by Buyer
                 </Link>
                 <Link
                   href="/dashboard/job-seeker/profile"

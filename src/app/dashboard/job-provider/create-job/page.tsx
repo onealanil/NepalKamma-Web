@@ -33,8 +33,7 @@ const CreateJobPage = () => {
         type: 'Point',
     });
     const [selectedSkills, setSelectedSkills] = useState<number[]>([]);
-    const [captchaToken, setCaptchaToken] = useState<string>('');
-    console.log(captchaToken);
+
     //ref for recaptcha
     const recaptcha: RefObject<ReCAPTCHA | null> = useRef(null);
 
@@ -68,15 +67,18 @@ const CreateJobPage = () => {
             return;
         }
 
-        if (!captchaToken) {
-            setIsSubmitting(false);
-            ErrorToast('Please complete the captcha');
-            return;
-        }
-
 
         if (!isReady) {
             ErrorToast("Authentication not ready to proceed, Login Again!");
+            return;
+        }
+
+        const token = await recaptcha.current?.executeAsync();
+        recaptcha.current?.reset();
+
+        if (!token) {
+            ErrorToast("Captcha verification failed, Please try again later!");
+            setIsSubmitting(false);
             return;
         }
 
@@ -90,7 +92,7 @@ const CreateJobPage = () => {
                 latitude: geometry?.coordinates?.[1],
                 longitude: geometry?.coordinates?.[0],
                 phoneNumber: user?.phoneNumber || '9804077722',
-                captchaToken: captchaToken
+                captchaToken: token
             }
 
             const response = await createJob(newValues);
@@ -120,11 +122,6 @@ const CreateJobPage = () => {
         );
     };
 
-    const onCaptchaChange = (token: string | null) => {
-        if (token) {
-            setCaptchaToken(token);
-        }
-    };
 
 
     if (isLoading) {
@@ -247,7 +244,14 @@ const CreateJobPage = () => {
                                         </div>
                                         {/* Location */}
                                         <div>
+                                            <div className="p-2 bg-yellow-100 border text-xs border-yellow-300 text-yellow-800 rounded-md">
+                                                <svg className="inline w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                                Instead of choosing an exact address like &apos;Salakpur&apos; choose a nearby cities like &apos;Biratnagar&apos;, &apos;Itahari&apos;, &apos;Kathmandu&apos;, &apos;Pokhara&apos; etc. Or you can choose a unique name of your location like sundarharaincha, morang etc. This will help our map to show job location correctly. Sometimes the exact location may not appear in the map, we apologize for the inconvenience and we are working to improve it.
+                                            </div>
                                             <div className="flex items-center justify-between mb-2">
+
                                                 <label className="block text-sm font-medium text-black">
                                                     Location
                                                 </label>
@@ -342,7 +346,7 @@ const CreateJobPage = () => {
                                         {/* ----payment method start --- */}
                                         <div>
                                             <label className="block text-sm font-medium text-gray-900 mb-2">
-                                                Set Payment method * (Default Cash: Online payment is not available yet)
+                                                Set Payment method &quot;(Default Cash: Online payment is not available yet)
                                             </label>
                                             <select
                                                 className="w-full px-4 py-3 border border-green-100 rounded-lg"
@@ -362,10 +366,9 @@ const CreateJobPage = () => {
 
                                         {/* ReCaptcha */}
                                         <ReCAPTCHA
-                                            size='normal'
+                                            size='invisible'
                                             sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!}
                                             ref={recaptcha}
-                                            onChange={onCaptchaChange}
                                             className='mt-4'
                                         />
                                         {/* Submit Button */}

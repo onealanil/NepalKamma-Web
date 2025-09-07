@@ -36,6 +36,9 @@ export default function Home() {
         const urlLat = searchParams.get('lat');
         const urlLng = searchParams.get('lng');
 
+        console.log("This is job lat and long", urlLat, urlLng);
+        console.log("This is user lat and long", userLat, userLng);
+
         if (urlLat && urlLng && userLat && userLng) {
             // Both user and job coordinates available - create route
             const jobLat = parseFloat(urlLat);

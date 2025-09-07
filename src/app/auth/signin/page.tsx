@@ -168,11 +168,11 @@ export default function SignIn() {
                     </div>
 
                     {/* Forgot Password */}
-                    <div className="text-right">
+                    {/* <div className="text-right">
                         <Link href="/auth/forgot-password" className="text-sm font-semibold text-black hover:text-primary">
                             Forgot Password?
                         </Link>
-                    </div>
+                    </div> */}
 
                     {/* Submit Button */}
                     <button
@@ -189,7 +189,7 @@ export default function SignIn() {
 
                     {/* Sign Up Link */}
                     <div className="text-center">
-                        <span className="text-gray-600">Don&apost have an account? </span>
+                        <span className="text-gray-600">Don&apos;t have an account? </span>
                         <Link href="/auth/signup" className="text-primary font-semibold hover:underline">
                             Sign up
                         </Link>

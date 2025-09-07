@@ -469,6 +469,35 @@ select.language-selector:focus {
   animation: floating 3s ease-in-out infinite;
 }
 
+recaptcha-container {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+/* Style for ReCaptcha iframe popup */
+.grecaptcha-popup {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  z-index: 999999 !important;
+}
+
+/* Responsive adjustments for the ReCaptcha widget */
+@media screen and (max-width: 480px) {
+  .grecaptcha-popup {
+    transform: translate(-50%, -50%) scale(0.9) !important;
+  }
+}
+
+@media screen and (max-width: 360px) {
+  .grecaptcha-popup {
+    transform: translate(-50%, -50%) scale(0.8) !important;
+  }
+}
+
 /* Add this to your globals.css file */
 
 /* Add this to the END of your globals.css file */

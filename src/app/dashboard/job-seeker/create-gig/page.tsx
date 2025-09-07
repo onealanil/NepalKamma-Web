@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { RefObject, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ChevronLeft, X, Image as ImageIcon } from 'lucide-react';
 import { Formik } from 'formik';
@@ -9,7 +9,6 @@ import { MotivationalQuotes } from '@/components/ui/MotivationalQuotes';
 import { SuccessToast, ErrorToast } from '@/components/ui/Toast';
 import { Skills_data } from '@/utils/data/data';
 import RichTextEditor from '@/components/ui/RichTextEditor';
-import { uploadGigImages } from '@/lib/gig/gig-api';
 import { useGigStore } from '@/store/gigStore';
 import { useEnsureAuth } from '@/hooks/useEnsureAuth';
 import { GigI } from '@/types/gig';
@@ -19,6 +18,9 @@ import { ZodError } from 'zod';
 import Loader from '@/components/global/Loader';
 import Image from 'next/image';
 import { useAuthStore } from '@/store/authStore';
+import ReCaptcha from "react-google-recaptcha";
+import { useUserGigs } from '@/hooks/gigs/useGigs';
+
 
 const initialValues: GigI = {
     title: '',
@@ -32,9 +34,13 @@ const CreateGigPage = () => {
     const { isReady, isLoading } = useEnsureAuth();
     const { user: loggedInUser } = useAuthStore();
     const { createGig } = useGigStore();
+    const { mutate } = useUserGigs(loggedInUser?._id || "");
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
     const [images, setImages] = useState<File[]>([]);
     const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+
+    //ref for recaptcha
+    const recaptcha: RefObject<ReCaptcha | null> = useRef(null);
 
     // Check if current user is verified
     const isCurrentUserVerified = loggedInUser?.isDocumentVerified === "verified";
@@ -46,7 +52,7 @@ const CreateGigPage = () => {
      */
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = Array.from(e.target.files || []);
-        const maxImages = 3;
+        const maxImages = 2;
 
         if (files.length > maxImages) {
             ErrorToast(`Maximum ${maxImages} images allowed`);
@@ -76,63 +82,82 @@ const CreateGigPage = () => {
      */
     const handleSubmit = async (values: GigI) => {
         try {
-            //validation
             gigSchema.parse(values);
         } catch (error: unknown) {
             if (error instanceof ZodError) {
-                const firstError = error.issues[0]?.message || "Validation failed";
-                ErrorToast(firstError);
+                ErrorToast(error.issues[0]?.message || "Validation failed");
                 return;
             }
         }
 
         if (images.length === 0) {
-            ErrorToast('Please add at least one image');
+            ErrorToast("Please add at least one image");
             return;
         }
 
         if (!isReady) {
-            ErrorToast("Authentication not ready to proceed, Login Again!");
+            ErrorToast("Authentication not ready, Login Again!");
             return;
         }
 
-        setIsSubmitting(true);
+
         try {
-            // Create FormData for image upload
-            const formData = new FormData();
-            images.forEach(image => {
-                formData.append('files', image);
-            });
-            //uploading the image
-            const responseImage = await uploadGigImages(formData);
-            if (responseImage?.status !== 201) {
-                ErrorToast("Something went wrong uploading your image, Please try again later!");
+            const token = await recaptcha.current?.executeAsync();
+            recaptcha.current?.reset();
+
+            if (!token) {
+                ErrorToast("Captcha verification failed, Please try again later!");
+                setIsSubmitting(false);
                 return;
             }
-            //Creating the gig
-            const newValues = {
-                ...values
-            }
 
-            const responseGig = await createGig(responseImage?.data?.imagesData?._id, newValues);
+            setIsSubmitting(true);
+
+            const responseGig = await createGig({
+                ...values,
+                images: images || [],
+                captchaToken: token,
+            });
+
             if (responseGig.status === "success") {
                 SuccessToast("Successfully Created your Gig!");
-                router.push('/dashboard/job-seeker/my-gigs');
+                await mutate();
+                router.push("/dashboard/job-seeker/my-gigs");
             }
         } catch (error: unknown) {
             if (error instanceof AxiosError) {
-                const errorMessage = error.response?.data?.message || 'Failed to Create the Gig!';
-                ErrorToast(errorMessage);
+                ErrorToast(error.response?.data?.message || "Failed to create the gig!");
             } else {
-                ErrorToast('An error occurred while creating your gig');
+                ErrorToast("An error occurred while creating your gig");
             }
         } finally {
             setIsSubmitting(false);
         }
     };
 
+
     if (isLoading) {
         return <Loader />
+    }
+
+    if (isSubmitting) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="text-center">
+                    <p className="text-lg font-medium text-gray-700 flex items-center justify-center gap-1">
+                        Requesting
+                        <span className="flex space-x-1">
+                            <span className="animate-bounce">.</span>
+                            <span className="animate-bounce [animation-delay:200ms]">.</span>
+                            <span className="animate-bounce [animation-delay:400ms]">.</span>
+                        </span>
+                    </p>
+                    <div className='p-5 flex items-center justify-center'>
+                        <p className="text-sm text-gray-500 mt-2">Please do not refresh or navigate away from the page.</p>
+                    </div>
+                </div>
+            </div>
+        )
     }
 
     return (
@@ -253,7 +278,7 @@ const CreateGigPage = () => {
                                         {/* Image Upload */}
                                         <div>
                                             <label className="block text-sm font-medium text-gray-900 mb-2">
-                                                Gig Images * (Max 3) (Banner)
+                                                Gig Images * (Max 2) (Banner)
                                             </label>
                                             <div className="border-2 border-dashed border-green-200 rounded-lg p-6 text-center hover:border-primary transition-colors">
                                                 <input
@@ -298,6 +323,14 @@ const CreateGigPage = () => {
                                                 </div>
                                             )}
                                         </div>
+
+                                        {/* ReCaptcha */}
+                                        <ReCaptcha
+                                            size='invisible'
+                                            sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!}
+                                            ref={recaptcha}
+                                            className='mt-4'
+                                        />
 
                                         {/* Submit Button */}
                                         <button

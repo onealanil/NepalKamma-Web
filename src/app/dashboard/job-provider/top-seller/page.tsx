@@ -9,6 +9,7 @@ import PeopleCard from "@/components/user/PeopleCard";
 import Link from "next/link";
 import RefreshingButton from "@/components/ui/RefreshingButton";
 import { useTopRatedSeeker } from "@/hooks/useTopRatedSeekers";
+import TopRatedJobSeekerPagination from "@/components/top-rated-seller/TopRatedJobSeekerPagination";
 
 // Loading skeleton component
 const PeopleLoader = () => (
@@ -28,11 +29,9 @@ const PeopleLoader = () => (
 export default function TopSellerPage() {
   const router = useRouter();
 
-  const {
-    users: jobSeekers,
-    isLoading,
-    mutate,
-  } = useTopRatedSeeker();
+  const [currentPage, setCurrentPage] = useState(1);
+  const { users: jobSeekers, pagination, isLoading, isError, mutate } = useTopRatedSeeker(currentPage);
+
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
 
   const handleRefresh = async () => {
@@ -46,6 +45,14 @@ export default function TopSellerPage() {
       setIsRefreshing(false);
     }
   };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  if (isError) {
+    return <div>Error loading job seekers</div>;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
@@ -109,6 +116,12 @@ export default function TopSellerPage() {
                           />
                         </Link>
                       ))}
+                      <TopRatedJobSeekerPagination
+                        pagination={pagination}
+                        currentPage={currentPage}
+                        onPageChange={handlePageChange}
+                        isLoading={isLoading}
+                      />
                     </div>
                   )}
                 </>

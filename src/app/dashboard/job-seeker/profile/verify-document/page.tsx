@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import { SuccessToast, ErrorToast } from '@/components/ui/Toast';
@@ -12,6 +12,7 @@ import { X, Upload, Phone, CheckCircle, Clock, AlertCircle } from 'lucide-react'
 import { verifyDocument } from '@/lib/profile/profile-api';
 import { useEnsureAuth } from '@/hooks/useEnsureAuth';
 import Image from 'next/image';
+import { useAuth } from '@/hooks/useAuth';
 
 /**
  * @function VerifyDocument
@@ -21,9 +22,24 @@ import Image from 'next/image';
 export default function VerifyDocument() {
     const router = useRouter();
     const { user, setUser } = useAuthStore();
+    const { mutate } = useAuth();
     const { isLoading, isReady } = useEnsureAuth();
     const [images, setImages] = useState<File[]>([]);
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+    const [localVerificationStatus, setLocalVerificationStatus] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (user?.isDocumentVerified !== 'Pending' && localVerificationStatus === 'Pending') {
+            if (user?.isDocumentVerified === 'is_not_verified') {
+                return;
+            }
+        }
+        setLocalVerificationStatus(null);
+    }, [user?._id, user?.isDocumentVerified, localVerificationStatus])
+
+    const getCurrentVerificationStatus = () => {
+        return localVerificationStatus || user?.isDocumentVerified;
+    };
 
     /**
      * @function handleImagePicker
@@ -56,7 +72,7 @@ export default function VerifyDocument() {
             ErrorToast('User not found');
             return;
         }
-        if (user.phoneNumber === null) {
+        if (user.phoneNumber === null || user.phoneNumber === '') {
             ErrorToast('Please verify your phone number first');
             return;
         }
@@ -81,11 +97,22 @@ export default function VerifyDocument() {
                 formData.append('files', image);
             });
 
+
             const response = await verifyDocument(formData);
             if (response.status === 201) {
-                setUser({ ...user, isDocumentVerified: 'Pending' });
+                const updatedUser = {
+                    ...user,
+                    isDocumentVerified: 'Pending'
+                };
+
+                setLocalVerificationStatus('Pending');
+
+                setUser(updatedUser);
+
+                setImages([]);
+
                 SuccessToast('Document verification request submitted successfully');
-                router.push('/dashboard/job-seeker/profile');
+                await mutate();
             }
         } catch (error: unknown) {
             if (error instanceof AxiosError) {
@@ -97,7 +124,7 @@ export default function VerifyDocument() {
         } finally {
             setIsSubmitting(false);
         }
-    }, [images, router, setUser, user, isReady]);
+    }, [images, setUser, user, mutate, isReady]);
 
     if (!user) {
         return <Loader />
@@ -105,6 +132,26 @@ export default function VerifyDocument() {
 
     if (isLoading) {
         return <Loader />
+    }
+
+    if (isSubmitting) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="text-center">
+                    <p className="text-lg font-medium text-gray-700 flex items-center justify-center gap-1">
+                        Requesting
+                        <span className="flex space-x-1">
+                            <span className="animate-bounce">.</span>
+                            <span className="animate-bounce [animation-delay:200ms]">.</span>
+                            <span className="animate-bounce [animation-delay:400ms]">.</span>
+                        </span>
+                    </p>
+                    <div className='p-5 flex items-center justify-center'>
+                        <p className="text-sm text-gray-500 mt-2">Please do not refresh or navigate away from the page.</p>
+                    </div>
+                </div>
+            </div>
+        )
     }
 
     /**
@@ -174,7 +221,8 @@ export default function VerifyDocument() {
                 </div>
                 <p className="text-yellow-700 mb-4">
                     Your documents are pending. NepalKamma is currently reviewing them.
-                    We will email you once your documents have been verified. Thank you for your patience.
+                    We will email you once your documents have been verified. If you don&apos;t see the email in your inbox, please check your spam folder. Thank you for your patience.
+
                 </p>
                 <button
                     onClick={() => router.push('/dashboard/job-seeker/profile')}
@@ -290,7 +338,9 @@ export default function VerifyDocument() {
     );
 
     const getContent = () => {
-        switch (user?.isDocumentVerified) {
+        const currentStatus = getCurrentVerificationStatus();
+
+        switch (currentStatus) {
             case 'verified':
                 return renderVerifiedContent();
             case 'Pending':

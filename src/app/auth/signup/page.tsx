@@ -28,7 +28,6 @@ export default function SignUp() {
     location: '',
     latitude: 0,
     longitude: 0,
-    captchaToken: ''
   });
   const [errors, setErrors] = useState<Partial<SignupFormData>>({});
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -91,9 +90,6 @@ export default function SignUp() {
       newErrors.location = "Location is required, Select one from the suggestions";
     }
 
-    if (!formData.captchaToken) {
-      newErrors.captchaToken = "Captcha is required";
-    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -106,6 +102,15 @@ export default function SignUp() {
    */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const token = await recaptcha.current?.executeAsync();
+    recaptcha.current?.reset();
+
+    if (token) {
+      setFormData(prev => ({ ...prev, captchaToken: token }));
+    }
+
+
     if (!validateForm()) return;
 
     setIsLoading(true);
@@ -113,7 +118,8 @@ export default function SignUp() {
     try {
       const payload = {
         ...formData,
-        role: who
+        role: who, 
+        captchaToken: token
       }
       const response = await signup(payload);
       if (response.status === 'pending' && response.data) {
@@ -148,11 +154,6 @@ export default function SignUp() {
     }
   };
 
-  const onCaptchaChange = (token: string | null) => {
-    if (token) {
-      formData.captchaToken = token;
-    }
-  };
 
   return (
     <div className="min-h-screen bg-white pt-24 pb-8">
@@ -361,15 +362,22 @@ export default function SignUp() {
 
               {/* ReCaptcha */}
               <ReCaptcha
-                size='normal'
+                size='invisible'
                 sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!}
                 ref={recaptcha}
-                onChange={onCaptchaChange}
                 className='mt-4'
               />
-              {errors.captchaToken && (
-                <p className="text-red-500 text-sm mt-1">{errors.captchaToken}</p>
-              )}
+              {/* Terms and Conditions */}
+              <div className="text-sm text-gray-600">
+                By signing up, you agree to our{' '}
+                <Link href="/terms" className="text-primary hover:underline">
+                  Terms of Service
+                </Link>{' '}
+                and{' '}
+                <Link href="/privacy-policy" className="text-primary hover:underline">
+                  Privacy Policy
+                </Link>.
+              </div>
 
               {/* Submit Button */}
               <button
@@ -393,13 +401,14 @@ export default function SignUp() {
               </div>
             </form>
           </div>
-        </div>
+        </div >
       ) : (
         // Who Selection
         <div className="h-[calc(100vh-6rem)] flex items-center justify-center px-4">
           <Who setWho={setWho} />
         </div>
-      )}
-    </div>
+      )
+      }
+    </div >
   );
 }

@@ -31,10 +31,8 @@ export default function UserProfilePage() {
     const params = useParams();
     const userId = params.id as string;
 
-    // Get current logged-in user for verification checks
     const { user: currentUser } = useAuthStore();
 
-    // Fetch paginated reviews for the job seeker
     const {
         reviews: reviewData,
         pagination,
@@ -44,13 +42,10 @@ export default function UserProfilePage() {
         setCurrentPage,
     } = usePaginatedReviews(userId);
 
-    // Use the hook to fetch user data and gigsmutateReviews
     const { user, userGigs, isLoading, isError } = useSingleUserSeeker(userId);
 
-      // Online status for other user
-      const { isOnline: isOtherUserOnline } = useOnlineStatusIndicator(userId || '');
+    const { isOnline: isOtherUserOnline } = useOnlineStatusIndicator(userId || '');
 
-    // Message store for handling conversations and messages
     const {
         createConversationAction,
         createMessageAction,
@@ -302,8 +297,8 @@ export default function UserProfilePage() {
                             <button
                                 onClick={handleMessagePress}
                                 className={`flex items-center justify-center gap-2 text-white px-4 sm:px-6 lg:px-10 py-3 sm:py-2 rounded-md font-semibold transition-colors ${isCurrentUserVerified && !isCreatingConversation
-                                        ? "bg-primary hover:bg-primary/90"
-                                        : "bg-gray-400 cursor-not-allowed"
+                                    ? "bg-primary hover:bg-primary/90"
+                                    : "bg-gray-400 cursor-not-allowed"
                                     }`}
                                 disabled={!isCurrentUserVerified || isCreatingConversation}
                             >
@@ -424,9 +419,9 @@ export default function UserProfilePage() {
                                         </span>
                                     </div>
                                     <div className="flex justify-between">
-                                        <span className="text-gray-600">Level</span>
+                                        <span className="text-gray-600">User Income</span>
                                         <span className="font-bold text-green-600">
-                                            {user.mileStone}
+                                            Rs. {user.totalIncome || 0} 
                                         </span>
                                     </div>
                                     <div className="flex justify-between">
@@ -525,9 +520,9 @@ export default function UserProfilePage() {
                                     </span>
                                 </div>
                                 <div className="text-center">
-                                    <span className="block text-xs text-gray-600">Level</span>
+                                    <span className="block text-xs text-gray-600">User Income</span>
                                     <span className="font-bold text-green-600">
-                                        {user.mileStone}
+                                        Rs. {user.totalIncome || 0}
                                     </span>
                                 </div>
                                 <div className="text-center">

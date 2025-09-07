@@ -21,7 +21,7 @@ import clientLogger from '@/utils/logger';
  * @returns {JSX.Element}
  */
 export default function ProfilePageSeeker() {
-    const { isLoading } = useAuth();
+    const { isLoading, mutate } = useAuth();
     const { isReady } = useEnsureAuth();
     const { user: userData, setUser } = useAuthStore();
     const { gigs } = useUserGigs(userData?._id ? userData?._id : "");
@@ -78,6 +78,7 @@ export default function ProfilePageSeeker() {
             const response = await updateProfilePicture(formData);
             if (response.status === 200) {
                 setUser({ ...userData, profilePic: { public_id: response.data.public_id, url: response.data.url } });
+                await mutate();
                 SuccessToast('Profile picture updated successfully!');
                 setShowImageModal(false);
                 setImage(null);
@@ -110,6 +111,26 @@ export default function ProfilePageSeeker() {
             setCurrentGigIndex(0);
         }
     };
+
+    if (isUploadingImage) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="text-center">
+                    <p className="text-lg font-medium text-gray-700 flex items-center justify-center gap-1">
+                        Requesting
+                        <span className="flex space-x-1">
+                            <span className="animate-bounce">.</span>
+                            <span className="animate-bounce [animation-delay:200ms]">.</span>
+                            <span className="animate-bounce [animation-delay:400ms]">.</span>
+                        </span>
+                    </p>
+                    <div className='p-5 flex items-center justify-center'>
+                        <p className="text-sm text-gray-500 mt-2">Please do not refresh or navigate away from the page.</p>
+                    </div>
+                </div>
+            </div>
+        )
+    }
 
     if (isLoading) return <Loader />;
     if (!userData) return <p>No user data found</p>;
@@ -231,6 +252,25 @@ export default function ProfilePageSeeker() {
                                     <p className="text-gray-700">{userData.email}</p>
                                 </div>
                             </div>
+
+                            {/* my stats  */}
+                            <div className="bg-white rounded-xl p-6 shadow-sm mb-6">
+                                <h2 className="text-xl font-bold text-gray-900 mb-4">My Stats</h2>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div className="bg-gray-50 p-4 rounded-lg text-center">
+                                        <p className="text-3xl font-bold text-gray-900">{userData?.totalCompletedJobs || 0}</p>
+                                        <p className="text-gray-600">Jobs Completed</p>
+                                    </div>
+                                    <div className="bg-gray-50 p-4 rounded-lg text-center">
+                                        <p className="text-3xl font-bold text-gray-900">
+                                            Rs. {userData?.totalIncome ? userData?.totalIncome.toLocaleString() : 0}
+                                        </p>
+                                        <p className="text-gray-600">Earnings</p>
+                                    </div>
+                                </div>
+                            </div>
+
+
 
                             {/* Skills Section */}
                             <div className="bg-white rounded-xl p-6 shadow-sm mb-6">

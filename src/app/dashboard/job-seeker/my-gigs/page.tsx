@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft, ChevronRight, RefreshCw } from 'lucide-react';
 import LeftSideSeeker from '@/components/ui/LeftSideSeeker';
 import { MotivationalQuotes } from '@/components/ui/MotivationalQuotes';
 import { GigI } from '@/types/gig';
@@ -24,13 +24,30 @@ const MyGigsPage = () => {
 
     const userId = user?._id;
     const { gigs, isLoading, mutate } = useUserGigs(userId);
-
-
     const [selectedGig, setSelectedGig] = useState<GigI | null>(null);
     const [showGigModal, setShowGigModal] = useState(false);
     const [gigToDelete, setGigToDelete] = useState<GigI | null>(null);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [isDeleteLoading, setIsDeleteLoading] = useState<boolean>(false);
+    const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+    /**
+  * @function handleRefresh
+  * @description Function to refresh the jobs list
+  */
+    const handleRefresh = async () => {
+        setIsRefreshing(true);
+        try {
+            await mutate();
+        } catch (error) {
+            console.error('Failed to refresh jobs:', error);
+            ErrorToast('Failed to refresh jobs');
+        } finally {
+            setIsRefreshing(false);
+        }
+    };
+
 
     const handleViewGig = (gig: GigI) => {
         setSelectedGig(gig);
@@ -54,7 +71,7 @@ const MyGigsPage = () => {
             ErrorToast("Failed to delete gig.");
             clientLogger.error("Failed to delete gig", err);
         } finally {
-            setIsDeleteLoading(false); 
+            setIsDeleteLoading(false);
         }
     }
 
@@ -81,15 +98,43 @@ const MyGigsPage = () => {
                             </button>
                         </div>
 
-                        {gig.images?.[0]?.url && (
-                            <div className="mb-6">
-                                <Image
-                                    src={gig.images[0].url}
-                                    alt={gig.title}
-                                    width={1000}
-                                    height={400}
-                                    className="w-full h-64 object-cover rounded-lg"
-                                />
+                        {/* Image Gallery */}
+                        {gig && gig.images && gig.images.length > 0 && (
+                            <div className="space-y-4">
+                                <div className="relative h-45 bg-gray-100 rounded-lg overflow-hidden">
+                                    <Image
+                                        src={gig.images[currentImageIndex]?.url || ''}
+                                        alt={`Gig image ${currentImageIndex + 1}`}
+                                        width={600}
+                                        height={300}
+                                        className="w-full h-full object-cover"
+                                    />
+                                </div>
+                                {gig.images.length > 1 && (
+                                    <>
+                                        <button
+                                            onClick={() => setCurrentImageIndex(prev =>
+                                                prev === 0 ? gig.images!.length - 1 : prev - 1
+                                            )}
+                                            className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
+                                        >
+                                            <ChevronLeft size={20} />
+                                        </button>
+                                        <button
+                                            onClick={() => setCurrentImageIndex(prev =>
+                                                prev === gig.images!.length - 1 ? 0 : prev + 1
+                                            )}
+                                            className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
+                                        >
+                                            <ChevronRight size={20} />
+                                        </button>
+                                    </>
+                                )}
+                                <div className="text-center">
+                                    <span className="text-sm text-gray-600">
+                                        Banner - {currentImageIndex + 1} of {gig.images.length}
+                                    </span>
+                                </div>
                             </div>
                         )}
 
@@ -155,7 +200,7 @@ const MyGigsPage = () => {
                     {/* Main Content */}
                     <div className="lg:col-span-6 py-6">
                         {/* Header */}
-                        <div className="flex items-center gap-4 mb-6">
+                        <div className="flex items-center gap-4 justify-between mb-6">
                             <button
                                 onClick={() => router.back()}
                                 className="lg:hidden p-2 hover:bg-white rounded-full transition-colors"
@@ -166,6 +211,17 @@ const MyGigsPage = () => {
                                 <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">My Gigs</h1>
                                 <p className="text-gray-600">Manage your posted gigs</p>
                             </div>
+                            {/* Refresh Button */}
+                            <button
+                                onClick={handleRefresh}
+                                disabled={isRefreshing}
+                                className="p-2 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                title="Refresh jobs"
+                            >
+                                <RefreshCw
+                                    className={`w-5 h-5 text-gray-600 ${isRefreshing ? 'animate-spin' : ''}`}
+                                />
+                            </button>
                         </div>
 
                         {/* Stats */}
@@ -196,6 +252,38 @@ const MyGigsPage = () => {
                                     <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
                                 </svg>
                             </Link>
+                        </div>
+
+                        <div className="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6">
+                            <div className="flex">
+                                <div className="flex-shrink-0">
+                                    <svg className="h-5 w-5 text-blue-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2
+v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                                    </svg>
+                                </div>
+                                <div className="ml-3">
+                                    <p className="text-sm text-blue-700">
+                                        After posting a gig, if you don&apos;t see it here immediately, please refresh the list using the refresh button.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6">
+                            <div className="flex">
+                                <div className="flex-shrink-0">
+                                    <svg className="h-5 w-5 text-blue-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2
+v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                                    </svg>
+                                </div>
+                                <div className="ml-3">
+                                    <p className="text-sm text-blue-700">
+                                        You can&apos;t create more than 2 gigs until you delete an existing one. This helps us maintain quality and manageability on the platform. Please consider removing an old gig to make space for a new one.
+                                    </p>
+                                </div>
+                            </div>
                         </div>
 
                         {/* Gigs List */}

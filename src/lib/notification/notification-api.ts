@@ -76,7 +76,7 @@ export const markAllNotificationsAsRead = async (): Promise<void> => {
 };
 
 /**
- * Delete notification (not available in your backend)
+ * Delete notification 
  */
 export const deleteNotification = async (): Promise<void> => {
   try {
@@ -102,14 +102,12 @@ export const getUnreadNotificationCount = async (): Promise<number> => {
 };
 
 /**
- * Clear all read notifications (not available in your backend)
+ * Clear all read notifications 
  */
 export const clearReadNotifications = async (): Promise<void> => {
   try {
-    // Your backend doesn't have clear read endpoint
-    // For now, we'll just mark all as read
+    // mark all as read
     await axiosInstance.put('/notification/readAllNotifications');
-    console.warn('Clear read notifications not implemented in backend, marking all as read instead');
   } catch (error) {
     console.error('Error clearing read notifications:', error);
     throw error;

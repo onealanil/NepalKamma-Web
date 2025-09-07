@@ -13,6 +13,7 @@ import ErrorNearBy from "@/components/ui/dashboard/job-seeker/ErrorNearBy";
 import { useMostRecent } from "@/hooks/jobs/useMostRecent";
 import ErrorMostRecent from "@/components/ui/dashboard/job-seeker/ErrorMostRecent";
 import RefreshingButton from "@/components/ui/RefreshingButton";
+import Link from "next/link";
 
 function JobSeekerDashboard() {
   const router = useRouter();
@@ -157,11 +158,10 @@ function JobSeekerDashboard() {
                       <button
                         key={tab}
                         onClick={() => handleTabChange(tab)}
-                        className={`flex-1 py-2 px-4 text-sm font-medium rounded-md transition-colors ${
-                          currentTab === tab
-                            ? "bg-primary text-white shadow-sm"
-                            : "text-gray-600 hover:text-gray-900"
-                        }`}
+                        className={`flex-1 py-2 px-4 text-sm font-medium rounded-md transition-colors ${currentTab === tab
+                          ? "bg-primary text-white shadow-sm"
+                          : "text-gray-600 hover:text-gray-900"
+                          }`}
                       >
                         {tab}
                       </button>
@@ -198,12 +198,20 @@ function JobSeekerDashboard() {
                               There are no jobs within 10km of your location.
                               Try expanding your search area.
                             </p>
-                            <button
-                              onClick={() => mutate()}
-                              className="bg-primary text-white px-6 py-3 rounded-xl font-semibold hover:bg-primary/90 transition-colors"
-                            >
-                              Refresh Jobs
-                            </button>
+                            <div className="flex flex-col lg:flex-row gap-4 items-center justify-center">
+                              <button
+                                onClick={() => mutate()}
+                                className="bg-primary text-white px-6 py-3 rounded-xl font-semibold hover:bg-primary/90 transition-colors"
+                              >
+                                Refresh Jobs
+                              </button>
+                              <Link
+                                href="/dashboard/job-seeker/explore"
+                                className="bg-primary text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors"
+                              >
+                                Explore Jobs
+                              </Link>
+                            </div>
                           </div>
                         ) : (
                           <div className="space-y-4">
@@ -223,7 +231,7 @@ function JobSeekerDashboard() {
                               <JobCardSeeker
                                 key={job._id}
                                 data={job}
-                                onSelect={() => {}}
+                                onSelect={() => { }}
                               />
                             ))}
                           </div>
@@ -346,13 +354,13 @@ function JobSeekerDashboard() {
                                                   ))}
                                                 {job.matchedSkills.length >
                                                   3 && (
-                                                  <span className="text-xs text-gray-500">
-                                                    +
-                                                    {job.matchedSkills.length -
-                                                      3}{" "}
-                                                    more
-                                                  </span>
-                                                )}
+                                                    <span className="text-xs text-gray-500">
+                                                      +
+                                                      {job.matchedSkills.length -
+                                                        3}{" "}
+                                                      more
+                                                    </span>
+                                                  )}
                                               </div>
                                             </div>
                                           )}
@@ -362,7 +370,7 @@ function JobSeekerDashboard() {
                                       <div className="p-0">
                                         <JobCardSeeker
                                           data={job}
-                                          onSelect={() => {}}
+                                          onSelect={() => { }}
                                         />
                                       </div>
                                     </div>
@@ -385,7 +393,7 @@ function JobSeekerDashboard() {
                             </h3>
                             <p className="text-gray-600 mb-6">
                               We&apos;re working on showing the most recently posted
-                              jobs in your area.
+                              jobs.
                             </p>
                             <button
                               onClick={() => setCurrentTab("Nearby")}
@@ -411,7 +419,7 @@ function JobSeekerDashboard() {
                               <JobCardSeeker
                                 key={job._id}
                                 data={job}
-                                onSelect={() => {}}
+                                onSelect={() => { }}
                               />
                             ))}
                           </div>

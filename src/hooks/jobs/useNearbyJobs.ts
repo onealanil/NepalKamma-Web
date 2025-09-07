@@ -28,7 +28,7 @@ export const useNearbyJobs = (
         },
         { 
             revalidateOnFocus: true,
-            refreshInterval: 0,
+            refreshInterval: 10000,
             errorRetryCount: 3,
             errorRetryInterval: 5000
         }

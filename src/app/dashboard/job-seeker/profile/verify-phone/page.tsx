@@ -13,15 +13,17 @@ import Image from 'next/image';
 import { updatePhoneNumber } from '@/lib/profile/profile-api';
 import { useEnsureAuth } from '@/hooks/useEnsureAuth';
 import clientLogger from '@/utils/logger';
+import { useAuth } from '@/hooks/useAuth';
 
 /**
  * @function VerifyPhone
  * @description This page is used to verify the phone number of the user
  * @returns {JSX.Element}
  */
-export default function VerifyPhone(){
+export default function VerifyPhone() {
     const router = useRouter();
     const { isReady, isLoading } = useEnsureAuth();
+    const { mutate } = useAuth();
     const { user } = useAuthStore();
     const [phoneNumber, setPhoneNumber] = useState<string>(user?.phoneNumber || '');
     const [countryCode, setCountryCode] = useState<string>('+977');
@@ -84,7 +86,7 @@ export default function VerifyPhone(){
             if (response.status === 200) {
                 SuccessToast('Phone number added successfully');
             }
-            // router.push('/dashboard/job-seeker/profile');
+            // router.push('/dashboard/job-seeker/profile/verify-document');
         } catch (error: unknown) {
             if (error instanceof AxiosError) {
                 const errorMessage = error.response?.data?.message || 'Failed to update phone number';
@@ -116,6 +118,8 @@ export default function VerifyPhone(){
             }
 
             await updatePhoneDatabase();
+            await mutate();
+
         }
         catch (error) {
             ErrorToast('An error occurred while validating phone number, Try again Later');
@@ -168,6 +172,26 @@ export default function VerifyPhone(){
                                     className="object-contain"
                                 />
                             </div>
+
+                            {/* alert section  */}
+                            <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+                                <div className="flex">
+                                    <div className="flex-shrink-0">
+                                        <svg className="h-5 w-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                            <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.981-1.742 2.981H4.42c-1.53 0-2.493-1.647-1.743-2.98l5.58-9.92zM11 13a1 1 0 10-2 0 1 1 0 002
+    0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+
+
+                                        </svg>
+                                    </div>
+                                    <div className="ml-3">
+                                        <p className="text-sm text-yellow-700">
+                                            Make sure to enter a valid phone number as it will be used for account verification and important notifications.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
 
                             {/* Phone Input Section */}
                             <div className="bg-white rounded-xl p-6 shadow-sm">
@@ -225,6 +249,16 @@ export default function VerifyPhone(){
                                                     </p>
                                                 </div>
                                             )}
+                                            {/* if verified  */}
+                                            {
+                                                user && user?.phoneNumber === phoneNumber ? (
+                                                    <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                                                        <p className="text-green-700 text-sm font-medium">
+                                                            Your phone number is verified.
+                                                        </p>
+                                                    </div>
+                                                ) : null
+                                            }
                                         </div>
                                     </div>
 

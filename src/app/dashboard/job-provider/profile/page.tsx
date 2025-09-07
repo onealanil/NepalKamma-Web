@@ -15,6 +15,7 @@ import { useUserJobs } from '@/hooks/jobs/useJobs';
 import Link from 'next/link';
 import logger from '@/utils/logger';
 import Image from 'next/image';
+import SafeHTML from '@/components/global/SafeHTML';
 
 /**
  * @function ProfilePageProvider
@@ -23,7 +24,7 @@ import Image from 'next/image';
  */
 export default function ProfilePageProvider() {
     const router = useRouter();
-    const { isLoading } = useAuth();
+    const { isLoading, mutate } = useAuth();
     const { isReady } = useEnsureAuth();
     const { user: userData, setUser } = useAuthStore();
     const { jobs } = useUserJobs(userData?._id || '');
@@ -79,6 +80,7 @@ export default function ProfilePageProvider() {
             const response = await updateProfilePicture(formData);
             if (response.status === 200) {
                 setUser({ ...userData, profilePic: { public_id: response.data.public_id, url: response.data.url } });
+                await mutate();
                 SuccessToast('Profile picture updated successfully!');
                 setShowImageModal(false);
                 setImage(null);
@@ -232,10 +234,47 @@ export default function ProfilePageProvider() {
                                     <p className="text-gray-700">{userData.email}</p>
                                 </div>
                             </div>
+                            
+
+                                     <div className="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6">
+                            <div className="flex">
+                                <div className="flex-shrink-0">
+                                    <svg className="h-5 w-5 text-blue-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2
+v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                                    </svg>
+                                </div>
+                                <div className="ml-3">
+                                    <p className="text-sm text-blue-700">
+                                        Each time you complete an 5 jobs, your milestone level will increase by 1. For example, after completing 10 jobs, you&apos;ll reach milestone level 2; after 15 jobs, milestone level 3; and so on.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                            {/* user milestone section  */}
+                            <div className="bg-white rounded-xl p-6 shadow-sm mb-6">
+                                <h2 className="text-xl font-bold text-gray-900 mb-4">Milestones</h2>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div className="bg-gray-50 p-4 rounded-lg text-center">
+                                        <p className="text-2xl font-bold text-gray-900">{userData?.mileStone}</p>
+                                        <p className="text-gray-600">Level</p>
+                                    </div>
+                                    <div className="bg-gray-50 p-4 rounded-lg text-center">
+                                        <p className="text-2xl font-bold text-gray-900">Rs. {userData?.totalAmountPaid.toLocaleString() || 0}</p>
+                                        <p className="text-gray-600">Total Amount Paid</p>
+                                    </div>
+                                    <div className="bg-gray-50 p-4 rounded-lg text-center">
+                                        <p className="text-2xl font-bold text-gray-900">{userData?.totalCompletedJobs || 0}</p>
+                                        <p className="text-gray-600">Completed Jobs</p>
+                                    </div>
+                                </div>
+                            </div>
+
 
                             {/* My jobs Section */}
                             <div className="bg-white rounded-xl p-6 shadow-sm">
-                                <h2 className="text-xl font-bold text-gray-900 mb-4">My Gigs</h2>
+                                <h2 className="text-xl font-bold text-gray-900 mb-4">My Jobs</h2>
                                 {jobs.length > 0 ? (
                                     <div>
                                         <div className="border rounded-xl p-4 mb-4">
@@ -245,7 +284,7 @@ export default function ProfilePageProvider() {
                                                     ₹{jobs[currentJobIndex].price.toLocaleString()}
                                                 </span>
                                             </div>
-                                            <p className="text-gray-600 mb-3">{jobs[currentJobIndex].job_description}</p>
+                                            <SafeHTML html={jobs[currentJobIndex].job_description as string} />
                                             <div className="flex items-center justify-between">
                                                 <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">
                                                     {jobs[currentJobIndex].category}
@@ -265,7 +304,7 @@ export default function ProfilePageProvider() {
                                     </div>
                                 ) : (
                                     <p className="text-red-500 font-bold text-center py-4">
-                                        No Gigs available
+                                        No Jobs available
                                     </p>
                                 )}
                             </div>

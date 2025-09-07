@@ -31,13 +31,12 @@ export default function MyJobsPage() {
     const [selectedJob, setSelectedJob] = useState<JobI | null>(null);
     const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
 
-
     const handleViewJob = (job: JobI) => {
         setSelectedJob(job);
         setShowJobModal(true);
     };
 
-  
+
     /**
      * @function handleRefresh
      * @description Function to refresh the jobs list
@@ -82,7 +81,7 @@ export default function MyJobsPage() {
             setShowDeleteConfirm(false);
             setJobToDelete(null);
             SuccessToast("Successfully deleted your job!");
-            mutate();
+            await mutate();
         } else {
             ErrorToast(response.error || "Failed to delete job.");
         }
@@ -99,7 +98,7 @@ export default function MyJobsPage() {
     /**
      * if user is not authenticated
      **/
-    if (!user ) {
+    if (!user) {
         return <Loader />
     }
 
@@ -142,7 +141,7 @@ export default function MyJobsPage() {
 
                         {/* stats  */}
                         <div className="flex flex-wrap gap-2 mb-4">
-                            {['Pending', 'In_Progress', 'Completed', 'Cancelled', 'Paid'].map((status) => (
+                            {['Pending', 'In_Progress', 'Completed', 'Cancelled', 'Paid', 'can_delete'].map((status) => (
                                 <button
                                     key={status}
                                     className={`
@@ -155,8 +154,15 @@ export default function MyJobsPage() {
       `}
                                     onClick={() => setActiveTab(status.toLowerCase())}
                                 >
-                                    {status === "In_Progress" ? "In Progress" : status}
-                                     ({jobs.filter((job: JobI) => job.job_status === status).length})
+                                    {status === "In_Progress" ? "In Progress" : (status === "can_delete" ? "Can Delete" : status)}
+
+                                    ({jobs.filter((job: JobI) => {
+                                        if (job.job_status && job.visibility === "public" && job.job_status === "Pending") {
+                                            return job.job_status === status;
+                                        }
+                                        if (job.job_status && job.job_status !== "Pending") return job.job_status === status;
+                                    }).length
+                                    })
                                 </button>
                             ))}
                         </div>
@@ -177,6 +183,103 @@ export default function MyJobsPage() {
                             </Link>
                         </div>
 
+                        {/* alert message  */}
+
+                        <div className="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6">
+                            <div className="flex">
+                                <div className="flex-shrink-0">
+                                    <svg className="h-5 w-5 text-blue-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2
+v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                                    </svg>
+                                </div>
+                                <div className="ml-3">
+                                    <p className="text-sm text-blue-700">
+                                        After posting a job, if you don&apos;t see it here immediately, please refresh the list using the refresh button.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {
+                            activeTab === "can_delete" && (
+                                <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+                                    <div className="flex">
+                                        <div className="flex-shrink-0">
+                                            <svg className="h-5 w-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2
+v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                                            </svg>
+                                        </div>
+                                        <div className="ml-3">
+                                            <p className="text-sm text-yellow-700">
+                                                Jobs listed under &apos;Can Delete&apos; can be removed from your job list. These jobs are either cancelled or completed or private and no longer active. Make sure to delete these jobs to keep your job list organized.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            )
+                        }
+
+                        {
+                            activeTab === "paid" && (
+                                <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+                                    <div className="flex">
+                                        <div className="flex-shrink-0">
+                                            <svg className="h-5 w-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2
+v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                                            </svg>
+                                        </div>
+                                        <div className="ml-3">
+                                            <p className="text-sm text-yellow-700">
+                                                Good job ! You have successfully marked the jobs as &apos;Paid&apos;. This indicates that the payment process for these jobs has been completed. Keep up the great work! Once we verified the payment from both sides, this jobs will be moved to &apos;can delete&apos; section.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            )
+                        }
+
+
+
+                        {
+                            activeTab === "completed" && (
+                                <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+                                    <div className="flex">
+                                        <div className="flex-shrink-0">
+                                            <svg className="h-5 w-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2
+v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                                            </svg>
+                                        </div>
+                                        <div className="ml-3">
+                                            <p className="text-sm text-yellow-700">
+                                                Till now job seeker has completed the jobs, Now click on the &apos;Go to Payments&apos; button to proceed for payment and mark the job as &apos;Paid&apos;.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            )
+                        }
+
+                        {/* Go to Payments page button  */}
+                        {activeTab === "completed" && (
+                            <div className="flex items-center justify-center mb-6">
+                                <Link href={"/dashboard/job-provider/completed-jobs"} className="w-full max-w-xs bg-primary text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors flex items-center justify-center gap-2">
+                                    <span>Go to Payments</span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-credit-card">
+                                        <rect x="2" y="4" width="20" height="16" rx="2" ry="2" />
+                                        <line x1="2" x2="22" y1="10" y2="10" />
+                                        <line x1="6" x2="6.01" y1="16" y2="16" />
+                                        <line x1="10" x2="14" y1="16" y2="16" />
+                                    </svg>
+                                </Link>
+                            </div>
+                        )
+                        }
+
+
                         {/* Gigs List */}
                         <div className="space-y-4">
                             {isLoading ? (
@@ -188,12 +291,13 @@ export default function MyJobsPage() {
                             ) : jobs.length > 0 ? (
                                 jobs
                                     .filter((job: JobI) => {
-                                        if (activeTab === "pending") return job.job_status === "Pending";
+                                        if (activeTab === "pending") return job.job_status === "Pending" && job.visibility === "public";
                                         if (activeTab === "in_progress") return job.job_status === "In_Progress";
                                         if (activeTab === "completed") return job.job_status === "Completed";
                                         if (activeTab === "cancelled") return job.job_status === "Cancelled";
                                         if (activeTab === "paid") return job.job_status === "Paid";
-                                        return false; // Don't show any jobs if no tab matches
+                                        if (activeTab === "can_delete") return job.job_status === "can_delete" || job.visibility === "private";
+                                        return false;
                                     })
                                     .map((job: JobI) => (
                                         <JobCard key={job._id} onView={handleViewJob} job={job} onDelete={handleDeleteJob} />
@@ -248,7 +352,7 @@ export default function MyJobsPage() {
                                 {isDeleteLoading ? (
                                     <div className="flex items-center justify-center gap-3">
                                         <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                                        Deleting JOb...
+                                        Deleting Job...
                                     </div>
                                 ) : (
                                     'Delete Job'

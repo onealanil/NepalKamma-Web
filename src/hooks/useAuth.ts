@@ -10,7 +10,7 @@ import { useAuthStore } from "@/store/authStore";
 export const useAuth = () => {
     const { setUser } = useAuthStore();
 
-    const { data, error, isLoading } = useSWR("/auth/check-auth", fetcher, {
+    const { data, error, isLoading, mutate } = useSWR("/auth/check-auth", fetcher, {
         revalidateOnFocus: false,
         onSuccess: (data) => {
             setUser(data.user);
@@ -21,5 +21,6 @@ export const useAuth = () => {
         userData: data?.user,
         isLoading,
         isError: !!error,
+        mutate
     }
 }

@@ -475,25 +475,6 @@ export default function UserProfilePage() {
                   <p className="text-red-500 font-bold">No review found</p>
                 )}
               </div>
-
-              {/* Skills
-                            <div className="bg-white rounded-xl p-6 shadow-sm">
-                                <h3 className="font-bold text-gray-900 mb-4">Skills</h3>
-                                <div className="flex flex-wrap gap-2">
-                                    {user.skills && user.skills.length > 0 ? (
-                                        user.skills.map((skill: string, index: number) => (
-                                            <span
-                                                key={index}
-                                                className="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-medium"
-                                            >
-                                                {skill}
-                                            </span>
-                                        ))
-                                    ) : (
-                                        <p className="text-gray-500">No skills listed</p>
-                                    )}
-                                </div>
-                            </div> */}
             </div>
           </div>
 
@@ -570,25 +551,6 @@ export default function UserProfilePage() {
                 <p className="text-red-500 font-bold">No review found</p>
               )}
             </div>
-
-            {/* Skills */}
-            {/* <div className="bg-white rounded-xl p-4 shadow-sm">
-                            <h3 className="font-bold text-gray-900 mb-3">Skills</h3>
-                            <div className="flex flex-wrap gap-2">
-                                {user.skills && user.skills.length > 0 ? (
-                                    user.skills.map((skill: string, index: number) => (
-                                        <span
-                                            key={index}
-                                            className="bg-primary/10 text-primary px-2 py-1 rounded-full text-xs font-medium"
-                                        >
-                                            {skill}
-                                        </span>
-                                    ))
-                                ) : (
-                                    <p className="text-gray-500 text-sm">No skills listed</p>
-                                )}
-                            </div>
-                        </div> */}
           </div>
         </div>
       </div>

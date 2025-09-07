@@ -1,7 +1,10 @@
 // src/utils/clientLogger.ts
 export type LogLevel = "info" | "warn" | "error" | "debug";
 
-// Define a type that accepts any loggable value
+const type = process.env.NEXT_PUBLIC_ENVIRONMENT === "production" ? "prod" : "dev";
+export const isProd = type === "prod";
+export const isDev = type === "dev";
+
 type LogMessage = unknown;
 
 class ClientLogger {
@@ -26,19 +29,27 @@ class ClientLogger {
   }
 
   info(...args: LogMessage[]): void {
-    console.log(...this.format("info", args));
+    if (isDev) {
+      console.log(...this.format("info", args));
+    }
   }
 
   warn(...args: LogMessage[]): void {
-    console.warn(...this.format("warn", args));
+    if (isDev) {
+      console.warn(...this.format("warn", args));
+    }
   }
 
   error(...args: LogMessage[]): void {
-    console.error(...this.format("error", args));
+    if (isDev) {
+      console.error(...this.format("error", args));
+    }
   }
 
   debug(...args: LogMessage[]): void {
-    console.debug(...this.format("debug", args));
+    if (isDev) {
+      console.debug(...this.format("debug", args));
+    }
   }
 }
 

@@ -21,7 +21,6 @@ type MapRouteProps = {
   routeWidth?: number;
 };
 
-// Mapbox Directions API response types
 interface MapboxGeometry {
   type: "LineString";
   coordinates: [number, number][];
@@ -87,7 +86,7 @@ export default function MapRoute({
   } finally {
     setIsLoading(false);
   }
-}, []); // \u2705 empty deps or include mapboxgl.accessToken if needed
+}, []); 
 
 useEffect(() => {
   if (coordinates.length >= 2 && showRoute) {
@@ -103,7 +102,6 @@ useEffect(() => {
     const sourceId = "route-source";
     const layerId = "route-layer";
 
-    // Remove existing route if it exists
     if (map?.getLayer(layerId)) {
       map.removeLayer(layerId);
     }
@@ -111,7 +109,6 @@ useEffect(() => {
       map.removeSource(sourceId);
     }
 
-    // Add route source and layer
     map.addSource(sourceId, {
       type: "geojson",
       data: {
@@ -138,7 +135,6 @@ useEffect(() => {
 
     return () => {
       try {
-        // Check if map exists and is not destroyed
         if (map && map.getCanvas && map.getCanvas() && map.getStyle && map.getStyle()) {
           if (map.getLayer && map.getLayer(layerId)) {
             map.removeLayer(layerId);
@@ -148,20 +144,17 @@ useEffect(() => {
           }
         }
       } catch (error) {
-        // Silently ignore cleanup errors when map is destroyed
         console.warn('Map cleanup error (expected during navigation):', error instanceof Error ? error.message : 'Unknown error');
       }
     };
   }, [map, routeData, showRoute, routeColor, routeWidth]);
 
-  // Fetch route when coordinates change
   useEffect(() => {
     if (coordinates.length >= 2 && showRoute) {
       fetchRoute(coordinates);
     }
   }, [coordinates, showRoute, fetchRoute]);
 
-  // Fit map to show all markers
   useEffect(() => {
     if (!map || coordinates.length === 0) return;
 

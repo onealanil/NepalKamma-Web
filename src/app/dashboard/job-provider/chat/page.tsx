@@ -28,14 +28,12 @@ export default function ChatPageProvider() {
   const [conversationsWithLastMessage, setConversationsWithLastMessage] = useState<ConversationWithLastMessage[]>([]);
   const [isLoadingLastMessages, setIsLoadingLastMessages] = useState(false);
 
-  // Socket.IO integration with real-time last message updates
   useSocketConversations((conversationId, message) => {
-    // Update the last message in real-time when a new message is received
     setConversationsWithLastMessage(prev =>
       prev.map(conversation => {
         if (conversation._id === conversationId) {
           const newLastMessage: MessageI = {
-            _id: message.conversationId + '_' + Date.now(), // Temporary ID
+            _id: message.conversationId + '_' + Date.now(),
             msg: message.message,
             senderId: message.sender,
             recipientId: message.receiver,
@@ -52,7 +50,6 @@ export default function ChatPageProvider() {
         }
         return conversation;
       }).sort((a, b) => {
-        // Re-sort by last message time (most recent first)
         const aTime = a.lastMessage?.createdAt ? new Date(a.lastMessage.createdAt).getTime() : 0;
         const bTime = b.lastMessage?.createdAt ? new Date(b.lastMessage.createdAt).getTime() : 0;
         return bTime - aTime;
@@ -62,7 +59,6 @@ export default function ChatPageProvider() {
 
   const { getUserOnlineStatus } = useSocketOnlineUsers();
 
-  // Fetch last messages for each conversation
   const fetchLastMessages = useCallback(async () => {
     if (!conversations.length) return;
 
@@ -90,7 +86,6 @@ export default function ChatPageProvider() {
         })
       );
 
-      // Sort by last message time (most recent first)
       conversationsWithMessages.sort((a, b) => {
         const aTime = a.lastMessage?.createdAt ? new Date(a.lastMessage.createdAt).getTime() : 0;
         const bTime = b.lastMessage?.createdAt ? new Date(b.lastMessage.createdAt).getTime() : 0;
@@ -169,7 +164,6 @@ export default function ChatPageProvider() {
           </div>
         </div>
 
-        {/* Online Users Horizontal Scroll */}
         <div className="mb-6">
           <div className="overflow-x-auto pb-2">
             <div className="flex gap-4 min-w-max px-2">
@@ -190,9 +184,8 @@ export default function ChatPageProvider() {
                         className="w-16 h-16 rounded-full object-cover"
                       />
                       {/* Real-time online status */}
-                      <div className={`absolute -bottom-1 -right-1 w-5 h-5 rounded-full border-2 border-white ${
-                        getUserOnlineStatus(otherUser?._id || '') ? 'bg-green-500' : 'bg-gray-400'
-                      }`}></div>
+                      <div className={`absolute -bottom-1 -right-1 w-5 h-5 rounded-full border-2 border-white ${getUserOnlineStatus(otherUser?._id || '') ? 'bg-green-500' : 'bg-gray-400'
+                        }`}></div>
                     </div>
                     <span className="mt-2 text-xs font-semibold text-black text-center max-w-[60px] truncate">
                       {otherUser?.username || 'Unknown'}
@@ -204,12 +197,25 @@ export default function ChatPageProvider() {
           </div>
         </div>
 
+        <div className="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6">
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <svg className="h-5 w-5 text-blue-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2
+v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <p className="text-sm text-blue-700">
+                Once you finish a conversation with a freelancer and want to assign them to your job postings, go to &quot;My Jobs&quot; page. Happy Hiring!
+              </p>
+            </div>
+          </div>
+        </div>
+
         {/* Messages Header */}
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold text-black">Messages</h2>
-          <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-            <Search size={20} className="text-gray-600" />
-          </button>
         </div>
 
         {/* Conversations List */}
@@ -274,11 +280,10 @@ export default function ChatPageProvider() {
                         {/* Last Message */}
                         <div className="flex items-center">
                           <p
-                            className={`text-sm truncate ${
-                              isUnread
+                            className={`text-sm truncate ${isUnread
                                 ? 'text-black font-semibold'
                                 : 'text-gray-500'
-                            }`}
+                              }`}
                           >
                             {lastMessage?.msg || 'No messages yet'}
                           </p>

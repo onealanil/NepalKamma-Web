@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from 'react';
-import { ChevronLeft, ChevronDown, Edit3, Search, MessageCircle } from 'lucide-react';
+import { ChevronLeft, ChevronDown, Edit3, MessageCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { formatDistanceToNow } from 'date-fns';
 import Image from 'next/image';
@@ -209,7 +209,7 @@ v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
             </div>
             <div className="ml-3">
               <p className="text-sm text-blue-700">
-                Once you assigned to a job, completed a job you will get an email. But after completing the job, go to "Completed jobs" page to request the payment, which is cruicial 
+                Once you assigned to a job, completed a job you will get an email. But after completing the job, go to &quot;Completed jobs&quot; page to request the payment, which is cruicial 
               </p>
             </div>
           </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from 'react';
-import { ChevronLeft, ChevronDown, Edit3, Search, MessageCircle } from 'lucide-react';
+import { ChevronLeft, ChevronDown, Edit3, MessageCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { formatDistanceToNow } from 'date-fns';
 import Image from 'next/image';

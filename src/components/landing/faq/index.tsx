@@ -14,7 +14,7 @@ export default function FAQSection({ dict }: { dict: Dictionary }) {
   };
 
   return (
-    <section className="py-16">
+    <section className="pt-16 pb-0 md:pb-16">
       <div className="container mx-auto px-6 md:px-12">
         <h2 className="text-xl md:text-4xl font-bold text-center text-gray-800 mb-10">
           {dict.landing.faq.title}

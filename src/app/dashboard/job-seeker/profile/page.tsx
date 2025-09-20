@@ -86,7 +86,7 @@ export default function ProfilePageSeeker() {
             }
 
         } catch (error) {
-            ErrorToast('Failed to update profile picture');
+            ErrorToast('Failed to update profile picture: Make sure the image is less than 10MB');
             clientLogger.error("Failed to update profile picture ", error);
         } finally {
             setIsUploadingImage(false);

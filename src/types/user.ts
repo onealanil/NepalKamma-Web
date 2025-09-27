@@ -4,7 +4,7 @@ export interface User {
   __v: number;
   email: string;
   username: string;
-  role: 'job_seeker' | string;
+  role: 'job_seeker' | 'job_provider' | 'admin' | string;
   profilePic: {
     public_id: string;
     url: string;

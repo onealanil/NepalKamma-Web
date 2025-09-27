@@ -23,6 +23,10 @@ export default function DashboardLayout({
 
         if (!user) {
             router.push('/auth/signin');
+        } else if (user.role === 'admin') {
+            // Admin users should not access job-seeker dashboard
+            useAuthStore.getState().logout();
+            router.push('/auth/signin');
         } else if (user.role !== 'job_seeker') {
             router.push('/unauthorized');
         } else if (userData) {

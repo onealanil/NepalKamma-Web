@@ -21,6 +21,10 @@ export default function JobProviderLayout({
 
         if (!user) {
             router.push('/auth/signin');
+        } else if (user.role === 'admin') {
+            // Admin users should not access job-provider dashboard  
+            useAuthStore.getState().logout();
+            router.push('/auth/signin');
         } else if (user.role !== 'job_provider') {
             router.push('/unauthorized');
         } else if (userData) {

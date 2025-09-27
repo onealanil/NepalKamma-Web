@@ -68,10 +68,11 @@ npm run dev
 
 ## Important implementation notes
 
-- Authentication: `useAuth` hook (SWR) fetches `/auth/check-auth` and writes the user into the Zustand store. When you update user data on the server, call SWR `mutate()` for that key or call a `fetchUser()` in the store to keep UI in sync.
-- Document verification: After upload, backend should return the updated user object, or the frontend should revalidate the user. Otherwise the UI will show stale data until a reload.
-- Offline & server detection: Prefer using SWR to detect server health (`/health`) rather than manual intervals. SWR avoids memory leaks and deduplicates requests.
-- reCAPTCHA: The widget challenge popup is controlled by Google. For mobile, use the `compact` size or consider Invisible reCAPTCHA / v3 to avoid puzzle popups.
+- **Authentication**: `useAuth` hook (SWR) fetches `/auth/check-auth` and writes the user into the Zustand store. When you update user data on the server, call SWR `mutate()` for that key or call a `fetchUser()` in the store to keep UI in sync.
+- **Admin Access Restriction**: Admin users are prevented from logging into the main site. They receive an error message directing them to the admin portal. Multiple layers of protection ensure admins cannot access job seeker/provider dashboards. See `ADMIN_RESTRICTION.md` for details.
+- **Document verification**: After upload, backend should return the updated user object, or the frontend should revalidate the user. Otherwise the UI will show stale data until a reload.
+- **Offline & server detection**: Prefer using SWR to detect server health (`/health`) rather than manual intervals. SWR avoids memory leaks and deduplicates requests.
+- **reCAPTCHA**: The widget challenge popup is controlled by Google. For mobile, use the `compact` size or consider Invisible reCAPTCHA / v3 to avoid puzzle popups.
 
 ## Tailwind & custom breakpoints
 

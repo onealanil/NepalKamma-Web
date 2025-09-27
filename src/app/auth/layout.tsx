@@ -29,6 +29,13 @@ export default function AuthLayout({
 
         if (user) {
             setIsRedirecting(true);
+            
+            // Prevent admin users from accessing auth pages
+            if (user.role === 'admin') {
+                useAuthStore.getState().logout();
+                return;
+            }
+            
             fetchSavedJobs();
             if (user.role === 'job_seeker') {
                 router.push('/dashboard/job-seeker');

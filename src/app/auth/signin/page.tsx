@@ -53,9 +53,7 @@ export default function SignIn() {
             if (response.status === 'success') {
                 const user = useAuthStore.getState().user;
                 
-                // Check if user is admin - prevent login on main site
                 if (user?.role === 'admin') {
-                    // Clear the auth store since admin shouldn't be logged in here
                     useAuthStore.getState().logout();
                     ErrorToast("Admins must log in from the admin portal.");
                     return;

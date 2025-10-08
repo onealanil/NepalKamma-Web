@@ -37,19 +37,15 @@ export const useSocketMessages = ({
     const handleMessageReceived = (event: CustomEvent<SocketMessage>) => {
       const message = event.detail;
       
-      // Only process messages for current conversation or if no specific conversation
       if (!conversationIdRef.current || message.conversationId === conversationIdRef.current) {
         clientLogger.info('Processing received message:', message);
         
-        // Trigger SWR revalidation for messages
         if (message.conversationId) {
           mutate(`/api/message/${message.conversationId}`);
         }
         
-        // Trigger SWR revalidation for conversations list
         mutate('/api/conversation');
         
-        // Call custom handler if provided
         if (onMessageReceived) {
           onMessageReceived(message);
         }

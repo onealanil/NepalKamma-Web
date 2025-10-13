@@ -234,23 +234,28 @@ export default function ProfilePageProvider() {
                                     <p className="text-gray-700">{userData.email}</p>
                                 </div>
                             </div>
-                            
 
-                                     <div className="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6">
-                            <div className="flex">
-                                <div className="flex-shrink-0">
-                                    <svg className="h-5 w-5 text-blue-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2
+
+                            <div className="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6">
+                                <div className="flex">
+                                    <div className="flex-shrink-0">
+                                        <svg className="h-5 w-5 text-blue-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2
 v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                                    </svg>
+                                        </svg>
+                                    </div>
+                                    <div className="ml-3">
+                                        <p className="text-sm text-blue-700">
+                                            Each time you complete an 5 jobs, your milestone level will increase by 1. For example, after completing 10 jobs, you&apos;ll reach milestone level 2; after 15 jobs, milestone level 3; and so on.
+                                        </p>
+                                    </div>
                                 </div>
-                                <div className="ml-3">
-                                    <p className="text-sm text-blue-700">
-                                        Each time you complete an 5 jobs, your milestone level will increase by 1. For example, after completing 10 jobs, you&apos;ll reach milestone level 2; after 15 jobs, milestone level 3; and so on.
-                                    </p>
-                                </div>
+
+                                <p className="text-red-500 text-center py-4 font-medium">
+                                    Click on &quot;Settings&quot; to verify your identity and get access to more job opportunities and freelancer projects.
+                                </p>
+
                             </div>
-                        </div>
 
                             {/* user milestone section  */}
                             <div className="bg-white rounded-xl p-6 shadow-sm mb-6">

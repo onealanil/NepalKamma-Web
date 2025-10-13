@@ -235,6 +235,10 @@ export default function ProfilePageSeeker() {
                                         Settings
                                     </Link>
                                 </div>
+                                <p className="text-red-500 text-center py-4 font-medium">
+                                    Click on &quot;Settings&quot; to verify your identity and get access to more job opportunities and freelancer projects.
+                                </p>
+
                             </div>
 
                             {/* About Me Section */}

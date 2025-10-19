@@ -45,7 +45,7 @@ export default function Header() {
     <>
       <header className="absolute top-0 left-0 w-full z-50">
         <div className="container mx-auto px-4 py-6 flex justify-between items-center">
-          <Link href="/" onClick={closeMobileMenu}>
+          <Link href={`/dashboard/${user?.role}`} onClick={closeMobileMenu}>
             <Image
               src="/images/NepalKamma.png"
               alt="NepalKamma Logo"

@@ -76,9 +76,11 @@ export default function Hero({ dict }: HeroProps) {
                 >
                   {dict.landing.hero.getStarted}
                 </Link>
-                <button className="border-2 cursor-pointer border-primary text-primary hover:text-black px-8 py-4 rounded-lg font-semibold text-lg transition-all duration-300">
+                <Link
+                  href={'/terms'}
+                  className="border-2 cursor-pointer border-primary text-primary hover:text-black px-8 py-4 rounded-lg font-semibold text-lg transition-all duration-300">
                   {dict.landing.hero.learnMore}
-                </button>
+                </Link>
               </div>
               <div className="mt-8 flex items-center justify-center lg:justify-start gap-6 text-sm text-gray-500">
                 <div className="flex items-center gap-2">

@@ -303,9 +303,15 @@ v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
                                     <div className="text-4xl mb-4">📝</div>
                                     <h3 className="text-lg font-bold text-gray-900 mb-2">No Gigs Yet</h3>
                                     <p className="text-gray-600 mb-6">Start by creating your first gig to showcase your skills</p>
-                                    <button className="bg-primary text-white px-6 py-3 rounded-xl font-semibold hover:bg-primary/90 transition-colors">
-                                        Create Your First Gig
-                                    </button>
+                                    <Link href={"/dashboard/job-seeker/create-gig"} className="w-full my-3 bg-primary text-white py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors flex items-center justify-center gap-2">
+                                        <span>Create Your First Gig</span>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-copy-plus">
+                                            <line x1="15" x2="15" y1="12" y2="18" />
+                                            <line x1="12" x2="18" y1="15" y2="15" />
+                                            <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+                                            <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+                                        </svg>
+                                    </Link>
                                 </div>
                             )}
                         </div>

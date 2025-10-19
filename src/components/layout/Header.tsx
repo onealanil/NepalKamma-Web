@@ -41,11 +41,19 @@ export default function Header() {
     handleLogout();
   }
 
+  let role = "";
+
+  if (user?.role === "job_seeker") {
+    role = "job-seeker";
+  } else if (user?.role === "job_provider") {
+    role = "job-provider";
+  }
+
   return (
     <>
       <header className="absolute top-0 left-0 w-full z-50">
         <div className="container mx-auto px-4 py-6 flex justify-between items-center">
-          <Link href={`/dashboard/${user?.role}`} onClick={closeMobileMenu}>
+          <Link href={`/dashboard/${role}`} onClick={closeMobileMenu}>
             <Image
               src="/images/NepalKamma.png"
               alt="NepalKamma Logo"

@@ -7,10 +7,10 @@ import { GeoapifyResponse, GeoLocationProps, Place } from '@/types/AutoSuggestio
 const AutoSuggestionGeoLocation = ({ setGeometry, setLocationName }: GeoLocationProps) => {
     const [suggestions, setSuggestions] = useState<Place[]>([]);
     const [inputValue, setInputValue] = useState('');
-    const [hasSelected, setHasSelected] = useState(false); // ✅ NEW
+    const [hasSelected, setHasSelected] = useState(false); 
 
     const fetchSuggestions = debounce(async (value: string) => {
-        if (!value || hasSelected) { // ✅ prevent fetch if already selected
+        if (!value || hasSelected) { 
             setSuggestions([]);
             return;
         }

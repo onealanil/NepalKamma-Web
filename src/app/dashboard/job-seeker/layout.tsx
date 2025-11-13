@@ -7,6 +7,7 @@ import { useAuthStore } from "@/store/authStore";
 import Loader from "@/components/global/Loader";
 import Header from "@/components/layout/Header";
 import { useAuth } from "@/hooks/useAuth";
+import DocumentVerificationPopup from "@/components/ui/DocumentVerificationProp";
 
 export default function DashboardLayout({
     children,
@@ -47,6 +48,10 @@ export default function DashboardLayout({
             <div className="flex-1">
                 <Header />
                 {children}
+
+                {user.isDocumentVerified === "is_not_verified" && (
+                    <DocumentVerificationPopup user={user} />
+                )}
             </div>
         </div>
     );

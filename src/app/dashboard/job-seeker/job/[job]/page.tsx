@@ -413,7 +413,7 @@ export default function SingleJobPage() {
                     About this Job
                   </h2>
                   <div className="prose prose-sm max-w-none">
-                    <SafeHTML html={jobData?.job_description || ""} />
+                    <SafeHTML html={jobData?.job_description || ""} isFullDescription={true} />
                   </div>
                 </div>
 

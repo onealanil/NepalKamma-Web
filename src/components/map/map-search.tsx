@@ -20,6 +20,7 @@ import {
   LocationSuggestion,
 } from "@/lib/mapbox/utils";
 import { LocationMarker } from "../location-marker";
+//commments
 import { LocationPopup } from "../location-popup";
 
 export default function MapSearch() {

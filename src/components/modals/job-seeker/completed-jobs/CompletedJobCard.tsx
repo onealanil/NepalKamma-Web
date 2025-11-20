@@ -1,6 +1,7 @@
 import { CompletedJob } from "@/types/job-provider/CompletedJob";
 import { Calendar, CheckCircle, CreditCard, Eye, MapPin } from "lucide-react";
 
+//comments
 const CompletedJobCard = ({
     data,
     onViewPayment,
